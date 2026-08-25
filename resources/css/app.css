@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* Tell Tailwind where your classes live (v4) */
+@source "../**/*.blade.php";
+@source "../**/*.{js,jsx,ts,tsx,vue}";
+@source "../../storage/framework/views/*.php";
