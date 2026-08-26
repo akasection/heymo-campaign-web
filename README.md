@@ -168,6 +168,7 @@ php artisan queue:work
 - Tests: PHPUnit (`vendor/bin/phpunit`).
 - Keep `.env` out of version control; update `.env.example` when adding configuration.
 - When changing the DB, always add a migration (`php artisan make:migration`) rather than editing existing ones.
+- Keep [docs/KANBAN.md](docs/KANBAN.md) current as tickets move between columns. Periodically commit and merge those board-only updates directly to `main`; do not include them in an individual task's pull request.
 
 ### AI Agents
 
