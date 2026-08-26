@@ -36,6 +36,7 @@ export default defineConfig({
     "**/dist/**",
     "**/coverage/**",
     "**/storage/**",
+    "**/*.md", // docs & README are human-authored; keep their formatting
     "_dev/**",
     "composer.json",
     "composer.lock",

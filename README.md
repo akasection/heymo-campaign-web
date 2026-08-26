@@ -123,13 +123,22 @@ php artisan migrate
 
 ## First Run
 
+Start both the Vite dev server **and** the Laravel server in one command:
+
+```bash
+pnpm dev:all        # or: composer dev (same thing)
+```
+
+This runs Vite (hot reload) and `php artisan serve` together via `concurrently`, with color-coded `[vite]` / `[php]` output. Ctrl+C stops both.
+
+Prefer separate terminals? Use them individually:
+
 ```bash
 # Terminal 1 — frontend dev server (Vite, hot reload)
 pnpm dev
 
 # Terminal 2 — backend server
-php artisan serve
-# or: php artisan serve --port=8000
+pnpm serve          # == php artisan serve
 ```
 
 Then open <http://localhost:8000>.

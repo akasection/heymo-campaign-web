@@ -33,10 +33,7 @@ export default defineConfig({
     "import/group-exports": "off",
     "import/no-named-export": "off",
     "max-statements": ["warn", 64],
-    "max-lines": [
-      "warn",
-      { max: 750, skipBlankLines: true, skipComments: true },
-    ],
+    "max-lines": ["warn", { max: 750, skipBlankLines: true, skipComments: true }],
     "max-lines-per-function": "off", // Noisy against Vue template/script blocks
     "sort-keys": "off",
     "sort-vars": "off",
@@ -88,13 +85,5 @@ export default defineConfig({
     ],
   },
   settings: {},
-  ignorePatterns: [
-    "node_modules/**",
-    "vendor/**",
-    "public/**",
-    "tmp/**",
-    "coverage/**",
-    "dist/**",
-    ".rspack-cache/**",
-  ],
+  ignorePatterns: ["node_modules/**", "vendor/**", "public/**", "tmp/**", "coverage/**", "dist/**", ".rspack-cache/**"],
 });
