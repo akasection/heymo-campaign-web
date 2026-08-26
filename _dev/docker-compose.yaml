@@ -1,0 +1,62 @@
+# Heymo! Campaign Webapp — local development services
+#
+# Usage:
+#   docker compose -f _dev/docker-compose.yaml up -d
+#   docker compose -f _dev/docker-compose.yaml down
+#
+# Provides:
+#   - PostgreSQL 18  (database)  -> localhost:5434
+#   - Valkey 8       (cache/queue/session, Redis-protocol compatible) -> localhost:6380
+#
+# The app itself runs on the host via `php artisan serve` and connects to
+# these services through the published ports below.
+
+name: heymo-campaign-web
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: heymo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-heymo}
+      POSTGRES_USER: ${POSTGRES_USER:-heymo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+    ports:
+      # Host port 5434 by default: native PostgreSQL clusters already use 5432/5433.
+      - "${POSTGRES_PORT:-5434}:5432"
+    volumes:
+      # NOTE: For PostgreSQL 18+ the official image mounts data under
+      # /var/lib/postgresql (PGDATA is /var/lib/postgresql/18/docker).
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-heymo} -d ${POSTGRES_DB:-heymo}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: heymo-valkey
+    restart: unless-stopped
+    # Enable persistence (append-only) so cache/session data survives restarts.
+    command: ["valkey-server", "--appendonly", "yes"]
+    ports:
+      # Host port 6380 by default: a native Valkey may already occupy 6379.
+      - "${VALKEY_PORT:-6380}:6379"
+    volumes:
+      - valkey-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:
+  valkey-data:

@@ -27,4 +27,20 @@ export default defineConfig({
   proseWrap: "preserve",
   bracketSpacing: true,
   singleAttributePerLine: false,
+  // Only format frontend source files; leave tooling/config files and build
+  // artifacts to their own formatters (Pint, Composer, pnpm, etc.).
+  ignorePatterns: [
+    "**/node_modules/**",
+    "**/vendor/**",
+    "**/public/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "**/storage/**",
+    "_dev/**",
+    "composer.json",
+    "composer.lock",
+    "pint.json",
+    "package.json",
+    "pnpm-lock.yaml",
+  ],
 });

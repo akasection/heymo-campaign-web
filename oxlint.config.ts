@@ -1,10 +1,4 @@
 import { defineConfig } from "oxlint";
-// import reactHooksConfig from "./oxlint/react-hooks.config.ts";
-
-// Glob is prefixed with **/ so it resolves correctly from either the package
-// dir (CLI invocation) or the repo root (LSP invocation from VSCode). The
-// leading wildcard absorbs the optional packages/boon-core/ prefix.
-const PREFIX = "**/app/javascript/bundles/takeoff-v2/**";
 
 export default defineConfig({
   categories: {
@@ -17,8 +11,8 @@ export default defineConfig({
   },
   plugins: ["import", "unicorn", "typescript", "vue", "oxc", "promise"],
   options: {
-    typeCheck: true,
     typeAware: true,
+    typeCheck: true,
   },
   rules: {
     "func-style": [
@@ -32,14 +26,9 @@ export default defineConfig({
       },
     ],
     "capitalized-comments": "off",
-    "sort-imports": [
-      "warn",
-      {
-        ignoreMemberSort: true,
-        ignoreDeclarationSort: true,
-        ignoreCase: true,
-      },
-    ],
+    "sort-imports": "off", // import sorting is handled by oxfmt
+    "one-var": "off", // one binding per line (Vue script setup convention)
+    "import/no-unassigned-import": "off", // allow side-effect imports
     "import/exports-last": "warn",
     "import/group-exports": "off",
     "import/no-named-export": "off",
@@ -48,12 +37,10 @@ export default defineConfig({
       "warn",
       { max: 750, skipBlankLines: true, skipComments: true },
     ],
-    // "max-lines-per-function": ["warn", { max: 64, skipBlankLines: true, skipComments: true }],
-    "max-lines-per-function": "off", // Noisy against React jsx
+    "max-lines-per-function": "off", // Noisy against Vue template/script blocks
     "sort-keys": "off",
     "sort-vars": "off",
     curly: ["warn", "multi-line", "consistent"],
-    "react/react-in-jsx-scope": "off",
     "unicorn/numeric-separators-style": [
       "warn",
       {
@@ -74,22 +61,6 @@ export default defineConfig({
     "no-unneeded-ternary": "warn",
     "unicorn/no-null": "off",
     "no-magic-numbers": "off",
-    // "no-magic-numbers": [
-    //   "warn",
-    //   {
-    //     ignore: [-1, 0, 1, 2, 10, 100, 1000, 16, 32, 36, 64], // boolean flags, percentages, array out-of-bounds, radix
-    //     ignoreArrayIndexes: true,
-    //     ignoreDefaultValues: true,
-    //     ignoreNumericLiteralTypes: true,
-    //     ignoreClassFieldInitialValues: true,
-    //     ignoreTypeIndexes: true,
-    //     ignoreReadonlyClassProperties: true,
-    //     enforceConst: true,
-    //   },
-    // ], // Broken rule: numbers in arrays cannot be ignored
-    "react/jsx-max-depth": ["warn", { max: 7 }],
-    "react/jsx-handler-names": "off",
-    "react-perf/jsx-no-new-function-as-prop": "error",
     "id-length": "off",
     "typescript/consistent-type-definitions": ["error", "type"],
     "prefer-destructuring": [
@@ -125,10 +96,5 @@ export default defineConfig({
     "coverage/**",
     "dist/**",
     ".rspack-cache/**",
-    "**/*",
-    `!${PREFIX}`,
-    `!${PREFIX}/**`,
-    "**/app/javascript/**/__mocks__/**/*.{cjs,mjs}",
-    "**/app/javascript/bundles/__jest__/**/*.{cjs,mjs}",
   ],
 });

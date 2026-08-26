@@ -40,14 +40,17 @@ if (-not (Test-Path $msys)) {
   mingw-w64-x86_64-libwebp \
   mingw-w64-x86_64-libsodium \
   mingw-w64-x86_64-gmp \
-  mingw-w64-x86_64-readline" | Out-Host
+  mingw-w64-x86_64-readline \
+  mingw-w64-x86_64-postgresql  # required to build pdo_pgsql for PostgreSQL" | Out-Host
 
 Write-Host "Done."
 Write-Host ""
 Write-Host "Next (new terminal):"
-Write-Host "  mise uninstall php@8.1"
-Write-Host "  mise install php@8.1"
-Write-Host "  mise use -p php@8.1"
+Write-Host "  # NOTE: 'mise install php@8.1' uses a DIFFERENT build (asdf 'php' plugin)."
+Write-Host "  # pdo_pgsql is not compiled in by default by vfox-php; append"
+Write-Host "  # '--with-pdo-pgsql' to the plugin's bin/install configure flags, then:"
+Write-Host "  mise install vfox:version-fox/vfox-php@8.1"
+Write-Host "  mise use -p vfox:version-fox/vfox-php@8.1"
 Write-Host ""
 Write-Host "Verify:"
 Write-Host "  php -m"
