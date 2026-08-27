@@ -12,3 +12,10 @@
   or any other process that could interrupt the user's active workflow.
 - When an existing server cannot be reused, report the reason and ask for
   confirmation before starting a separate instance.
+
+# Plan Artifacts
+
+- Store plans that are written as files, including Markdown, text, JSON, or
+  other metadata formats, under `docs/plans/`.
+- For a substantial plan with supporting structure or multiple artifacts,
+  create a dedicated subdirectory within `docs/plans/` for that plan.
