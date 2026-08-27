@@ -63,7 +63,7 @@ php -m | grep pdo_pgsql   # should list pdo_pgsql
 
 </details>
 
-### 2. Start the data services (PostgreSQL 18 + Valkey)
+### 2. Start the data and mail services (PostgreSQL 18 + Valkey + Mailpit)
 
 ```bash
 docker compose -f _dev/docker-compose.yaml up -d
@@ -71,14 +71,16 @@ docker compose -f _dev/docker-compose.yaml up -d
 
 This starts:
 
-| Service    | Image                    | Host port | Purpose                                   |
-| ---------- | ------------------------ | --------- | ----------------------------------------- |
-| `postgres` | `postgres:18-alpine`     | `5434`    | PostgreSQL 18 database                    |
-| `valkey`   | `valkey/valkey:8-alpine` | `6380`    | Cache, queue, sessions (Redis-compatible) |
+| Service    | Image                    | Host port       | Purpose                                   |
+| ---------- | ------------------------ | --------------- | ----------------------------------------- |
+| `postgres` | `postgres:18-alpine`     | `5434`          | PostgreSQL 18 database                    |
+| `valkey`   | `valkey/valkey:8-alpine` | `6380`          | Cache, queue, sessions (Redis-compatible) |
+| `mailpit`  | `axllent/mailpit:latest` | `1025` / `8025` | Development SMTP / captured inbox         |
 
-> The host ports are deliberately **5434 / 6380** so they don't clash with any
-> native PostgreSQL or Valkey/Redis already running on 5432/5433/6379. You can
-> override them with `POSTGRES_PORT` / `VALKEY_PORT` env vars.
+> The host ports are deliberately **5434 / 6380 / 1025 / 8025** so they don't
+> clash with native PostgreSQL, Valkey/Redis, or mail tooling. You can override
+> them with `POSTGRES_PORT`, `VALKEY_PORT`, `MAILPIT_SMTP_PORT`, and
+> `MAILPIT_WEB_PORT` env vars.
 >
 > Both services use named volumes (`postgres-data`, `valkey-data`) so data
 > survives container restarts.
@@ -115,11 +117,53 @@ REDIS_HOST=127.0.0.1
 REDIS_PORT=6380
 ```
 
-### 5. Run migrations
+### 5. Run migrations and seed the reviewer accounts
 
 ```bash
-php artisan migrate
+php artisan migrate --seed
 ```
+
+## Authentication
+
+The `/admin` dashboard uses Laravel's `web` session guard. Sign-in is passwordless: open
+<http://localhost:8000/login>, enter one of the provisioned email addresses below, and enter
+the six-digit code from Mailpit. The captured email is available at
+<http://localhost:8025>. Codes are formatted as `xxx-yyy`, expire after ten minutes, are
+single-use, and are rate-limited.
+
+### Seeded reviewer accounts
+
+| Email                | Name          | Organisation    | Role   |
+| -------------------- | ------------- | --------------- | ------ |
+| `admin@heymo.test`   | Mara Ellis    | Heymo Org       | Admin  |
+| `ops@lexical.test`   | Noah Williams | Lexical Labs    | Member |
+| `review@eje.test`    | Samira Patel  | EJE Science     | Member |
+| `team@xohealth.test` | Jonah Brooks  | XO Health Group | Member |
+
+There are no seeded passwords. Every login request creates a new code and sends a custom HTML
+email through Mailpit. With `OTP_LOG_CODES=true` and `APP_ENV=local`, the formatted code is also
+written to stderr, so it is visible in the terminal running `php artisan serve` or `pnpm
+dev:all`. Keep `OTP_LOG_CODES=false` outside local development.
+
+Administrators receive the `backoffice.manage` capability. Members can open the dashboard but
+do not receive management controls. The frontend keeps its short-lived JWT in
+`sessionStorage`; the server also maintains the browser session. `GET /api/user` requires a
+Bearer JWT, `POST /api/auth/token` renews one for an authenticated web session, and
+`POST /api/auth/logout` revokes the active JWT and ends the browser session.
+
+For a clean local reviewer reset, run:
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+This removes and recreates the configured development database.
+
+### JWT settings
+
+`JWT_ALGORITHM` is restricted to `HS256`. For local use, an empty `JWT_SECRET` falls back to
+`APP_KEY`; set a separate long random `JWT_SECRET` in any shared or non-local environment.
+`JWT_ISSUER`, `JWT_AUDIENCE`, and `JWT_TTL_MINUTES` control the token claims and lifetime.
 
 ## First Run
 

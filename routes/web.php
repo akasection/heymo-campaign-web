@@ -17,4 +17,5 @@ Route::get('/', function () {
     return view('app');
 });
 
-Route::view('/admin', 'Backoffice.dashboard')->name('admin.dashboard');
+Route::view('login', 'AdminLogin.login')->middleware('guest')->name('login');
+Route::view('admin', 'Backoffice.dashboard')->middleware('auth')->name('admin.dashboard');

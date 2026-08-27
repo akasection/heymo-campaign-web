@@ -46,8 +46,8 @@
       <div class="mt-4 flex items-center gap-3 px-2">
         <span class="flex size-9 items-center justify-center rounded-full bg-white/15 text-sm font-bold">LM</span>
         <div class="min-w-0">
-          <p class="truncate text-sm font-bold">Lena Morgan</p>
-          <p class="truncate text-xs text-blue-200">Campaign operations</p>
+          <p class="truncate text-sm font-bold">{{ userName }}</p>
+          <p class="truncate text-xs text-blue-200">{{ organizationName }}</p>
         </div>
       </div>
     </div>
@@ -61,6 +61,8 @@ import type { Component } from "vue";
 defineProps<{
   items: { id: string; label: string; icon: Component; count?: string }[];
   activeId: string;
+  userName: string;
+  organizationName: string;
 }>();
 
 defineEmits<{

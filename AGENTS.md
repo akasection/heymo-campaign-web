@@ -18,4 +18,13 @@
 - Store plans that are written as files, including Markdown, text, JSON, or
   other metadata formats, under `docs/plans/`.
 - For a substantial plan with supporting structure or multiple artifacts,
-  create a dedicated subdirectory within `docs/plans/` for that plan.
+  create a dedicated subdirectory within `docs/plans/`.
+
+# Testing Scope
+
+- Limit unit tests primarily to self-contained, pure-function utilities with
+  minimal dependence on Laravel or Vue framework behavior.
+- Avoid adding unit tests for framework-coupled Laravel or Vue files unless the
+  behavior cannot be covered effectively at another test level.
+- For frontend work, skip Vue component tests for now and focus only on
+  TypeScript utility tests.
