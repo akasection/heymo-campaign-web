@@ -53,53 +53,53 @@ accounts for the T-03 access-boundary demonstration.
 
 ## Affected Files
 
-| File | Change Type | Dependencies |
-|------|-------------|--------------|
-| `database/migrations/*_create_brands_table.php` | create | `organizations` migration |
-| `database/migrations/*_create_approved_claims_table.php` | create | brands migration |
-| `database/migrations/*_create_angles_table.php` | create | brands and approved claims migrations |
-| `database/migrations/*_create_landing_pages_table.php` | create | angles migration; keep static page identifiers |
-| `app/Models/Brand.php` | create | Organization relationship |
-| `app/Models/ApprovedClaim.php` | create | Brand relationship and status casting |
-| `app/Models/Angle.php` | create | Brand and approved-proof relationships |
-| `app/Models/LandingPage.php` | create | Angle relationship |
-| `app/Models/Organization.php` | modify | `hasMany(Brand::class)` |
-| `app/Models/User.php` | modify | organization-scoped authorization helpers if needed |
-| `database/factories/*` | create/modify | model tests and deterministic seed support |
-| `database/seeders/DatabaseSeeder.php` | modify | seed organizations, two brands, claims, angles, and mappings in dependency order |
-| `app/Http/Controllers/*` and `app/Http/Requests/*` | create | authenticated brand/claim endpoints |
-| `routes/api.php` | modify | protected, organization-scoped routes |
-| `resources/js/pages/Backoffice/*` | create/modify | brand list/forms and dashboard navigation |
-| `resources/js/lib/*` | modify | typed brand API calls only if existing helper surface is insufficient |
-| `README.md` | modify | brand model, seeded demo, reset command, and safety decisions |
-| `tests/Feature/*` | create/modify | authorization, scoping, archive, and seed behavior |
+| File                                                     | Change Type   | Dependencies                                                                     |
+| -------------------------------------------------------- | ------------- | -------------------------------------------------------------------------------- |
+| `database/migrations/*_create_brands_table.php`          | create        | `organizations` migration                                                        |
+| `database/migrations/*_create_approved_claims_table.php` | create        | brands migration                                                                 |
+| `database/migrations/*_create_angles_table.php`          | create        | brands and approved claims migrations                                            |
+| `database/migrations/*_create_landing_pages_table.php`   | create        | angles migration; keep static page identifiers                                   |
+| `app/Models/Brand.php`                                   | create        | Organization relationship                                                        |
+| `app/Models/ApprovedClaim.php`                           | create        | Brand relationship and status casting                                            |
+| `app/Models/Angle.php`                                   | create        | Brand and approved-proof relationships                                           |
+| `app/Models/LandingPage.php`                             | create        | Angle relationship                                                               |
+| `app/Models/Organization.php`                            | modify        | `hasMany(Brand::class)`                                                          |
+| `app/Models/User.php`                                    | modify        | organization-scoped authorization helpers if needed                              |
+| `database/factories/*`                                   | create/modify | model tests and deterministic seed support                                       |
+| `database/seeders/DatabaseSeeder.php`                    | modify        | seed organizations, two brands, claims, angles, and mappings in dependency order |
+| `app/Http/Controllers/*` and `app/Http/Requests/*`       | create        | authenticated brand/claim endpoints                                              |
+| `routes/api.php`                                         | modify        | protected, organization-scoped routes                                            |
+| `resources/js/pages/Backoffice/*`                        | create/modify | brand list/forms and dashboard navigation                                        |
+| `resources/js/lib/*`                                     | modify        | typed brand API calls only if existing helper surface is insufficient            |
+| `README.md`                                              | modify        | brand model, seeded demo, reset command, and safety decisions                    |
+| `tests/Feature/*`                                        | create/modify | authorization, scoping, archive, and seed behavior                               |
 
 ## Execution Plan
 
 ### Phase 1: Lock the domain contract
 
 - [ ] Define the minimum Brand fields: organization owner, name, slug, active/archive state,
-  logo reference, structured visual tokens, voice, reading level, sign-off, required phrases,
-  banned phrases, and compliance language.
+      logo reference, structured visual tokens, voice, reading level, sign-off, required phrases,
+      banned phrases, and compliance language.
 - [ ] Define ApprovedClaim fields: brand owner, claim text, source/reference, conditions or
-  disclosure, status, and archive metadata.
+      disclosure, status, and archive metadata.
 - [ ] Define the full Angle fields from the PRD and the selected approved-proof relation.
 - [ ] Define a stable landing identifier to angle mapping without composing page markup from
-  database records.
+      database records.
 - [ ] Decide which fields are generation inputs versus editorial/audit documentation and
-  record the decision in the README or a design note.
+      record the decision in the README or a design note.
 - **Verify:** review foreign-key ownership, uniqueness rules, archive behavior, and the
   organization scope before writing migrations.
 
 ### Phase 2: Build the T-02 persistence foundation
 
 - [ ] Add migrations in dependency order with foreign keys, useful indexes, organization-plus
-  slug uniqueness, explicit statuses, and nullable archive timestamps where history must remain.
+      slug uniqueness, explicit statuses, and nullable archive timestamps where history must remain.
 - [ ] Use PostgreSQL JSON/JSONB-compatible fields for visual tokens and phrase lists only where
-  the data is genuinely structured; keep claims and angle fields queryable as columns.
+      the data is genuinely structured; keep claims and angle fields queryable as columns.
 - [ ] Add Eloquent relationships, casts, factories, and approved-claim selection relations.
 - [ ] Preserve historical brand/angle references when a record is archived; do not cascade-delete
-  campaign evidence.
+      campaign evidence.
 - **Verify:** run migrations in a disposable test database and execute the focused feature tests
   before adding the UI.
 
@@ -109,7 +109,7 @@ accounts for the T-03 access-boundary demonstration.
 - [ ] Add approved-claim management endpoints and validation for required compliance fields.
 - [ ] Add angle management endpoints only after brand and claim ownership are available.
 - [ ] Enforce `auth.jwt` plus the backend `backoffice.manage` capability on mutations; never rely
-  on hidden frontend controls.
+      on hidden frontend controls.
 - [ ] Scope every query by `$request->user()->organization_id` and reject cross-organization IDs.
 - [ ] Return archived records only through an explicit review/history path.
 - **Verify:** feature-test unauthenticated access, member mutation denial, cross-organization
@@ -130,14 +130,14 @@ accounts for the T-03 access-boundary demonstration.
 
 - [ ] Keep the four existing organizations and four accounts unchanged.
 - [ ] Seed two genuinely different brands under `Heymo Org`, for example a measured clinical
-  identity and a warmer active-lifestyle identity.
+      identity and a warmer active-lifestyle identity.
 - [ ] Make the brands differ in colors, typography tokens, voice, reading level, sign-off,
-  required language, and banned phrases, not only in name or logo.
+      required language, and banned phrases, not only in name or logo.
 - [ ] Seed approved claims with conditions and disclosures, three angles, and static landing
-  identifiers after their migrations exist.
+      identifiers after their migrations exist.
 - [ ] Use `updateOrCreate` or equivalent stable keys so normal reseeding is deterministic.
 - [ ] Add authored sample records later through T-12 so reviewers can inspect the demo without
-  an LLM key or remote provider call.
+      an LLM key or remote provider call.
 - **Verify:** on an isolated/disposable database, run exactly `php artisan migrate:fresh --seed`
   and confirm it completes unattended and produces both brands plus the required demo records.
   Do not run the destructive command against the active development database without explicit
@@ -146,13 +146,13 @@ accounts for the T-03 access-boundary demonstration.
 ### Phase 6: Document and hand off
 
 - [ ] Explain Organization versus Brand and explicitly state that organization switching is out
-  of scope.
+      of scope.
 - [ ] Document the two seeded brands, their contrasting constraints, and the admin review path.
 - [ ] Document which fields feed generation, which claims are approved, and how archive/scoping
-  protects audit history.
+      protects audit history.
 - [ ] Update the end-to-end README journey when visitor/campaign tickets are implemented.
 - [ ] Leave T-03 marked Done; update ticket status only when the corresponding future ticket is
-  actually delivered.
+      actually delivered.
 - **Final verification:** `vendor/bin/phpunit`, `composer lint`, `pnpm lint`, `pnpm build`, and
   `git diff --check`.
 
