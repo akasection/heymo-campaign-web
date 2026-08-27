@@ -1,11 +1,3 @@
-<script setup>
-import { ref } from "vue";
-
-const appName = "Heymo! Campaign Webapp";
-const stack = ["Laravel 9", "Vue 3", "PostgreSQL 18", "Valkey 8"];
-const count = ref(0);
-</script>
-
 <template>
   <div class="flex min-h-screen items-center justify-center bg-slate-950 p-6 text-slate-100">
     <div class="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/60 p-8 shadow-2xl">
@@ -28,3 +20,11 @@ const count = ref(0);
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+
+const appName = "Heymo! Campaign Webapp";
+const stack = ["Laravel 9", "Vue 3", "PostgreSQL 18", "Valkey 8"];
+const count = ref(0);
+</script>

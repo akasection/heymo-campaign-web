@@ -1,0 +1,32 @@
+{
+  // Laravel Pint (PHP formatter) — requires the "Laravel Pint" VS Code extension
+  "Laravel.pint.runOnSave": true,
+
+  // --- JS/TS/Vue: Oxc (oxlint + oxfmt) via the "Oxc" extension ---
+  "editor.formatOnSave": true,
+  "oxc.enable": true,
+  "oxc.enable.oxlint": true,
+  "oxc.enable.oxfmt": true,
+  "oxc.lint.run": "onType",
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+
+  // --- PHP: TLint (Laravel best practices) via the "Tighten TLint" extension ---
+  "tighten-lint.defaultSeverity": "warning",
+
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}

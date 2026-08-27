@@ -20,3 +20,6 @@ indent_size = 4
 
 [*.{json,js,ts,jsx,tsx,vue}]
 indent_size = 2
+
+[*.blade.php]
+indent_size = 2
