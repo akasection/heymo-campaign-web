@@ -41,7 +41,9 @@ class PasswordlessLoginService
             ->latest('created_at')
             ->first();
 
-        if ($latestChallenge && $latestChallenge->created_at->diffInSeconds(now()) < (int) config('otp.resend_cooldown_seconds')) {
+        if ($latestChallenge
+            && $latestChallenge->isUsable()
+            && $latestChallenge->created_at->diffInSeconds(now()) < (int) config('otp.resend_cooldown_seconds')) {
             return [
                 'challenge_id' => $latestChallenge->public_id,
                 'expires_in' => max(0, now()->diffInSeconds($latestChallenge->expires_at)),
