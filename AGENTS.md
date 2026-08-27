@@ -13,6 +13,12 @@
 - When an existing server cannot be reused, report the reason and ask for
   confirmation before starting a separate instance.
 
+  # Issue Tracking
+
+- See [docs/KANBAN.md](docs/KANBAN.md) for the current Kanban board and ticket workflow.
+- Use the kanban skills to manipulate the KANBAN board. Also adhere the worktree approach when modifying the tickets, so it can be parallel against current work.
+- User may occasionally refer the ticket number in the prompt or the task description. If so, you eagerly check the ticket spec.
+
 # Plan Artifacts
 
 - Store plans that are written as files, including Markdown, text, JSON, or
