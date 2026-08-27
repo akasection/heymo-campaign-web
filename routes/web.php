@@ -16,3 +16,5 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('app');
 });
+
+Route::view('/admin', 'Backoffice.dashboard')->name('admin.dashboard');

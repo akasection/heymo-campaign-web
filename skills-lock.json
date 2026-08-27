@@ -6,6 +6,24 @@
       "sourceType": "github",
       "skillPath": "skills/markdown-kanban/SKILL.md",
       "computedHash": "7f1680b929ad91f2962eb934f4f5aaf8d2a89d1f3b16fc8cb77f8d4856d1ab77"
+    },
+    "pinia": {
+      "source": "full-statck-skills/vue-skills",
+      "sourceType": "github",
+      "skillPath": "skills/pinia/SKILL.md",
+      "computedHash": "0d481c50a36a7b4eb7db1cefb7a2bbefe12266eb3bb102ed58bf3e863d9b38a1"
+    },
+    "vue-router-v4": {
+      "source": "full-statck-skills/vue-skills",
+      "sourceType": "github",
+      "skillPath": "skills/vue-router-v4/SKILL.md",
+      "computedHash": "467d765ed1c4d5a3b95e475f6e50605446f4ad6a62d134fc5e970e7234bb18f6"
+    },
+    "vue3": {
+      "source": "full-statck-skills/vue-skills",
+      "sourceType": "github",
+      "skillPath": "skills/vue3/SKILL.md",
+      "computedHash": "c613d6e1b6eb28b922da21895c8a87ed210b821fba8e01c629b98e384b60df19"
     }
   }
 }
