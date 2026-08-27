@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'Heymo! Campaign Webapp') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.ts'])
+    @vite(['resources/css/app.css', 'resources/js/campaign.ts'])
   </head>
   <body class="antialiased">
     <div id="app"></div>
