@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Backoffice | {{ config('app.name', 'Heymo!') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/backoffice.ts'])
+    <title>Sign in | {{ config('app.name', 'Heymo!') }}</title>
+    @vite(['resources/css/app.css', 'resources/js/admin-login.ts'])
   </head>
   <body class="antialiased">
-    <div id="app"></div>
+    <div id="app" data-show-demo-accounts="{{ app()->environment('local') ? 'true' : 'false' }}"></div>
   </body>
 </html>

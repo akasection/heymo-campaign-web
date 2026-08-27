@@ -13,9 +13,24 @@
 - When an existing server cannot be reused, report the reason and ask for
   confirmation before starting a separate instance.
 
+  # Issue Tracking
+
+- See [docs/KANBAN.md](docs/KANBAN.md) for the current Kanban board and ticket workflow.
+- Use the kanban skills to manipulate the KANBAN board. Also adhere the worktree approach when modifying the tickets, so it can be parallel against current work.
+- User may occasionally refer the ticket number in the prompt or the task description. If so, you eagerly check the ticket spec.
+
 # Plan Artifacts
 
 - Store plans that are written as files, including Markdown, text, JSON, or
   other metadata formats, under `docs/plans/`.
 - For a substantial plan with supporting structure or multiple artifacts,
-  create a dedicated subdirectory within `docs/plans/` for that plan.
+  create a dedicated subdirectory within `docs/plans/`.
+
+# Testing Scope
+
+- Limit unit tests primarily to self-contained, pure-function utilities with
+  minimal dependence on Laravel or Vue framework behavior.
+- Avoid adding unit tests for framework-coupled Laravel or Vue files unless the
+  behavior cannot be covered effectively at another test level.
+- For frontend work, skip Vue component tests for now and focus only on
+  TypeScript utility tests.

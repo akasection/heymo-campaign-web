@@ -10,13 +10,27 @@
     </Transition>
     <Transition name="drawer">
       <div v-if="isMobileNavOpen" class="fixed inset-y-0 left-0 z-40 lg:hidden">
-        <SidebarNav :items="navigationItems" :active-id="activeNavigation" @select="selectNavigation" @close="isMobileNavOpen = false" />
+        <SidebarNav
+          :items="navigationItems"
+          :active-id="activeNavigation"
+          :user-name="currentUser?.name ?? 'Workspace user'"
+          :organization-name="currentUser?.organization?.name ?? 'Campaign operations'"
+          @select="selectNavigation"
+          @close="isMobileNavOpen = false"
+        />
       </div>
     </Transition>
 
     <div class="flex min-h-screen">
       <div class="hidden shrink-0 lg:block">
-        <SidebarNav :items="navigationItems" :active-id="activeNavigation" @select="selectNavigation" @close="isMobileNavOpen = false" />
+        <SidebarNav
+          :items="navigationItems"
+          :active-id="activeNavigation"
+          :user-name="currentUser?.name ?? 'Workspace user'"
+          :organization-name="currentUser?.organization?.name ?? 'Campaign operations'"
+          @select="selectNavigation"
+          @close="isMobileNavOpen = false"
+        />
       </div>
 
       <main class="min-w-0 flex-1">
@@ -40,10 +54,17 @@
               <span class="absolute right-1.5 top-1.5 size-2 rounded-full bg-heymo-red ring-2 ring-white" aria-hidden="true"></span>
             </button>
             <button
-              class="flex items-center gap-2 rounded-md border border-heymo-line bg-white px-2.5 py-2 text-left transition hover:border-heymo-red focus:outline-2 focus:outline-offset-2 focus:outline-heymo-red"
+              class="flex items-center gap-2 rounded-md border border-heymo-line bg-white px-2.5 py-2 text-left transition hover:border-heymo-red focus:outline-2 focus:outline-offset-2 focus:outline-heymo-red disabled:cursor-wait disabled:opacity-60"
+              :aria-label="isSigningOut ? 'Signing out' : 'Sign out'"
+              :disabled="isSigningOut"
+              title="Sign out"
+              @click="logout"
             >
-              <span class="flex size-7 items-center justify-center rounded-full bg-heymo-navy text-[10px] font-bold text-white">LM</span>
-              <CaretDown :size="15" weight="bold" class="hidden text-heymo-muted sm:block" aria-hidden="true" />
+              <span class="flex size-7 items-center justify-center rounded-full bg-heymo-navy text-[10px] font-bold text-white">{{
+                currentUserInitials
+              }}</span>
+              <span class="hidden max-w-32 truncate text-xs font-bold text-heymo-navy sm:block">{{ currentUser?.name ?? "Workspace user" }}</span>
+              <SignOut :size="16" weight="bold" class="text-heymo-muted" aria-hidden="true" />
             </button>
           </div>
         </header>
@@ -63,6 +84,7 @@
                 <CaretDown :size="14" weight="bold" aria-hidden="true" />
               </button>
               <button
+                v-if="canManageBackoffice"
                 class="inline-flex min-h-10 items-center gap-2 rounded-md bg-heymo-red px-3 text-sm font-bold text-white shadow-sm transition hover:bg-heymo-red-dark focus:outline-2 focus:outline-offset-2 focus:outline-heymo-red"
               >
                 <Plus :size="18" weight="bold" aria-hidden="true" />
@@ -306,18 +328,20 @@ import {
   PhMapPin as MapPin,
   PhPlus as Plus,
   PhPulse as Pulse,
+  PhSignOut as SignOut,
   PhSquaresFour as SquaresFour,
   PhUsersThree as UsersThree,
   PhWarningCircle as WarningCircle,
   PhX as X,
 } from "@phosphor-icons/vue";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import type { Component } from "vue";
 import HexValidationTile from "../../components/Backoffice/HexValidationTile.vue";
 import Panel from "../../components/Backoffice/Panel.vue";
 import SidebarNav from "../../components/Backoffice/SidebarNav.vue";
 import StatTile from "../../components/Backoffice/StatTile.vue";
 import StatusBadge from "../../components/Backoffice/StatusBadge.vue";
+import { ApiError, apiFetch, clearAccessToken, saveAccessToken } from "../../lib/auth";
 import {
   campaignProgress,
   dashboardMetrics,
@@ -328,6 +352,7 @@ import {
   sampleRows,
   trendValues,
 } from "./dashboard";
+import type { AuthUser, AuthenticationResponse } from "../../lib/auth";
 
 const navigationItems: {
   id: string;
@@ -349,9 +374,47 @@ const activeAlerts = ref([...recentAlerts]);
 const isMobileNavOpen = ref(false);
 const selectedValidationStep = ref(3);
 const validationSteps = ref([...initialValidationSteps]);
+const currentUser = ref<AuthUser | null>(null);
+const isSigningOut = ref(false);
 
 const activeNavigationLabel = computed(() => navigationItems.find(item => item.id === activeNavigation.value)?.label ?? "Dashboard");
 const selectedValidation = computed(() => validationSteps.value.find(step => step.id === selectedValidationStep.value) ?? validationSteps.value[0]);
+const canManageBackoffice = computed(() => currentUser.value?.capabilities.includes("backoffice.manage") ?? false);
+const currentUserInitials = computed(() => {
+  const name = currentUser.value?.name ?? "Workspace user";
+  return name
+    .split(" ")
+    .map(part => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+});
+
+async function loadAuthenticatedUser() {
+  try {
+    const response = await apiFetch<AuthenticationResponse>("/api/auth/token", {
+      method: "POST",
+    });
+    saveAccessToken(response.access_token);
+    currentUser.value = response.user;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      globalThis.location.assign("/login");
+    }
+  }
+}
+
+async function logout() {
+  isSigningOut.value = true;
+
+  try {
+    await apiFetch<{ message: string }>("/api/auth/logout", { method: "POST" });
+  } finally {
+    clearAccessToken();
+    globalThis.location.assign("/login");
+  }
+}
 
 function selectNavigation(id: string) {
   activeNavigation.value = id;
@@ -365,6 +428,8 @@ function dismissAlert(id: number) {
 function selectValidationStep(id: number) {
   selectedValidationStep.value = id;
 }
+
+onMounted(loadAuthenticatedUser);
 </script>
 
 <style scoped>

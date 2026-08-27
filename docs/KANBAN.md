@@ -380,27 +380,6 @@
   answers what was generated, why it was generated, and whether it was sent.
   ```
 
-### T-03 Add authenticated admin access and authorisation
-
-- tags: [backend, frontend, auth, admin]
-- priority: high
-- workload: Normal
-- steps:
-  - [ ] Add a secure session-based admin login and logout flow.
-  - [ ] Protect all admin UI and admin API routes.
-  - [ ] Seed one documented administrator account.
-
-  ```md
-  **Dependencies:** T-02 Create the campaign domain and immutable audit schema.
-
-  Use Laravel's web/session guard for the dashboard rather than exposing admin operations
-  through the public capture API. Add a minimal role/ability boundary now, even if the demo
-  seeds only administrators.
-
-  **Done when:** unauthenticated users cannot read or mutate brands, angles, visitors, or
-  campaigns, while the seeded administrator can access the dashboard.
-  ```
-
 ## Review / QA
 
 ## Done
@@ -414,4 +393,27 @@
   Laravel 9/PHP 8.1, Vue 3/Vite/Tailwind, PostgreSQL 18, Valkey 8, Docker Compose, pnpm, and
   project linting/formatting conventions are established. The current application remains the
   intentional starter scaffold for the assignment implementation.
+  ```
+
+### T-03 Add authenticated admin access and authorisation
+
+- tags: [backend, frontend, auth, admin]
+- priority: high
+- workload: Normal
+- defaultExpanded: false
+- steps:
+  - [x] Add a secure session-based admin login and logout flow.
+  - [x] Protect all admin UI and admin API routes.
+  - [x] Seed one documented administrator account.
+  - [x] Seed three other business accounts.
+
+  ```md
+  **Dependencies:** T-02 Create the campaign domain and immutable audit schema.
+
+  Use Laravel's web/session guard for the dashboard rather than exposing admin operations
+  through the public capture API. Add a minimal role/ability boundary now, even if the demo
+  seeds only administrators.
+
+  **Done when:** unauthenticated users cannot read or mutate brands, angles, visitors, or
+  campaigns, while the seeded administrator can access the dashboard.
   ```
