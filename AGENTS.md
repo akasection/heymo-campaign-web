@@ -13,7 +13,21 @@
 - When an existing server cannot be reused, report the reason and ask for
   confirmation before starting a separate instance.
 
-  # Issue Tracking
+# Architecture & Security Contracts
+
+- `ARCHITECTURE.md` and `SECURITY.md` are the authoritative contracts for the
+  intent-led campaign system. They are **not auto-loaded** — read them before
+  any work on the domain (T-02 and later) and treat their rules as binding.
+- `ARCHITECTURE.md` fixes the entity/ownership map, the LLM-vs-deterministic
+  boundary, angle-field routing, the model response schema, and the
+  validation/fail-closed policy.
+- `SECURITY.md` fixes the threat model and the **Required** controls (org-scoped
+  policies, consent/suppression enforcement, provider-key handling, rate limits).
+- If a change would contradict either document, update the document first and
+  flag the change rather than silently diverging.
+- `ARCHITECTURE.md` is finalised for T-01 (no provisional sections remain); treat all sections as binding when implementing T-02 and later.
+
+# Issue Tracking
 
 - See [docs/KANBAN.md](docs/KANBAN.md) for the current Kanban board and ticket workflow.
 - Use the kanban skills to manipulate the KANBAN board. Also adhere the worktree approach when modifying the tickets, so it can be parallel against current work.
