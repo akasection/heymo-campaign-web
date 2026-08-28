@@ -270,8 +270,7 @@ the fields below and selects claim IDs; it cannot emit offer, compliance, or sig
 ```
 
 - `claim_ids` must reference claims owned by the campaign's brand.
-- The full formal schema lives in the runtime contract (`response-schema.md`); this
-  document fixes only the shape and the ownership invariant.
+- The full formal schema will live in the runtime contract (`resources/llm/response-schema.md`) (to be added in T-09); this document fixes only the shape and the ownership invariant.
 - Each attempt records: prompt version, provider/model, raw structured response, policy
   result, and final composed output.
 
