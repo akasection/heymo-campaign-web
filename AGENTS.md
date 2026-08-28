@@ -25,9 +25,7 @@
   policies, consent/suppression enforcement, provider-key handling, rate limits).
 - If a change would contradict either document, update the document first and
   flag the change rather than silently diverging.
-- Provisional sections in `ARCHITECTURE.md` (angle-field routing, worked
-  example, runtime contract folder) are pending sign-off; confirm before
-  hard-coding them.
+- `ARCHITECTURE.md` is finalised for T-01 (no provisional sections remain); treat all sections as binding when implementing T-02 and later.
 
 # Issue Tracking
 
