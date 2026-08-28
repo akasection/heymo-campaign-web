@@ -203,7 +203,7 @@
 - priority: high
 - workload: Normal
 - steps:
-  - [ ] Document local install, Docker services, env settings, queue worker, mail driver, and seed/reset command.
+  - [x] Document local install, Docker services, env settings, queue worker, mail driver, and seed/reset command.
   - [ ] Publish seeded admin credentials and landing-page URLs.
   - [ ] Walk through one named visitor's inputs, campaign rationale, and all three resulting messages.
   - [ ] Explain the safety/constraint strategy and testing choices.
@@ -318,41 +318,6 @@
   constraints are available to both the landing and campaign pipelines.
   ```
 
-### T-01 Define the campaign contract and safety policy
-
-- tags: [architecture, safety, llm, prd]
-- priority: high
-- workload: Hard
-- steps:
-  - [ ] Define the entity relationship map and ownership boundaries.
-  - [ ] Identify which angle fields feed generation and which remain editorial documentation.
-  - [ ] Specify the structured model response schema for all three email beats.
-  - [ ] Write the validation and retry/fail-closed policy for unsafe or malformed output.
-
-  ```md
-  **Why:** The PRD requires constraints to be enforced, rather than merely placed in an LLM prompt.
-
-  **Generation inputs:** angle audience, trigger, primary job, tension, desired outcome,
-  single promise, approved proof, objection, truthful offer, tone, and next step; visitor
-  age range, sex, sub-interest, trigger, concern, page context, and consent; brand voice,
-  reading level, sign-off, visual identity, required language, banned phrases, and approved
-  claim records.
-
-  **Enforcement design:** persist approved facts/claims and disclosures as structured data.
-  The model returns valid JSON that selects approved claim IDs and writes only the
-  personalisation/transition fields. A server-side policy validator rejects missing required
-  language, banned phrases, unsupported claim references, prohibited diagnosis/cure/outcome
-  language, demographic clinical inference, inaccurate subjects, and malformed structure.
-  Re-prompt once with violations; if it remains invalid or the provider fails, persist a failed
-  generation attempt and send nothing. The final email is composed from validated content plus
-  deterministic approved blocks, with the prompt recipe, policy result, and model metadata
-  retained for audit.
-
-  **Done when:** this decision is documented in the README or an architecture note, with one
-  example showing exactly why two profiles receive different presentation without different
-  clinical claims.
-  ```
-
 ## In Progress
 
 ### T-11 Build the admin audit trail and angle performance dashboard
@@ -383,6 +348,41 @@
 ## Review / QA
 
 ## Done
+
+### T-01 Define the campaign contract and safety policy
+
+- tags: [architecture, safety, llm, prd]
+- priority: high
+- workload: Hard
+- steps:
+  - [x] Define the entity relationship map and ownership boundaries.
+  - [x] Identify which angle fields feed generation and which remain editorial documentation.
+  - [x] Specify the structured model response schema for all three email beats.
+  - [x] Write the validation and retry/fail-closed policy for unsafe or malformed output.
+
+  ```md
+  **Why:** The PRD requires constraints to be enforced, rather than merely placed in an LLM prompt.
+
+  **Generation inputs:** angle audience, trigger, primary job, tension, desired outcome,
+  single promise, approved proof, objection, truthful offer, tone, and next step; visitor
+  age range, sex, sub-interest, trigger, concern, page context, and consent; brand voice,
+  reading level, sign-off, visual identity, required language, banned phrases, and approved
+  claim records.
+
+  **Enforcement design:** persist approved facts/claims and disclosures as structured data.
+  The model returns valid JSON that selects approved claim IDs and writes only the
+  personalisation/transition fields. A server-side policy validator rejects missing required
+  language, banned phrases, unsupported claim references, prohibited diagnosis/cure/outcome
+  language, demographic clinical inference, inaccurate subjects, and malformed structure.
+  Re-prompt once with violations; if it remains invalid or the provider fails, persist a failed
+  generation attempt and send nothing. The final email is composed from validated content plus
+  deterministic approved blocks, with the prompt recipe, policy result, and model metadata
+  retained for audit.
+
+  **Done when:** this decision is documented in the README or an architecture note, with one
+  example showing exactly why two profiles receive different presentation without different
+  clinical claims.
+  ```
 
 ### D-01 Prepare local development infrastructure
 
