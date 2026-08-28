@@ -49,7 +49,7 @@ Landing page (static, angle-bound)
    IDs.** Everything else — facts, offer, compliance language, sign-off, sequence shape —
    is composed deterministically.
 4. **The angle is chosen by the landing page, not by quiz answers.** The quiz captures
-   intent *within* an angle.
+   intent _within_ an angle.
 5. **Demographics shape presentation, never clinical claims.** Age and sex select a
    computed "presentation profile"; they cannot reach the model as a basis for clinical
    inference.
@@ -67,20 +67,20 @@ Landing page (static, angle-bound)
 
 ### Entities
 
-| Entity | Owned by | Purpose |
-|---|---|---|
-| `Brand` | — | Root. Visual identity, voice, reading level, sign-off, required/banned phrases, compliance language. |
-| `ApprovedClaim` | Brand | Structured, approved fact/mechanism/credential. Only source of claims in emails. |
-| `Angle` | Brand | Strategic anchor: 11 PRD fields. Not a headline, not a matcher. |
-| `LandingPage` (landing identifier) | Angle | Stable identifier mapping a static page to a seeded angle. |
-| `Visitor` | — | Demographics + email; the person being messaged. |
-| `IntentResponse` | Visitor | One per capture: sub-interest, trigger, concern, page/angle context, timestamp. Immutable. |
-| `ConsentRecord` | Visitor | Affirmative consent per channel, with source, timestamp, policy/version, exact address. Append-only. |
-| `Suppression` | Visitor | Durable opt-out/conversion state. Cannot be bypassed by a queued send. |
-| `Campaign` | Visitor + Angle (+ Brand) | One per capture; the generated 3-message sequence. |
-| `CampaignMessage` | Campaign | One row per sequence position **and** channel. |
-| `GenerationAttempt` | CampaignMessage | Append-only: prompt version, provider/model, raw response, policy result, composed output. |
-| `DeliveryEvent` | CampaignMessage | Append-only: attempted / sent / skipped / failed with actionable error. |
+| Entity                             | Owned by                  | Purpose                                                                                              |
+| ---------------------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `Brand`                            | —                         | Root. Visual identity, voice, reading level, sign-off, required/banned phrases, compliance language. |
+| `ApprovedClaim`                    | Brand                     | Structured, approved fact/mechanism/credential. Only source of claims in emails.                     |
+| `Angle`                            | Brand                     | Strategic anchor: 11 PRD fields. Not a headline, not a matcher.                                      |
+| `LandingPage` (landing identifier) | Angle                     | Stable identifier mapping a static page to a seeded angle.                                           |
+| `Visitor`                          | —                         | Demographics + email; the person being messaged.                                                     |
+| `IntentResponse`                   | Visitor                   | One per capture: sub-interest, trigger, concern, page/angle context, timestamp. Immutable.           |
+| `ConsentRecord`                    | Visitor                   | Affirmative consent per channel, with source, timestamp, policy/version, exact address. Append-only. |
+| `Suppression`                      | Visitor                   | Durable opt-out/conversion state. Cannot be bypassed by a queued send.                               |
+| `Campaign`                         | Visitor + Angle (+ Brand) | One per capture; the generated 3-message sequence.                                                   |
+| `CampaignMessage`                  | Campaign                  | One row per sequence position **and** channel.                                                       |
+| `GenerationAttempt`                | CampaignMessage           | Append-only: prompt version, provider/model, raw response, policy result, composed output.           |
+| `DeliveryEvent`                    | CampaignMessage           | Append-only: attempted / sent / skipped / failed with actionable error.                              |
 
 ### Ownership rules
 
@@ -159,54 +159,54 @@ Angle record (dynamic, admin-managed)
 
 ## 5. Angle-field routing
 
-The 11 PRD fields split into four buckets by *who writes them* and *how freely*. The
+The 11 PRD fields split into four buckets by _who writes them_ and _how freely_. The
 guiding principle: **fact-backed fields are hard rules; expressive fields are model prose
 under a hard constraint.** Safety comes from the deterministic validator (§8), not from
 hiding fields — so all 11 fields feed generation and **none are editorial-only**.
 
-| Bucket | Fields | Model's role |
-|---|---|---|
-| **Deterministic** (rendered as-is) | Proof, Offer, Next step | Never writes them; references claim IDs / transitions into them at most |
-| **Hard instruction** (enum) | Tone | Applies it as a constraint; never changes it |
-| **Bounded prose** (content fixed, phrasing free) | Single promise, Objection | Writes the phrasing — "restate, don't expand"; "address, don't invent" |
-| **Context** (shapes emphasis & framing) | Audience, Trigger moment, Primary job, Tension, Desired outcome | Uses them to write; never states them as fact or promise |
+| Bucket                                           | Fields                                                          | Model's role                                                            |
+| ------------------------------------------------ | --------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **Deterministic** (rendered as-is)               | Proof, Offer, Next step                                         | Never writes them; references claim IDs / transitions into them at most |
+| **Hard instruction** (enum)                      | Tone                                                            | Applies it as a constraint; never changes it                            |
+| **Bounded prose** (content fixed, phrasing free) | Single promise, Objection                                       | Writes the phrasing — "restate, don't expand"; "address, don't invent"  |
+| **Context** (shapes emphasis & framing)          | Audience, Trigger moment, Primary job, Tension, Desired outcome | Uses them to write; never states them as fact or promise                |
 
 Per-field detail:
 
-| Angle field | Bucket | Reaches model as | Rationale |
-|---|---|---|---|
-| Audience | Context | text | Write for the right person |
-| Trigger moment | Context | text | Acknowledge the real trigger; never escalate it |
-| Primary job | Context | text | Drives *emphasis* — the progress they're trying to make |
-| Tension | Context | text | Empathetic framing only; validator caps clinical inference |
-| Desired outcome | Context | text | Framing only — never promised as guaranteed |
-| Single promise | Bounded prose | text (restate only) | Content authoritative; phrasing personalised |
-| Proof | Deterministic | claim IDs | Facts served from `ApprovedClaim`, never improvised |
-| Objection | Bounded prose | text | Address the recorded objection; never invent one |
-| Offer | Deterministic | none (transition only) | Truthful terms never paraphrased |
-| Tone | Hard instruction | enum | Brand constraint, enforced |
-| Next step | Deterministic | none | Consistent, truthful CTA |
+| Angle field     | Bucket           | Reaches model as       | Rationale                                                  |
+| --------------- | ---------------- | ---------------------- | ---------------------------------------------------------- |
+| Audience        | Context          | text                   | Write for the right person                                 |
+| Trigger moment  | Context          | text                   | Acknowledge the real trigger; never escalate it            |
+| Primary job     | Context          | text                   | Drives _emphasis_ — the progress they're trying to make    |
+| Tension         | Context          | text                   | Empathetic framing only; validator caps clinical inference |
+| Desired outcome | Context          | text                   | Framing only — never promised as guaranteed                |
+| Single promise  | Bounded prose    | text (restate only)    | Content authoritative; phrasing personalised               |
+| Proof           | Deterministic    | claim IDs              | Facts served from `ApprovedClaim`, never improvised        |
+| Objection       | Bounded prose    | text                   | Address the recorded objection; never invent one           |
+| Offer           | Deterministic    | none (transition only) | Truthful terms never paraphrased                           |
+| Tone            | Hard instruction | enum                   | Brand constraint, enforced                                 |
+| Next step       | Deterministic    | none                   | Consistent, truthful CTA                                   |
 
 The **Context** bucket is the one most likely to drift toward diagnosis or urgency
 (`Tension`, `Desired outcome`, `Trigger moment`). The validator (§8, checks 5–7) is the
-backstop that makes this safe — these fields are fed *because* the validator catches
+backstop that makes this safe — these fields are fed _because_ the validator catches
 misuse, rather than demoting them to editorial.
 
 ---
 
 ## 6. Generation: LLM vs deterministic split
 
-| Deterministic (code) | LLM (model) |
-|---|---|
+| Deterministic (code)                                              | LLM (model)                                     |
+| ----------------------------------------------------------------- | ----------------------------------------------- |
 | Brand constraints (voice, reading level, required/banned phrases) | Restating the promise in the visitor's language |
-| Approved claims as structured records | Explaining the mechanism plainly |
-| Compliance blocks, offer, sign-off, unsubscribe footer | Addressing the angle-specific objection |
-| Sequence shape (promise → mechanism → objection) | Selecting **which** claim IDs to reference |
-| Consent / suppression checks | Subject line, headline, body paragraphs |
-| Demographic → presentation profile lookup | — |
-| Policy validator, retry, fail-closed | — |
-| Final email composition (validated prose + deterministic blocks) | — |
-| Audit persistence | — |
+| Approved claims as structured records                             | Explaining the mechanism plainly                |
+| Compliance blocks, offer, sign-off, unsubscribe footer            | Addressing the angle-specific objection         |
+| Sequence shape (promise → mechanism → objection)                  | Selecting **which** claim IDs to reference      |
+| Consent / suppression checks                                      | Subject line, headline, body paragraphs         |
+| Demographic → presentation profile lookup                         | —                                               |
+| Policy validator, retry, fail-closed                              | —                                               |
+| Final email composition (validated prose + deterministic blocks)  | —                                               |
+| Audit persistence                                                 | —                                               |
 
 The final email is **composed** as:
 
@@ -233,17 +233,17 @@ what reaches the model, demographics structurally cannot become clinical recomme
 
 The business is DTC blood testing: the visitor lands with a concern ("always tired"), not a
 purchase decision. The campaign converts that latent intent into a confident next step —
-confirming they're in the right place, making the mechanism plain, and removing *this
-person's* specific objection. It reinforces and directs motivation; it never manufactures
+confirming they're in the right place, making the mechanism plain, and removing _this
+person's_ specific objection. It reinforces and directs motivation; it never manufactures
 urgency.
 
 - **`offer`** = what makes acting now easier (a discount, a bundle) — always a truthful,
   precisely stated term, never a fake deadline or scarcity.
 - **`next step`** = the CTA itself ("Order the fatigue panel"). It must be the smallest
-  clear action, and framed as *getting clarity on your numbers*, never as a diagnosis
+  clear action, and framed as _getting clarity on your numbers_, never as a diagnosis
   ("find out if you have X").
 - Both are **deterministic, angle-scoped blocks** composed after the objection is handled
-  (email 3 or a later beat). Personalisation lives in the prose leading *up to* the CTA,
+  (email 3 or a later beat). Personalisation lives in the prose leading _up to_ the CTA,
   never inside the CTA.
 
 ---
@@ -257,15 +257,15 @@ the fields below and selects claim IDs; it cannot emit offer, compliance, or sig
 {
   "messages": [
     {
-      "position": 1,               // 1..3, fixed
-      "role": "promise",           // promise | mechanism | objection
-      "subject": "string",         // validated for accuracy (guardrail 5)
+      "position": 1, // 1..3, fixed
+      "role": "promise", // promise | mechanism | objection
+      "subject": "string", // validated for accuracy (guardrail 5)
       "headline": "string",
-      "body_paragraphs": ["..."],  // personalisation / transition prose
-      "claim_ids": ["uuid", "..."] // ApprovedClaim UUIDs, must resolve to the brand
-    }
+      "body_paragraphs": ["..."], // personalisation / transition prose
+      "claim_ids": ["uuid", "..."], // ApprovedClaim UUIDs, must resolve to the brand
+    },
     // position 2 = mechanism, position 3 = objection
-  ]
+  ],
 }
 ```
 
@@ -317,13 +317,13 @@ LLM call 1 → generate
 
 ## 9. Safety policy (guardrails → enforcement)
 
-| PRD guardrail | Enforcement mechanism |
-|---|---|
-| No unapproved health claims | Claims are DB records; model only selects IDs; validator rejects free-text claims and unknown IDs. |
-| No clinical inference from demographics | Presentation profile computed in code; demographics never passed as clinical basis; validator rejects inference patterns. |
-| No false urgency / scarcity / hidden conditions / misleading comparisons | Offer and next-step are deterministic; validator scans model prose for these patterns. |
-| Consent and suppression enforced | Affirmative `ConsentRecord` required **before** generation; re-checked **immediately before each send**; `Suppression` blocks queued sends. |
-| Subject lines accurately represent the message | Subject validated against body content before send. |
+| PRD guardrail                                                            | Enforcement mechanism                                                                                                                       |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| No unapproved health claims                                              | Claims are DB records; model only selects IDs; validator rejects free-text claims and unknown IDs.                                          |
+| No clinical inference from demographics                                  | Presentation profile computed in code; demographics never passed as clinical basis; validator rejects inference patterns.                   |
+| No false urgency / scarcity / hidden conditions / misleading comparisons | Offer and next-step are deterministic; validator scans model prose for these patterns.                                                      |
+| Consent and suppression enforced                                         | Affirmative `ConsentRecord` required **before** generation; re-checked **immediately before each send**; `Suppression` blocks queued sends. |
+| Subject lines accurately represent the message                           | Subject validated against body content before send.                                                                                         |
 
 ---
 
@@ -340,31 +340,31 @@ Approved claims (same for both visitors):
 - C3 — "Vitamin B12 and folate are measured because low levels are a recognised cause of
   tiredness."
 
-| | Visitor A | Visitor B |
-|---|---|---|
-| Age / sex | 28, female | 55, male |
-| Sub-interest | "always drained after workouts" | "energy crashes mid-afternoon" |
-| Concern | "low iron" | "thyroid in the family" |
+|                      | Visitor A                                                              | Visitor B                                                              |
+| -------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Age / sex            | 28, female                                                             | 55, male                                                               |
+| Sub-interest         | "always drained after workouts"                                        | "energy crashes mid-afternoon"                                         |
+| Concern              | "low iron"                                                             | "thyroid in the family"                                                |
 | Presentation profile | Short sentences, low reassurance, compact layout, lighter type density | Longer sentences, higher reassurance, larger type, more breathing room |
-| Voice result | Direct, pragmatic, minimal hedging | Patient, explanatory, more reassurance |
-| **Claim set** | **C1, C2, C3 (identical)** | **C1, C2, C3 (identical)** |
+| Voice result         | Direct, pragmatic, minimal hedging                                     | Patient, explanatory, more reassurance                                 |
+| **Claim set**        | **C1, C2, C3 (identical)**                                             | **C1, C2, C3 (identical)**                                             |
 
 The two emails differ materially in register, pacing, emphasis, and layout while
 referencing the **exact same approved claim set**. Neither email states or implies a
 diagnosis, a cure, an expected result, or "what they probably have" — demographics change
-only *how* the same facts are presented.
+only _how_ the same facts are presented.
 
 ### 10.2 Brand divergence — same situation, different brands
 
 Identical situation: the same "newlyweds planning their first joint health check" angle and
 the same visitor, but two brands:
 
-| | Lexical Labs | XO Health Group |
-|---|---|---|
-| Identity | Millennial, modern, approachable | Conservative, long-trusted, hospital-grade |
-| Voice | Warm, conversational | Formal, authoritative, reassuring |
-| Visual identity | Modern palette, friendly type | Restrained, clinical, traditional |
-| Result | Short, upbeat sentences, casual sign-off | Longer form, formal sign-off |
+|                 | Lexical Labs                             | XO Health Group                            |
+| --------------- | ---------------------------------------- | ------------------------------------------ |
+| Identity        | Millennial, modern, approachable         | Conservative, long-trusted, hospital-grade |
+| Voice           | Warm, conversational                     | Formal, authoritative, reassuring          |
+| Visual identity | Modern palette, friendly type            | Restrained, clinical, traditional          |
+| Result          | Short, upbeat sentences, casual sign-off | Longer form, formal sign-off               |
 
 The two emails are **recognisably different in look and voice** — the variable is the brand
 alone (PRD Requirement 1). Each email references only its own brand's approved claim

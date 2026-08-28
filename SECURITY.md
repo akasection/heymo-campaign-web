@@ -15,15 +15,15 @@ marketing email, and provider API keys.
 
 **Assets to protect**
 
-| Asset | Sensitivity |
-|---|---|
-| Visitor PII (email, age, sex) | High |
-| Stated health concern / intent answers | High |
-| Consent & suppression records | High (legal) |
-| Approved claims & brand constraints | Medium (business + compliance) |
-| Generated email bodies | High |
-| Admin accounts & sessions | High |
-| LLM provider keys | Critical |
+| Asset                                  | Sensitivity                    |
+| -------------------------------------- | ------------------------------ |
+| Visitor PII (email, age, sex)          | High                           |
+| Stated health concern / intent answers | High                           |
+| Consent & suppression records          | High (legal)                   |
+| Approved claims & brand constraints    | Medium (business + compliance) |
+| Generated email bodies                 | High                           |
+| Admin accounts & sessions              | High                           |
+| LLM provider keys                      | Critical                       |
 
 **Threat actors**
 
@@ -171,13 +171,13 @@ The model receives structured prompt payloads assembled from visitor free-text
 
 ## 11. Compliance checklist (PRD guardrails → control)
 
-| Guardrail | Security control |
-|---|---|
-| No unapproved health claims | Claims are DB records; model selects IDs only; deterministic validator rejects free-text claims. |
-| No clinical inference from demographics | Presentation profile computed in code; demographics never passed as clinical basis. |
-| No false urgency / scarcity / hidden conditions | Deterministic offer/next-step; validator scans model prose. |
-| Consent & suppression enforced | Consent gate + pre-send re-check + durable suppression. |
-| Subject lines accurate | Subject validated against body before send. |
+| Guardrail                                       | Security control                                                                                 |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| No unapproved health claims                     | Claims are DB records; model selects IDs only; deterministic validator rejects free-text claims. |
+| No clinical inference from demographics         | Presentation profile computed in code; demographics never passed as clinical basis.              |
+| No false urgency / scarcity / hidden conditions | Deterministic offer/next-step; validator scans model prose.                                      |
+| Consent & suppression enforced                  | Consent gate + pre-send re-check + durable suppression.                                          |
+| Subject lines accurate                          | Subject validated against body before send.                                                      |
 
 ---
 
