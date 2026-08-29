@@ -1,5 +1,8 @@
 # Plan: Brand Management Handoff
 
+> Status: **T-05 scoped Brand Settings complete**. Compliance language, runtime sign-off
+> resolution, and deterministic evidence administration remain deferred by product decision.
+
 ## Current State
 
 T-03 provides organization-scoped authentication. Each user has one `organization_id`,
@@ -7,9 +10,13 @@ JWTs carry that organization context, and the JWT middleware rejects stale or mi
 organization claims. The four seeded organizations are useful tenant/account boundaries;
 they are not marketing brands.
 
-`Organization` currently stores only a name and slug. There is no `Brand` model, brand
-configuration, deterministic evidence source, angle relationship, brand API, or brand
-management UI.
+The scoped T-05 implementation now provides an organization-owned `Brand` model, brand
+configuration, a brand API, policy authorization, and a backoffice management UI. It stores
+visual identity, four named writing preferences, preferred/avoided language, logo storage, and
+a versioned Markdown-backed prompt profile.
+
+There is not yet an Angle relationship or runtime deterministic evidence registry. Those are
+the next domain decisions for T-06 and later generation work.
 The current dashboard shows the signed-in user's organization and intentionally has no
 organization switcher.
 

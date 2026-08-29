@@ -62,7 +62,7 @@
 
   ```md
   **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
-  authenticated admin access and authorisation; T-05 Build brand management and copy controls.
+  authenticated admin access and authorisation; T-05 Build brand management settings.
 
   Implement the PRD fields: audience, trigger moment, primary job, tension, desired outcome,
   single promise, proof, objection, offer, tone, and next step. Treat angle data as campaign
@@ -84,7 +84,7 @@
   - [ ] Add a clear entry point to the capture quiz and preserve source-page context.
 
   ```md
-  **Dependencies:** T-05 Build brand management and copy controls; T-06 Build
+  **Dependencies:** T-05 Build brand management settings; T-06 Build
   authenticated angle management.
 
   These pages are deliberately hand-written Blade templates/Vue components. Each must make its
@@ -134,7 +134,7 @@
   ```md
   **Dependencies:** T-01 Define the campaign contract and safety policy; T-02 Create the
   campaign domain and immutable audit schema; T-04 Configure provider-neutral LLM and mail
-  integration; T-05 Build brand management and copy controls; T-06 Build
+  integration; T-05 Build brand management settings; T-06 Build
   authenticated angle management; T-08 Implement intent capture, explicit consent, and
   suppression handling.
 
@@ -187,7 +187,7 @@
 
   ```md
   **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
-  authenticated admin access and authorisation; T-05 Build brand management and copy controls;
+  authenticated admin access and authorisation; T-05 Build brand management settings;
   T-06 Build authenticated angle management; T-09 Generate and validate the
   three-email personalised welcome sequence; T-10 Queue, send, and observe campaign email
   delivery.
@@ -300,30 +300,6 @@
 
 ## In Progress
 
-### T-05 Build brand management and copy controls
-
-- tags: [backend, frontend, admin, brand, safety]
-- priority: high
-- workload: Hard
-- steps:
-  - [ ] Build authenticated brand list, create, edit, and archive flows.
-  - [ ] Manage visual identity, voice, reading level, sign-off, required and banned phrases.
-  - [ ] Configure required compliance language and the deterministic evidence source; relational `ApprovedClaim` records are optional enrichment.
-
-  ```md
-  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
-  authenticated admin access and authorisation.
-
-  Brands must be visibly and verbally distinct. Store structured visual tokens (logo reference,
-  colour palette, font choices) and copy constraints per brand; do not make the logo the only
-  differentiator. Any evidence used by a campaign must be deterministic, versioned where needed,
-  and scoped to the owning brand so only system-defined facts can enter an email. A relational
-  `ApprovedClaim` registry may support that boundary, but the core product does not depend on it.
-
-  **Done when:** an admin can maintain two substantially different brand profiles and their
-  constraints are available to both the landing and campaign pipelines.
-  ```
-
 ### T-11 Build the admin audit trail and angle performance dashboard
 
 - tags: [frontend, backend, admin, reporting, audit]
@@ -336,7 +312,7 @@
 
   ```md
   **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
-  authenticated admin access and authorisation; T-05 Build brand management and copy controls;
+  authenticated admin access and authorisation; T-05 Build brand management settings;
   T-06 Build authenticated angle management; T-08 Implement intent capture, explicit
   consent, and suppression handling; T-09 Generate and validate the three-email personalised
   welcome sequence; T-10 Queue, send, and observe campaign email delivery.
@@ -352,6 +328,32 @@
 ## Review / QA
 
 ## Done
+
+### T-05 Build brand management settings
+
+- tags: [backend, frontend, admin, brand, safety]
+- priority: high
+- workload: Hard
+- steps:
+  - [x] Build authenticated brand list, create, edit, archive, and restore flows.
+  - [x] Manage visual identity, voice, reading level, sign-off groundwork, preferred and avoided phrases, fonts, and logo.
+  - [x] Derive and expose a versioned Markdown-backed brand prompt profile.
+
+  ```md
+  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
+  authenticated admin access and authorisation.
+
+  This closes the agreed brand-settings slice. An administrator can maintain materially
+  different brand identities and writing profiles through the organization-scoped backoffice.
+  The Tone/Tense sign-off matrix is documented as generation groundwork, while the runtime
+  signature identity and resolver are deferred. Required compliance language and the deterministic
+  evidence source are intentionally deferred until campaign-generation priorities require them.
+  A relational `ApprovedClaim` registry remains optional enrichment and is not a product dependency.
+
+  **Done when:** an admin can maintain two substantially different brand profiles, inspect the
+  derived prompt profile, and make the settings available to future landing and campaign
+  pipelines without exposing provider secrets.
+  ```
 
 ### T-01 Define the campaign contract and safety policy
 
