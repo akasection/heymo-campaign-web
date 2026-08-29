@@ -38,7 +38,11 @@
           class="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-heymo-line bg-white/95 px-4 backdrop-blur sm:px-6 lg:px-8"
         >
           <div class="flex min-w-0 items-center gap-3">
-            <button class="heymo-icon-button lg:hidden" aria-label="Open navigation" @click="isMobileNavOpen = true">
+            <button
+              class="btn btn-square btn-ghost h-10 w-10 border border-base-300 bg-base-100 lg:hidden"
+              aria-label="Open navigation"
+              @click="isMobileNavOpen = true"
+            >
               <List :size="21" weight="bold" aria-hidden="true" />
             </button>
             <div class="min-w-0">
@@ -49,12 +53,12 @@
             </div>
           </div>
           <div class="flex items-center gap-2 sm:gap-3">
-            <button class="heymo-icon-button relative" aria-label="View notifications">
+            <button class="btn btn-square btn-ghost relative h-10 w-10 border border-base-300 bg-base-100" aria-label="View notifications">
               <Bell :size="20" weight="bold" aria-hidden="true" />
               <span class="absolute right-1.5 top-1.5 size-2 rounded-full bg-heymo-red ring-2 ring-white" aria-hidden="true"></span>
             </button>
             <button
-              class="flex items-center gap-2 rounded-md border border-heymo-line bg-white px-2.5 py-2 text-left transition hover:border-heymo-red focus:outline-2 focus:outline-offset-2 focus:outline-heymo-red disabled:cursor-wait disabled:opacity-60"
+              class="btn btn-outline btn-sm h-auto min-h-10 px-2.5 py-2 text-left disabled:cursor-wait disabled:opacity-60"
               :aria-label="isSigningOut ? 'Signing out' : 'Sign out'"
               :disabled="isSigningOut"
               title="Sign out"
@@ -69,24 +73,21 @@
           </div>
         </header>
 
-        <div class="mx-auto max-w-[1600px] p-4 sm:p-6 lg:p-8">
+        <BrandManagement v-if="activeNavigation === 'brands'" :can-manage="canManageBackoffice" />
+
+        <div v-else class="mx-auto max-w-[1600px] p-4 sm:p-6 lg:p-8">
           <div class="mb-6 flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
             <div>
               <h2 class="text-2xl font-extrabold text-heymo-navy">Campaign pulse</h2>
               <p class="mt-1 max-w-2xl text-sm text-heymo-muted">A live view of the sample journey across today&apos;s active cohorts.</p>
             </div>
             <div class="flex items-center gap-2">
-              <button
-                class="inline-flex min-h-10 items-center gap-2 rounded-md border border-heymo-line bg-white px-3 text-sm font-bold text-heymo-navy transition hover:border-heymo-red focus:outline-2 focus:outline-offset-2 focus:outline-heymo-red"
-              >
+              <button class="btn btn-outline btn-sm">
                 <CalendarBlank :size="18" weight="bold" aria-hidden="true" />
                 This week
                 <CaretDown :size="14" weight="bold" aria-hidden="true" />
               </button>
-              <button
-                v-if="canManageBackoffice"
-                class="inline-flex min-h-10 items-center gap-2 rounded-md bg-heymo-red px-3 text-sm font-bold text-white shadow-sm transition hover:bg-heymo-red-dark focus:outline-2 focus:outline-offset-2 focus:outline-heymo-red"
-              >
+              <button v-if="canManageBackoffice" class="btn btn-primary btn-sm">
                 <Plus :size="18" weight="bold" aria-hidden="true" />
                 <span class="hidden sm:inline">New campaign</span>
                 <span class="sm:hidden">New</span>
@@ -97,9 +98,7 @@
           <div class="grid gap-4 xl:grid-cols-12 xl:gap-5">
             <Panel title="Active sample pickup locations" description="10 live pickup points across 4 campaigns." class="xl:col-span-7">
               <template #action>
-                <button
-                  class="inline-flex items-center gap-1 text-xs font-bold text-heymo-red hover:text-heymo-red-dark focus:outline-2 focus:outline-offset-2 focus:outline-heymo-red"
-                >
+                <button class="btn btn-link btn-xs h-auto min-h-0 gap-1 px-0 text-heymo-red">
                   View map
                   <ArrowUpRight :size="15" weight="bold" aria-hidden="true" />
                 </button>
@@ -154,7 +153,7 @@
               padding-class="p-0"
             >
               <div class="overflow-x-auto">
-                <table class="w-full min-w-155 text-left text-sm">
+                <table class="table table-sm w-full min-w-155 text-left text-sm">
                   <thead class="border-y border-heymo-line bg-slate-50 text-[11px] uppercase tracking-[0.08em] text-heymo-muted">
                     <tr>
                       <th class="px-5 py-3 font-bold">Campaign</th>
@@ -177,9 +176,9 @@
                       </td>
                       <td class="px-3 py-3.5">
                         <div class="flex min-w-28 items-center gap-2">
-                          <span class="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100"
-                            ><span class="block h-full rounded-full bg-heymo-navy" :style="{ width: sample.completion }"></span
-                          ></span>
+                          <progress class="progress progress-primary h-1.5 flex-1" :value="sample.completionValue" max="100">
+                            {{ sample.completion }}
+                          </progress>
                           <span class="w-8 text-xs font-bold tabular-nums text-heymo-muted">{{ sample.completion }}</span>
                         </div>
                       </td>
@@ -213,9 +212,7 @@
                     <span class="text-heymo-ink">{{ item.label }}</span
                     ><span class="tabular-nums text-heymo-muted">{{ item.value }}%</span>
                   </div>
-                  <div class="h-2 overflow-hidden rounded-full bg-slate-100">
-                    <div class="h-full rounded-full" :class="item.color" :style="{ width: `${item.value}%` }"></div>
-                  </div>
+                  <progress class="progress progress-primary h-2 w-full" :value="item.value" max="100">{{ item.value }}%</progress>
                 </div>
               </div>
               <div class="mt-6 flex items-center gap-3 rounded-md bg-heymo-sky px-3 py-3 text-xs leading-5 text-heymo-navy">
@@ -342,6 +339,7 @@ import SidebarNav from "../../components/Backoffice/SidebarNav.vue";
 import StatTile from "../../components/Backoffice/StatTile.vue";
 import StatusBadge from "../../components/Backoffice/StatusBadge.vue";
 import { ApiError, apiFetch, clearAccessToken, saveAccessToken } from "../../lib/auth";
+import BrandManagement from "./BrandManagement.vue";
 import {
   campaignProgress,
   dashboardMetrics,
@@ -361,6 +359,7 @@ const navigationItems: {
   count?: string;
 }[] = [
   { id: "dashboard", label: "Dashboard", icon: SquaresFour },
+  { id: "brands", label: "Brands", icon: Drop },
   { id: "campaigns", label: "Campaigns", icon: ChartLineUp, count: "18" },
   { id: "samples", label: "Samples", icon: Flask, count: "433" },
   { id: "participants", label: "Participants", icon: UsersThree },

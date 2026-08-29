@@ -19,6 +19,7 @@ export type SampleRow = {
   planned: string;
   collected: string;
   completion: string;
+  completionValue: number;
   status: string;
   tone: StatusTone;
 };
@@ -82,6 +83,7 @@ export const sampleRows: SampleRow[] = [
     planned: "620",
     collected: "602",
     completion: "97%",
+    completionValue: 97,
     status: "Collected",
     tone: "positive",
   },
@@ -90,6 +92,7 @@ export const sampleRows: SampleRow[] = [
     planned: "440",
     collected: "416",
     completion: "95%",
+    completionValue: 95,
     status: "In analysis",
     tone: "navy",
   },
@@ -98,6 +101,7 @@ export const sampleRows: SampleRow[] = [
     planned: "330",
     collected: "284",
     completion: "86%",
+    completionValue: 86,
     status: "Pickup queued",
     tone: "warning",
   },
@@ -106,6 +110,7 @@ export const sampleRows: SampleRow[] = [
     planned: "275",
     collected: "198",
     completion: "72%",
+    completionValue: 72,
     status: "Needs review",
     tone: "danger",
   },

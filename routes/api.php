@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\PasswordlessLoginController;
+use App\Http\Controllers\BrandController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,4 +31,15 @@ Route::prefix('auth')->middleware('web')->group(function () {
 
 Route::middleware('auth.jwt')->get('user', function (Request $request) {
     return response()->json($request->user()->toAuthPayload());
+});
+
+Route::prefix('brands')->middleware(['web', 'auth.jwt'])->group(function () {
+    Route::get('options', [BrandController::class, 'options']);
+    Route::get('/', [BrandController::class, 'index']);
+    Route::post('/', [BrandController::class, 'store']);
+    Route::get('{brand}', [BrandController::class, 'show']);
+    Route::put('{brand}', [BrandController::class, 'update']);
+    Route::delete('{brand}', [BrandController::class, 'destroy']);
+    Route::post('{brand}/restore', [BrandController::class, 'restore']);
+    Route::post('{brand}/logo', [BrandController::class, 'uploadLogo']);
 });

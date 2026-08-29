@@ -5,7 +5,7 @@ Campaign management web application for Heymo!.
 ## Stack
 
 - **Backend**: Laravel 9 on PHP 8.1 (installed via mise + vfox-php)
-- **Frontend**: Vue 3 + Vite (TypeScript, Tailwind CSS v4), built with pnpm
+- **Frontend**: Vue 3 + Vite (TypeScript, Tailwind CSS v4 + daisyUI 5), built with pnpm
 - **Database**: PostgreSQL 18 (Docker — `_dev/docker-compose.yaml`)
 - **Cache / Queue / Session**: Valkey 8 (Docker — `_dev/docker-compose.yaml`), accessed through Laravel's Redis layer (predis client)
 
@@ -121,7 +121,11 @@ REDIS_PORT=6380
 
 ```bash
 php artisan migrate --seed
+php artisan storage:link
 ```
+
+The second command exposes uploaded brand logos through `public/storage` when using the local
+filesystem disk. It is safe to run again if the link already exists.
 
 ## Authentication
 
@@ -150,6 +154,34 @@ do not receive management controls. The frontend keeps its short-lived JWT in
 `sessionStorage`; the server also maintains the browser session. `GET /api/user` requires a
 Bearer JWT, `POST /api/auth/token` renews one for an authenticated web session, and
 `POST /api/auth/logout` revokes the active JWT and ends the browser session.
+
+### Brand management
+
+Administrators can open **Brands** from the backoffice navigation. Each profile stores its
+organization-owned identity separately from the static landing pages: primary and secondary
+colors, a logo, curated heading/body fonts, and four named writing preferences (tone, flow,
+tense, and reading level). Preferred and avoided terms are normalized before they are persisted.
+
+The backoffice uses daisyUI for shared controls such as buttons, inputs, cards, tabs, badges,
+alerts, tables, progress indicators, and loading states. Heymo color tokens and the bespoke
+hexagon/data-visual elements remain project-owned. This keeps the component language reusable
+without flattening the existing visual identity.
+
+The saved prompt blueprint is derived from those structured settings and carries a version. It
+is a preview of the writing instructions that future campaign generation will receive, not an
+editable free-form prompt and not a source of health claims. The long-form guidance for each
+voice preset lives in server-only Markdown files under
+`resources/llm/config/brands/<property>-<level>.md`; `config/brands.php` keeps only the preset
+metadata and file mapping. Required compliance and sign-off blocks are added in the later
+copy-controls slice before LLM generation is enabled. A relational approved-evidence registry,
+such as `ApprovedClaim`, is optional enrichment rather than a required product entity.
+
+The seeded administrator can compare two contrasting profiles under `heymo-org`:
+
+| Brand           | Palette               | Writing direction                     |
+| --------------- | --------------------- | ------------------------------------- |
+| Lexical Labs    | `#2E5BFF` + `#00B8A9` | Informal, narrative, relaxed, simpler |
+| XO Health Group | `#163A4A` + `#7393A8` | Formal, descriptive, serious, complex |
 
 For a clean local reviewer reset, run:
 

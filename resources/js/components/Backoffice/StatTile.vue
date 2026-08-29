@@ -1,5 +1,5 @@
 <template>
-  <article class="heymo-panel min-w-0 p-4 sm:p-5">
+  <article class="card card-border min-w-0 bg-base-100 p-4 text-base-content shadow-panel sm:p-5">
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
         <p class="text-xs font-semibold uppercase tracking-[0.08em] text-heymo-muted">
@@ -9,7 +9,7 @@
           {{ value }}
         </p>
       </div>
-      <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-heymo-sky text-heymo-navy">
+      <span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary/15 text-secondary">
         <component :is="icon" :size="20" weight="bold" aria-hidden="true" />
       </span>
     </div>

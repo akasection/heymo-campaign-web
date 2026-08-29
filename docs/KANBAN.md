@@ -15,10 +15,13 @@
   ```md
   **Dependencies:** T-01 Define the campaign contract and safety policy.
 
-  Create the minimum domain: Brand, ApprovedClaim, Angle, LandingPage/landing identifier,
-  Visitor, IntentResponse, ConsentRecord, Campaign, CampaignMessage, GenerationAttempt, and
+  Create the minimum domain: Brand, Angle, LandingPage/landing identifier, Visitor,
+  IntentResponse, ConsentRecord, Campaign, CampaignMessage, GenerationAttempt, and
   DeliveryEvent/Suppression. Model campaign messages by sequence position and channel so email
-  audit data is queryable without parsing blobs.
+  audit data is queryable without parsing blobs. Enforce the no-unapproved-claims rule through
+  a deterministic, brand-scoped evidence-source boundary. A relational `ApprovedClaim` registry
+  is optional enrichment when it adds useful fact selection, conditions, versioning, or audit
+  queryability; it is not a required product entity.
 
   **Done when:** one visitor can be traced from landing page and angle through answers,
   consent, campaign, generated message, policy outcome, and send status. A consent withdrawal
@@ -54,20 +57,20 @@
 - workload: Hard
 - steps:
   - [ ] Create, edit, archive, and list angles scoped to a brand.
-  - [ ] Capture all PRD angle fields and selected approved-proof records.
+  - [ ] Capture all PRD angle fields and deterministic proof references; support optional evidence enrichment.
   - [ ] Validate that promise, proof, offer, and next step are present and truthful.
 
   ```md
   **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
-  authenticated admin access and authorisation; T-05 Build brand management with approved-copy
-  controls.
+  authenticated admin access and authorisation; T-05 Build brand management and copy controls.
 
   Implement the PRD fields: audience, trigger moment, primary job, tension, desired outcome,
   single promise, proof, objection, offer, tone, and next step. Treat angle data as campaign
   strategy and landing-page reference; it is not a runtime page-builder.
 
-  **Done when:** an admin can see which brand owns every angle, select approved proof, and
-  archive an angle without breaking historical campaign audit records.
+  **Done when:** an admin can see which brand owns every angle, configure deterministic proof,
+  optionally select brand-scoped evidence enrichment, and archive an angle without breaking
+  historical campaign audit records.
   ```
 
 ### T-07 Build three hand-authored, message-matched landing pages
@@ -81,7 +84,7 @@
   - [ ] Add a clear entry point to the capture quiz and preserve source-page context.
 
   ```md
-  **Dependencies:** T-05 Build brand management with approved-copy controls; T-06 Build
+  **Dependencies:** T-05 Build brand management and copy controls; T-06 Build
   authenticated angle management.
 
   These pages are deliberately hand-written Blade templates/Vue components. Each must make its
@@ -131,7 +134,7 @@
   ```md
   **Dependencies:** T-01 Define the campaign contract and safety policy; T-02 Create the
   campaign domain and immutable audit schema; T-04 Configure provider-neutral LLM and mail
-  integration; T-05 Build brand management with approved-copy controls; T-06 Build
+  integration; T-05 Build brand management and copy controls; T-06 Build
   authenticated angle management; T-08 Implement intent capture, explicit consent, and
   suppression handling.
 
@@ -142,7 +145,7 @@
 
   **Done when:** two same-angle profiles with different demographics or answers produce
   materially different body copy, emphasis, and email look while retaining the exact same
-  approved claim set where their clinical context is the same. Every rejected or successful
+  deterministic evidence set where their clinical context is the same. Every rejected or successful
   attempt records prompt version, provider/model, raw structured response, policy result, and
   final composed output.
   ```
@@ -177,15 +180,15 @@
 - priority: high
 - workload: Hard
 - steps:
-  - [ ] Seed an administrator, two contrasting brands, three angles, claims, and landing mappings.
+  - [ ] Seed an administrator, two contrasting brands, three angles, optional evidence enrichment, and landing mappings.
   - [ ] Seed diverse consented, suppressed, and failed-generation visitor histories.
   - [ ] Seed authored/validated sample campaigns so review does not need an API key.
   - [ ] Verify a clean reset and reseed from an empty database.
 
   ```md
   **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
-  authenticated admin access and authorisation; T-05 Build brand management with approved-copy
-  controls; T-06 Build authenticated angle management; T-09 Generate and validate the
+  authenticated admin access and authorisation; T-05 Build brand management and copy controls;
+  T-06 Build authenticated angle management; T-09 Generate and validate the
   three-email personalised welcome sequence; T-10 Queue, send, and observe campaign email
   delivery.
 
@@ -295,7 +298,9 @@
 
 ## Todo
 
-### T-05 Build brand management with approved-copy controls
+## In Progress
+
+### T-05 Build brand management and copy controls
 
 - tags: [backend, frontend, admin, brand, safety]
 - priority: high
@@ -303,7 +308,7 @@
 - steps:
   - [ ] Build authenticated brand list, create, edit, and archive flows.
   - [ ] Manage visual identity, voice, reading level, sign-off, required and banned phrases.
-  - [ ] Manage approved claims/facts, conditions, and compliance blocks per brand.
+  - [ ] Configure required compliance language and the deterministic evidence source; relational `ApprovedClaim` records are optional enrichment.
 
   ```md
   **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
@@ -311,14 +316,13 @@
 
   Brands must be visibly and verbally distinct. Store structured visual tokens (logo reference,
   colour palette, font choices) and copy constraints per brand; do not make the logo the only
-  differentiator. Claims must belong to a brand and be selectable by an angle, so only approved
-  facts can enter an email.
+  differentiator. Any evidence used by a campaign must be deterministic, versioned where needed,
+  and scoped to the owning brand so only system-defined facts can enter an email. A relational
+  `ApprovedClaim` registry may support that boundary, but the core product does not depend on it.
 
   **Done when:** an admin can maintain two substantially different brand profiles and their
   constraints are available to both the landing and campaign pipelines.
   ```
-
-## In Progress
 
 ### T-11 Build the admin audit trail and angle performance dashboard
 
@@ -332,8 +336,8 @@
 
   ```md
   **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
-  authenticated admin access and authorisation; T-05 Build brand management with approved-copy
-  controls; T-06 Build authenticated angle management; T-08 Implement intent capture, explicit
+  authenticated admin access and authorisation; T-05 Build brand management and copy controls;
+  T-06 Build authenticated angle management; T-08 Implement intent capture, explicit
   consent, and suppression handling; T-09 Generate and validate the three-email personalised
   welcome sequence; T-10 Queue, send, and observe campaign email delivery.
 
@@ -364,20 +368,21 @@
   **Why:** The PRD requires constraints to be enforced, rather than merely placed in an LLM prompt.
 
   **Generation inputs:** angle audience, trigger, primary job, tension, desired outcome,
-  single promise, approved proof, objection, truthful offer, tone, and next step; visitor
+  single promise, deterministic proof, objection, truthful offer, tone, and next step; visitor
   age range, sex, sub-interest, trigger, concern, page context, and consent; brand voice,
-  reading level, sign-off, visual identity, required language, banned phrases, and approved
-  claim records.
+  reading level, sign-off, visual identity, required language, banned phrases, and a
+  deterministic evidence source when factual content requires it.
 
-  **Enforcement design:** persist approved facts/claims and disclosures as structured data.
-  The model returns valid JSON that selects approved claim IDs and writes only the
-  personalisation/transition fields. A server-side policy validator rejects missing required
-  language, banned phrases, unsupported claim references, prohibited diagnosis/cure/outcome
-  language, demographic clinical inference, inaccurate subjects, and malformed structure.
-  Re-prompt once with violations; if it remains invalid or the provider fails, persist a failed
-  generation attempt and send nothing. The final email is composed from validated content plus
-  deterministic approved blocks, with the prompt recipe, policy result, and model metadata
-  retained for audit.
+  **Enforcement design:** provide factual evidence and disclosures through a deterministic,
+  brand-scoped source. The source may be relational, configured, or block-based; the PRD does
+  not prescribe its entity name. The model returns valid JSON that selects evidence IDs and
+  writes only personalisation/transition fields. A server-side policy validator rejects missing
+  required language, banned phrases, unsupported evidence references, prohibited
+  diagnosis/cure/outcome language, demographic clinical inference, inaccurate subjects, and
+  malformed structure. Re-prompt once with violations; if it remains invalid or the provider
+  fails, persist a failed generation attempt and send nothing. The final email is composed from
+  validated prose plus validated evidence and deterministic blocks, with the prompt recipe,
+  policy result, evidence snapshot, and model metadata retained for audit.
 
   **Done when:** this decision is documented in the README or an architecture note, with one
   example showing exactly why two profiles receive different presentation without different

@@ -1,83 +1,140 @@
 @import "tailwindcss";
 
+@plugin "daisyui" {
+    themes:
+        heymo --default,
+        brand-preview;
+    include:
+        button, input, select, file-input, badge, alert, tab, card, table,
+        progress, skeleton, join, tooltip;
+}
+
+@plugin "daisyui/theme" {
+    name: "heymo";
+    default: true;
+    prefersdark: false;
+    color-scheme: light;
+
+    --color-base-100: #ffffff;
+    --color-base-200: #f4f7fb;
+    --color-base-300: #dbe4f0;
+    --color-base-content: #17233d;
+    --color-primary: #d92d3a;
+    --color-primary-content: #ffffff;
+    --color-secondary: #112957;
+    --color-secondary-content: #ffffff;
+    --color-accent: #e9f1fb;
+    --color-accent-content: #112957;
+    --color-neutral: #112957;
+    --color-neutral-content: #ffffff;
+    --color-info: #2e5bff;
+    --color-info-content: #ffffff;
+    --color-success: #168360;
+    --color-success-content: #ffffff;
+    --color-warning: #cc7a00;
+    --color-warning-content: #ffffff;
+    --color-error: #d92d3a;
+    --color-error-content: #ffffff;
+
+    --radius-selector: 0.375rem;
+    --radius-field: 0.375rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+    name: "brand-preview";
+    default: false;
+    prefersdark: false;
+    color-scheme: light;
+
+    --color-base-100: #ffffff;
+    --color-base-200: #f4f7fb;
+    --color-base-300: #dbe4f0;
+    --color-base-content: #17233d;
+    --color-primary: #2e5bff;
+    --color-primary-content: #ffffff;
+    --color-secondary: #00b8a9;
+    --color-secondary-content: #17233d;
+    --color-accent: #e9f1fb;
+    --color-accent-content: #112957;
+    --color-neutral: #112957;
+    --color-neutral-content: #ffffff;
+    --color-info: #2e5bff;
+    --color-info-content: #ffffff;
+    --color-success: #168360;
+    --color-success-content: #ffffff;
+    --color-warning: #cc7a00;
+    --color-warning-content: #ffffff;
+    --color-error: #d92d3a;
+    --color-error-content: #ffffff;
+
+    --radius-selector: 0.375rem;
+    --radius-field: 0.375rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
+}
+
 /* Tell Tailwind where your classes live (v4) */
 @source "../**/*.blade.php";
 @source "../**/*.{js,jsx,ts,tsx,vue}";
 @source "../../storage/framework/views/*.php";
 
 @theme {
-  --color-heymo-navy: #112957;
-  --color-heymo-navy-dark: #091a3e;
-  --color-heymo-red: #d92d3a;
-  --color-heymo-red-dark: #b52231;
-  --color-heymo-sky: #e9f1fb;
-  --color-heymo-ink: #17233d;
-  --color-heymo-muted: #667085;
-  --color-heymo-line: #dbe4f0;
-  --color-heymo-canvas: #f4f7fb;
-  --color-heymo-positive: #168360;
-  --color-heymo-warning: #cc7a00;
-  --font-sans: "Avenir Next", "Montserrat", "Segoe UI", sans-serif;
-  --shadow-panel: 0 12px 28px rgb(17 41 87 / 8%);
+    --color-heymo-navy: #112957;
+    --color-heymo-navy-dark: #091a3e;
+    --color-heymo-red: #d92d3a;
+    --color-heymo-red-dark: #b52231;
+    --color-heymo-sky: #e9f1fb;
+    --color-heymo-ink: #17233d;
+    --color-heymo-muted: #667085;
+    --color-heymo-line: #dbe4f0;
+    --color-heymo-canvas: #f4f7fb;
+    --color-heymo-positive: #168360;
+    --color-heymo-warning: #cc7a00;
+    --font-sans: "Avenir Next", "Montserrat", "Segoe UI", sans-serif;
+    --shadow-panel: 0 12px 28px rgb(17 41 87 / 8%);
 }
 
 @layer base {
-  html {
-    background: var(--color-heymo-canvas);
-  }
+    html {
+        background: var(--color-heymo-canvas);
+    }
 
-  body {
-    min-width: 320px;
-    background:
-      linear-gradient(90deg, rgb(219 228 240 / 42%) 1px, transparent 1px) 0 0 / 32px 32px,
-      linear-gradient(rgb(219 228 240 / 30%) 1px, transparent 1px) 0 0 / 32px 32px,
-      var(--color-heymo-canvas);
-    color: var(--color-heymo-ink);
-  }
+    body {
+        min-width: 320px;
+        background:
+            linear-gradient(90deg, rgb(219 228 240 / 42%) 1px, transparent 1px)
+                0 0 / 32px 32px,
+            linear-gradient(rgb(219 228 240 / 30%) 1px, transparent 1px) 0 0 /
+                32px 32px,
+            var(--color-heymo-canvas);
+        color: var(--color-heymo-ink);
+    }
 
-  button,
-  [role="button"] {
-    cursor: pointer;
-  }
+    button,
+    [role="button"] {
+        cursor: pointer;
+    }
 }
 
 @layer components {
-  .heymo-panel {
-    border: 1px solid var(--color-heymo-line);
-    border-radius: 8px;
-    background: white;
-    box-shadow: var(--shadow-panel);
-  }
-
-  .heymo-icon-button {
-    display: inline-flex;
-    height: 2.5rem;
-    width: 2.5rem;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--color-heymo-line);
-    border-radius: 0.5rem;
-    background: white;
-    color: var(--color-heymo-navy);
-    transition:
-      background-color 150ms ease,
-      border-color 150ms ease,
-      color 150ms ease;
-  }
-
-  .heymo-icon-button:hover {
-    border-color: var(--color-heymo-red);
-    color: var(--color-heymo-red);
-  }
-
-  .hex-tile {
-    clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0 50%);
-  }
-
-  @supports not (clip-path: polygon(0 0)) {
     .hex-tile {
-      clip-path: none;
-      border-radius: 0.75rem;
+        clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0 50%);
     }
-  }
+
+    @supports not (clip-path: polygon(0 0)) {
+        .hex-tile {
+            clip-path: none;
+            border-radius: 0.75rem;
+        }
+    }
 }

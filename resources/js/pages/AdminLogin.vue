@@ -63,7 +63,7 @@
             <p class="mt-3 max-w-md text-sm leading-6 text-heymo-muted">Use your work email and we&apos;ll send a fresh sign-in code.</p>
           </div>
 
-          <div class="heymo-panel overflow-hidden">
+          <div class="card card-border overflow-hidden bg-base-100 text-base-content shadow-panel">
             <div class="flex items-center gap-2 border-b border-heymo-line bg-heymo-sky/60 px-6 py-4 text-xs font-bold text-heymo-navy sm:px-8">
               <span class="flex size-6 items-center justify-center rounded-full bg-white text-heymo-red shadow-sm">
                 <span class="text-[10px]">{{ step === "email" ? "1" : "2" }}</span>
@@ -88,24 +88,16 @@
                         required
                         autofocus
                         placeholder="you@company.com"
-                        class="h-12 w-full rounded-md border border-heymo-line bg-white pl-10 pr-3 text-sm text-heymo-ink outline-none transition placeholder:text-slate-300 focus:border-heymo-red focus:ring-2 focus:ring-heymo-red/15"
+                        class="input input-lg w-full pl-10 placeholder:text-slate-300"
                       />
                     </div>
                   </div>
 
-                  <p
-                    v-if="errorMessage"
-                    class="rounded-md border border-rose-200 bg-rose-50 px-3 py-2.5 text-sm leading-5 text-rose-700"
-                    role="alert"
-                  >
+                  <p v-if="errorMessage" class="alert alert-soft alert-error px-3 py-2.5 text-sm leading-5" role="alert">
                     {{ errorMessage }}
                   </p>
 
-                  <button
-                    type="submit"
-                    :disabled="isLoading"
-                    class="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-heymo-red px-4 text-sm font-bold text-white shadow-sm transition hover:bg-heymo-red-dark focus:outline-2 focus:outline-offset-2 focus:outline-heymo-red disabled:cursor-wait disabled:opacity-60"
-                  >
+                  <button type="submit" :disabled="isLoading" class="btn btn-primary btn-lg w-full">
                     {{ isLoading ? "Sending code..." : "Send sign-in code" }}
                     <ArrowRight v-if="!isLoading" :size="18" weight="bold" aria-hidden="true" />
                   </button>
@@ -130,7 +122,7 @@
                       autofocus
                       placeholder="000-000"
                       aria-describedby="code-help"
-                      class="mt-2 h-14 w-full rounded-md border border-heymo-line bg-white px-4 text-center text-2xl font-extrabold tracking-[0.22em] text-heymo-navy outline-none transition placeholder:tracking-[0.16em] placeholder:text-slate-300 focus:border-heymo-red focus:ring-2 focus:ring-heymo-red/15"
+                      class="input input-lg mt-2 h-14 w-full text-center text-2xl font-extrabold tracking-[0.22em] text-heymo-navy placeholder:tracking-[0.16em] placeholder:text-slate-300"
                       @input="formatCodeInput"
                     />
                     <p id="code-help" class="mt-2 flex items-center gap-1.5 text-xs text-heymo-muted">
@@ -139,26 +131,14 @@
                     </p>
                   </div>
 
-                  <p
-                    v-if="message"
-                    class="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm leading-5 text-emerald-700"
-                    role="status"
-                  >
+                  <p v-if="message" class="alert alert-soft alert-success px-3 py-2.5 text-sm leading-5" role="status">
                     {{ message }}
                   </p>
-                  <p
-                    v-if="errorMessage"
-                    class="rounded-md border border-rose-200 bg-rose-50 px-3 py-2.5 text-sm leading-5 text-rose-700"
-                    role="alert"
-                  >
+                  <p v-if="errorMessage" class="alert alert-soft alert-error px-3 py-2.5 text-sm leading-5" role="alert">
                     {{ errorMessage }}
                   </p>
 
-                  <button
-                    type="submit"
-                    :disabled="isLoading || codeDigits.length !== 6"
-                    class="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-heymo-red px-4 text-sm font-bold text-white shadow-sm transition hover:bg-heymo-red-dark focus:outline-2 focus:outline-offset-2 focus:outline-heymo-red disabled:cursor-not-allowed disabled:opacity-60"
-                  >
+                  <button type="submit" :disabled="isLoading || codeDigits.length !== 6" class="btn btn-primary btn-lg w-full">
                     {{ isLoading ? "Checking code..." : "Open workspace" }}
                     <ArrowRight v-if="!isLoading" :size="18" weight="bold" aria-hidden="true" />
                   </button>
@@ -188,7 +168,7 @@
 
           <section
             v-if="step === 'email' && showDemoAccounts"
-            class="mt-5 rounded-md border border-heymo-line bg-white/80 p-4 sm:p-5"
+            class="card card-border mt-5 bg-base-100/80 p-4 sm:p-5"
             aria-labelledby="demo-accounts-title"
           >
             <div class="flex items-start gap-3">

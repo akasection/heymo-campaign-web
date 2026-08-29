@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Brand;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -66,6 +67,47 @@ class DatabaseSeeder extends Seeder
                     'email_verified_at' => now(),
                     'password' => Hash::make(Str::random(64)),
                 ],
+            );
+        }
+
+        $heymoOrganization = $organizations['heymo-org'];
+
+        foreach ([
+            [
+                'name' => 'Lexical Labs',
+                'slug' => 'lexical-labs',
+                'tone_preset' => 'informal',
+                'flow_preset' => 'narrative',
+                'tense_preset' => 'relaxed',
+                'reading_level_preset' => 'simpler',
+                'preferred_terms' => ['clear numbers', 'small steps', 'feel in the loop'],
+                'avoided_terms' => ['miracle', 'perfect', 'guaranteed'],
+                'primary_color' => '#2E5BFF',
+                'secondary_color' => '#00B8A9',
+                'heading_font' => 'space_grotesk',
+                'body_font' => 'public_sans',
+            ],
+            [
+                'name' => 'XO Health Group',
+                'slug' => 'xo-health-group',
+                'tone_preset' => 'formal',
+                'flow_preset' => 'descriptive',
+                'tense_preset' => 'serious',
+                'reading_level_preset' => 'complex',
+                'preferred_terms' => ['laboratory-reviewed', 'measured clarity', 'informed decisions'],
+                'avoided_terms' => ['quick fix', 'hack', 'guaranteed'],
+                'primary_color' => '#163A4A',
+                'secondary_color' => '#7393A8',
+                'heading_font' => 'source_serif',
+                'body_font' => 'ibm_plex_sans',
+            ],
+        ] as $brandAttributes) {
+            Brand::query()->updateOrCreate(
+                [
+                    'organization_id' => $heymoOrganization->id,
+                    'slug' => $brandAttributes['slug'],
+                ],
+                $brandAttributes,
             );
         }
     }

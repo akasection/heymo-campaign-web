@@ -8,7 +8,8 @@ organization claims. The four seeded organizations are useful tenant/account bou
 they are not marketing brands.
 
 `Organization` currently stores only a name and slug. There is no `Brand` model, brand
-configuration, approved-claim store, angle relationship, brand API, or brand management UI.
+configuration, deterministic evidence source, angle relationship, brand API, or brand
+management UI.
 The current dashboard shows the signed-in user's organization and intentionally has no
 organization switcher.
 
@@ -23,14 +24,19 @@ Organization
 
 Brand
   belongsTo Organization
-  hasMany ApprovedClaims
   hasMany Angles
+
+Optional enrichment:
+  Brand
+    hasMany ApprovedClaims (when a relational evidence registry is useful)
 ```
 
 A brand is an organization-owned marketing identity. It stores visual identity, voice,
-reading level, sign-off, required language, banned phrases, compliance blocks, and approved
-claims. Angles and future campaigns belong to a brand. Historical records must retain their
-brand relationship and must not depend on changing organization/user records.
+reading level, sign-off, required language, banned phrases, and compliance constraints. Angles
+and future campaigns belong to a brand. Historical records must retain their brand relationship
+and must not depend on changing organization/user records. The campaign system requires a
+deterministic, brand-scoped evidence source for factual health content, but does not require a
+specific persistence model; a relational `ApprovedClaim` registry is optional enrichment.
 
 Do not convert the four existing organizations into brands automatically. Seed two
 contrasting brands under `Heymo Org` so the current seeded administrator can review both
@@ -45,34 +51,34 @@ accounts for the T-03 access-boundary demonstration.
   `backoffice.manage` capability.
 - Every brand query and mutation is scoped through the authenticated user's organization.
 - Members may be allowed to view data later, but must not create, edit, or archive brands or
-  claims unless an explicit capability is added.
+  optional evidence records unless an explicit capability is added.
 - Static landing pages remain hand-authored. Brand/angle data supplies ownership and
   campaign context; it must not become a runtime page builder.
-- Do not add Vue component tests. Cover framework behavior with feature tests and keep unit
-  tests for pure utilities only, matching `AGENTS.md`.
+- Do not add Vue component or feature tests in this slice. Keep unit tests for pure utilities
+  only, matching the current testing decision and `AGENTS.md`.
 
 ## Affected Files
 
-| File                                                     | Change Type   | Dependencies                                                                     |
-| -------------------------------------------------------- | ------------- | -------------------------------------------------------------------------------- |
-| `database/migrations/*_create_brands_table.php`          | create        | `organizations` migration                                                        |
-| `database/migrations/*_create_approved_claims_table.php` | create        | brands migration                                                                 |
-| `database/migrations/*_create_angles_table.php`          | create        | brands and approved claims migrations                                            |
-| `database/migrations/*_create_landing_pages_table.php`   | create        | angles migration; keep static page identifiers                                   |
-| `app/Models/Brand.php`                                   | create        | Organization relationship                                                        |
-| `app/Models/ApprovedClaim.php`                           | create        | Brand relationship and status casting                                            |
-| `app/Models/Angle.php`                                   | create        | Brand and approved-proof relationships                                           |
-| `app/Models/LandingPage.php`                             | create        | Angle relationship                                                               |
-| `app/Models/Organization.php`                            | modify        | `hasMany(Brand::class)`                                                          |
-| `app/Models/User.php`                                    | modify        | organization-scoped authorization helpers if needed                              |
-| `database/factories/*`                                   | create/modify | model tests and deterministic seed support                                       |
-| `database/seeders/DatabaseSeeder.php`                    | modify        | seed organizations, two brands, claims, angles, and mappings in dependency order |
-| `app/Http/Controllers/*` and `app/Http/Requests/*`       | create        | authenticated brand/claim endpoints                                              |
-| `routes/api.php`                                         | modify        | protected, organization-scoped routes                                            |
-| `resources/js/pages/Backoffice/*`                        | create/modify | brand list/forms and dashboard navigation                                        |
-| `resources/js/lib/*`                                     | modify        | typed brand API calls only if existing helper surface is insufficient            |
-| `README.md`                                              | modify        | brand model, seeded demo, reset command, and safety decisions                    |
-| `tests/Feature/*`                                        | create/modify | authorization, scoping, archive, and seed behavior                               |
+| File                                                     | Change Type   | Dependencies                                                                                |
+| -------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------- |
+| `database/migrations/*_create_brands_table.php`          | create        | `organizations` migration                                                                   |
+| `database/migrations/*_create_approved_claims_table.php` | optional      | only if relational evidence enrichment is selected                                          |
+| `database/migrations/*_create_angles_table.php`          | create        | brands migration; optional evidence enrichment if selected                                  |
+| `database/migrations/*_create_landing_pages_table.php`   | create        | angles migration; keep static page identifiers                                              |
+| `app/Models/Brand.php`                                   | create        | Organization relationship                                                                   |
+| `app/Models/ApprovedClaim.php`                           | optional      | relational evidence enrichment only                                                         |
+| `app/Models/Angle.php`                                   | create        | Brand and deterministic proof references                                                    |
+| `app/Models/LandingPage.php`                             | create        | Angle relationship                                                                          |
+| `app/Models/Organization.php`                            | modify        | `hasMany(Brand::class)`                                                                     |
+| `app/Models/User.php`                                    | modify        | organization-scoped authorization helpers if needed                                         |
+| `database/factories/*`                                   | create/modify | deterministic seed support and utility fixtures                                             |
+| `database/seeders/DatabaseSeeder.php`                    | modify        | seed organizations, two brands, optional evidence, angles, and mappings in dependency order |
+| `app/Http/Controllers/*` and `app/Http/Requests/*`       | create        | authenticated brand and optional evidence endpoints                                         |
+| `routes/api.php`                                         | modify        | protected, organization-scoped routes                                                       |
+| `resources/js/pages/Backoffice/*`                        | create/modify | brand list/forms and dashboard navigation                                                   |
+| `resources/js/lib/*`                                     | modify        | typed brand API calls only if existing helper surface is insufficient                       |
+| `README.md`                                              | modify        | brand model, seeded demo, reset command, and safety decisions                               |
+| `tests/Unit/*`                                           | create/modify | pure utility behavior only                                                                  |
 
 ## Execution Plan
 
@@ -81,9 +87,11 @@ accounts for the T-03 access-boundary demonstration.
 - [ ] Define the minimum Brand fields: organization owner, name, slug, active/archive state,
       logo reference, structured visual tokens, voice, reading level, sign-off, required phrases,
       banned phrases, and compliance language.
-- [ ] Define ApprovedClaim fields: brand owner, claim text, source/reference, conditions or
-      disclosure, status, and archive metadata.
-- [ ] Define the full Angle fields from the PRD and the selected approved-proof relation.
+- [ ] If relational evidence enrichment is selected, define optional evidence fields such as
+      brand owner, exact text, source/reference, conditions or disclosure, status, and archive
+      metadata. Do not make this table a prerequisite for the core product loop.
+- [ ] Define the full Angle fields from the PRD and the selected deterministic proof source;
+      a relational approved-evidence relation is optional.
 - [ ] Define a stable landing identifier to angle mapping without composing page markup from
       database records.
 - [ ] Decide which fields are generation inputs versus editorial/audit documentation and
@@ -96,30 +104,37 @@ accounts for the T-03 access-boundary demonstration.
 - [ ] Add migrations in dependency order with foreign keys, useful indexes, organization-plus
       slug uniqueness, explicit statuses, and nullable archive timestamps where history must remain.
 - [ ] Use PostgreSQL JSON/JSONB-compatible fields for visual tokens and phrase lists only where
-      the data is genuinely structured; keep claims and angle fields queryable as columns.
-- [ ] Add Eloquent relationships, casts, factories, and approved-claim selection relations.
+      the data is genuinely structured; keep core angle fields queryable as columns and add a
+      relational evidence registry only when its queryability is worth the extra domain surface.
+- [ ] Add Eloquent relationships, casts, factories, and optional evidence-selection relations
+      only when that enrichment is selected.
 - [ ] Preserve historical brand/angle references when a record is archived; do not cascade-delete
       campaign evidence.
-- **Verify:** run migrations in a disposable test database and execute the focused feature tests
-  before adding the UI.
+- **Verify:** run migrations in a disposable test database and execute focused pure-utility
+  checks before adding the UI.
 
 ### Phase 3: Add backend management and authorization
 
 - [ ] Add authenticated brand list, create, update, and archive endpoints.
-- [ ] Add approved-claim management endpoints and validation for required compliance fields.
-- [ ] Add angle management endpoints only after brand and claim ownership are available.
+- [ ] Add optional evidence management endpoints only if the relational enrichment is selected;
+      the core API must expose the deterministic evidence-source boundary without assuming a
+      relational evidence table.
+- [ ] Add angle management endpoints after brand ownership is available. Validate proof against
+      the configured deterministic evidence source when one is selected.
 - [ ] Enforce `auth.jwt` plus the backend `backoffice.manage` capability on mutations; never rely
       on hidden frontend controls.
 - [ ] Scope every query by `$request->user()->organization_id` and reject cross-organization IDs.
 - [ ] Return archived records only through an explicit review/history path.
-- **Verify:** feature-test unauthenticated access, member mutation denial, cross-organization
-  access denial, valid admin CRUD, and archive preservation.
+- **Verify:** manually exercise unauthenticated access, member mutation denial,
+  cross-organization access denial, valid admin CRUD, and archive preservation. Keep new
+  automated coverage limited to pure utilities in this slice.
 
 ### Phase 4: Add the admin UI
 
 - [ ] Add a brand management entry from the existing Backoffice navigation.
 - [ ] Build a compact list/detail/edit flow for brand identity and copy constraints.
-- [ ] Surface approved claims and their conditions within the owning brand context.
+- [ ] Surface deterministic evidence/proof within the owning brand context; a relational
+      approved-claim editor is optional enrichment.
 - [ ] Show the current organization clearly and do not add an organization switcher.
 - [ ] Keep controls keyboard accessible and consistent with the existing Heymo visual language.
 - [ ] Use typed API responses and the existing `apiFetch` authentication helper.
@@ -133,13 +148,13 @@ accounts for the T-03 access-boundary demonstration.
       identity and a warmer active-lifestyle identity.
 - [ ] Make the brands differ in colors, typography tokens, voice, reading level, sign-off,
       required language, and banned phrases, not only in name or logo.
-- [ ] Seed approved claims with conditions and disclosures, three angles, and static landing
-      identifiers after their migrations exist.
+- [ ] Optionally seed deterministic evidence entries with conditions and disclosures, then seed
+      three angles and static landing identifiers after their migrations exist.
 - [ ] Use `updateOrCreate` or equivalent stable keys so normal reseeding is deterministic.
 - [ ] Add authored sample records later through T-12 so reviewers can inspect the demo without
       an LLM key or remote provider call.
 - **Verify:** on an isolated/disposable database, run exactly `php artisan migrate:fresh --seed`
-  and confirm it completes unattended and produces both brands plus the required demo records.
+  and confirm it completes unattended and produces both brands plus the core demo records.
   Do not run the destructive command against the active development database without explicit
   approval or an isolated database target.
 
@@ -148,8 +163,9 @@ accounts for the T-03 access-boundary demonstration.
 - [ ] Explain Organization versus Brand and explicitly state that organization switching is out
       of scope.
 - [ ] Document the two seeded brands, their contrasting constraints, and the admin review path.
-- [ ] Document which fields feed generation, which claims are approved, and how archive/scoping
-      protects audit history.
+- [ ] Document which fields feed generation, which deterministic evidence source is allowed,
+      and how archive/scoping protects audit history. Name `ApprovedClaim` only as optional
+      relational enrichment.
 - [ ] Update the end-to-end README journey when visitor/campaign tickets are implemented.
 - [ ] Leave T-03 marked Done; update ticket status only when the corresponding future ticket is
       actually delivered.
@@ -174,8 +190,9 @@ accounts for the T-03 access-boundary demonstration.
   would prevent one organization from owning multiple brands.
 - Frontend-only capability checks could expose cross-organization or member mutations; all
   management authorization must be enforced server-side.
-- JSON-only storage for claims or angle fields would make audit/reporting queries difficult;
-  keep important evidence relational and queryable.
+- JSON-only storage for important evidence or angle fields may make audit/reporting queries
+  difficult; choose relational evidence enrichment when queryability is worth the added domain
+  surface, but do not treat it as mandatory.
 - Seeding brands in external organizations would make them invisible to the current Heymo
   admin because organization switching is intentionally out of scope.
 - Running `migrate:fresh --seed` against the active local database can erase current data; use

@@ -1,5 +1,5 @@
 <template>
-  <section class="heymo-panel" :class="paddingClass">
+  <section class="card card-border bg-base-100 text-base-content shadow-panel" :class="paddingClass">
     <header v-if="title || $slots.action" class="mb-4 flex items-start justify-between gap-3">
       <div>
         <h2 v-if="title" class="text-sm font-bold text-heymo-navy">
