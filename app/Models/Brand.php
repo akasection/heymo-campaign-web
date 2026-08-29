@@ -13,6 +13,7 @@ class Brand extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'organization_id',
         'name',
         'slug',
         'tone_preset',

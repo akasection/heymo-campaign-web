@@ -9,6 +9,8 @@ class BrandPromptProfileBuilder
 {
     public const VERSION = 'brand-profile-v1';
 
+    private static array $instructionCache = [];
+
     /**
      * @param  array<string, mixed>  $attributes
      * @return array<string, mixed>
@@ -66,6 +68,10 @@ class BrandPromptProfileBuilder
     {
         $path = resource_path("llm/config/brands/{$filename}");
 
+        if (array_key_exists($path, self::$instructionCache)) {
+            return self::$instructionCache[$path];
+        }
+
         if (! is_readable($path)) {
             throw new RuntimeException("Brand prompt instruction file is missing or unreadable: {$filename}");
         }
@@ -76,6 +82,6 @@ class BrandPromptProfileBuilder
             throw new RuntimeException("Brand prompt instruction file is empty: {$filename}");
         }
 
-        return trim($contents);
+        return self::$instructionCache[$path] = trim($contents);
     }
 }
