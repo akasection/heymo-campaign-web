@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "./pages/Backoffice/Dashboard.vue";
 
 const router = createRouter({
-  history: createWebHistory("/admin"),
+  history: createWebHistory("/admin/"),
   routes: [
     {
       path: "/",
@@ -17,7 +17,7 @@ const router = createRouter({
       meta: { navigationId: "brands" },
     },
     {
-      path: "/brands/:id",
+      path: "/brands/:id(\\d+)",
       name: "admin.brand",
       component: Dashboard,
       meta: { navigationId: "brands" },

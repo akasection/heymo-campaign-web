@@ -116,6 +116,10 @@ class DatabaseSeeder extends Seeder
                 $brandAttributes,
             );
 
+            if (! array_key_exists($brand->slug, $brandLogoFixtures)) {
+                throw new RuntimeException("Missing seeded brand logo mapping for slug: {$brand->slug}");
+            }
+
             $this->seedBrandLogo($brand, $brandLogoFixtures[$brand->slug]);
         }
     }

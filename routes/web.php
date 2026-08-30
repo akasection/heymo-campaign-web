@@ -22,7 +22,7 @@ Route::view('login', 'AdminLogin.login')->middleware('guest')->name('login');
 Route::middleware('auth')->group(function () {
     Route::view('admin', 'Backoffice.dashboard')->name('admin.dashboard');
     Route::view('admin/brands', 'Backoffice.dashboard')->name('admin.brands');
-    Route::view('admin/brands/{brand}', 'Backoffice.dashboard')->name('admin.brand');
+    Route::view('admin/brands/{id}', 'Backoffice.dashboard')->whereNumber('id')->name('admin.brand');
     Route::view('admin/campaigns', 'Backoffice.dashboard')->name('admin.campaigns');
     Route::view('admin/samples', 'Backoffice.dashboard')->name('admin.samples');
     Route::view('admin/participants', 'Backoffice.dashboard')->name('admin.participants');
