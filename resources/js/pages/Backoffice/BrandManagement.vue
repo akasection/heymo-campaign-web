@@ -37,7 +37,8 @@
             :aria-selected="activeTab === 'active'"
             @click="setActiveTab('active')"
           >
-            Active <span class="ml-1 tabular-nums">{{ activeBrands.length }}</span>
+            Active
+            <span class="ml-1 tabular-nums">{{ activeBrands.length }}</span>
           </button>
           <button
             type="button"
@@ -47,7 +48,8 @@
             :aria-selected="activeTab === 'archived'"
             @click="setActiveTab('archived')"
           >
-            Archived <span class="ml-1 tabular-nums">{{ archivedBrands.length }}</span>
+            Archived
+            <span class="ml-1 tabular-nums">{{ archivedBrands.length }}</span>
           </button>
         </div>
 
@@ -59,7 +61,9 @@
         </div>
         <div v-else-if="!visibleBrands.length" class="rounded-md border border-dashed border-heymo-line px-4 py-10 text-center">
           <PaintBrush :size="28" class="mx-auto text-heymo-muted" aria-hidden="true" />
-          <p class="mt-3 text-sm font-bold text-heymo-navy">{{ activeTab === "active" ? "No active brands yet" : "No archived brands" }}</p>
+          <p class="mt-3 text-sm font-bold text-heymo-navy">
+            {{ activeTab === "active" ? "No active brands yet" : "No archived brands" }}
+          </p>
           <p class="mt-1 text-xs leading-5 text-heymo-muted">
             {{ activeTab === "active" ? "Create a profile to give future campaigns a distinct voice." : "Archived profiles will appear here." }}
           </p>
@@ -121,7 +125,8 @@
           <template #action>
             <div class="flex items-center gap-2">
               <button v-if="activeTab === 'active'" class="btn btn-outline btn-sm" @click="openEdit(selectedBrand)">
-                <PencilSimple :size="16" weight="bold" aria-hidden="true" /> Edit
+                <PencilSimple :size="16" weight="bold" aria-hidden="true" />
+                Edit
               </button>
               <button
                 v-if="activeTab === 'active'"
@@ -133,7 +138,8 @@
                 <Archive :size="17" weight="bold" aria-hidden="true" />
               </button>
               <button v-else class="btn btn-outline btn-sm" @click="restoreSelected">
-                <ArrowCounterClockwise :size="16" weight="bold" aria-hidden="true" /> Restore
+                <ArrowCounterClockwise :size="16" weight="bold" aria-hidden="true" />
+                Restore
               </button>
             </div>
           </template>
@@ -191,8 +197,12 @@
                 </div>
                 <dl class="grid gap-2 sm:grid-cols-2">
                   <div v-for="dimension in profileDimensions" :key="dimension.label" class="rounded-md bg-base-200 px-3 py-2.5">
-                    <dt class="text-[10px] font-bold uppercase tracking-[0.08em] text-heymo-muted">{{ dimension.label }}</dt>
-                    <dd class="mt-1 text-xs font-extrabold text-heymo-navy">{{ dimension.value }}</dd>
+                    <dt class="text-[10px] font-bold uppercase tracking-[0.08em] text-heymo-muted">
+                      {{ dimension.label }}
+                    </dt>
+                    <dd class="mt-1 text-xs font-extrabold text-heymo-navy">
+                      {{ dimension.value }}
+                    </dd>
                   </div>
                 </dl>
               </div>
@@ -285,10 +295,22 @@ const profileDimensions = computed(() => {
   }
 
   return [
-    { label: "Tone", value: selectedBrand.value.prompt_profile.voice.tone.label },
-    { label: "Flow", value: selectedBrand.value.prompt_profile.voice.flow.label },
-    { label: "Tense", value: selectedBrand.value.prompt_profile.voice.tense.label },
-    { label: "Reading level", value: selectedBrand.value.prompt_profile.voice.reading_level.label },
+    {
+      label: "Tone",
+      value: selectedBrand.value.prompt_profile.voice.tone.label,
+    },
+    {
+      label: "Flow",
+      value: selectedBrand.value.prompt_profile.voice.flow.label,
+    },
+    {
+      label: "Tense",
+      value: selectedBrand.value.prompt_profile.voice.tense.label,
+    },
+    {
+      label: "Reading level",
+      value: selectedBrand.value.prompt_profile.voice.reading_level.label,
+    },
   ];
 });
 
@@ -366,7 +388,10 @@ async function restoreSelected(): Promise<void> {
   const brandId = selectedBrand.value.id;
   await restoreBrand(brandId);
   activeTab.value = "active";
-  await router.replace({ name: "admin.brand", params: { id: String(brandId) } });
+  await router.replace({
+    name: "admin.brand",
+    params: { id: String(brandId) },
+  });
 }
 
 watch(
