@@ -73,9 +73,9 @@
           </div>
         </header>
 
-        <BrandManagement v-if="activeNavigation === 'brands'" :can-manage="canManageBackoffice" />
+        <BrandManagement v-if="isAuthReady && activeNavigation === 'brands'" :can-manage="canManageBackoffice" />
 
-        <div v-else class="mx-auto max-w-[1600px] p-4 sm:p-6 lg:p-8">
+        <div v-else-if="isAuthReady" class="mx-auto max-w-[1600px] p-4 sm:p-6 lg:p-8">
           <div class="mb-6 flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
             <div>
               <h2 class="text-2xl font-extrabold text-heymo-navy">Campaign pulse</h2>
@@ -305,6 +305,12 @@
             </Panel>
           </div>
         </div>
+        <div v-else class="mx-auto grid min-h-96 max-w-[1600px] place-items-center p-4 sm:p-6 lg:p-8">
+          <div class="flex items-center gap-3 text-sm font-semibold text-heymo-muted" aria-label="Loading workspace">
+            <span class="loading loading-spinner loading-sm text-heymo-red" aria-hidden="true"></span>
+            Loading workspace...
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -332,6 +338,7 @@ import {
   PhX as X,
 } from "@phosphor-icons/vue";
 import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import type { Component } from "vue";
 import HexValidationTile from "../../components/Backoffice/HexValidationTile.vue";
 import Panel from "../../components/Backoffice/Panel.vue";
@@ -368,14 +375,27 @@ const navigationItems: {
 ];
 
 const metricIcons = [Flask, ChartLineUp, Drop];
-const activeNavigation = ref("dashboard");
 const activeAlerts = ref([...recentAlerts]);
 const isMobileNavOpen = ref(false);
 const selectedValidationStep = ref(3);
 const validationSteps = ref([...initialValidationSteps]);
 const currentUser = ref<AuthUser | null>(null);
 const isSigningOut = ref(false);
+const isAuthReady = ref(false);
+const route = useRoute();
+const router = useRouter();
 
+const navigationRoutes: Record<string, string> = {
+  dashboard: "admin.dashboard",
+  brands: "admin.brands",
+  campaigns: "admin.campaigns",
+  samples: "admin.samples",
+  participants: "admin.participants",
+  locations: "admin.locations",
+  reports: "admin.reports",
+};
+
+const activeNavigation = computed(() => (typeof route.meta.navigationId === "string" ? route.meta.navigationId : "dashboard"));
 const activeNavigationLabel = computed(() => navigationItems.find(item => item.id === activeNavigation.value)?.label ?? "Dashboard");
 const selectedValidation = computed(() => validationSteps.value.find(step => step.id === selectedValidationStep.value) ?? validationSteps.value[0]);
 const canManageBackoffice = computed(() => currentUser.value?.capabilities.includes("backoffice.manage") ?? false);
@@ -401,6 +421,8 @@ async function loadAuthenticatedUser() {
     if (error instanceof ApiError && error.status === 401) {
       globalThis.location.assign("/login");
     }
+  } finally {
+    isAuthReady.value = true;
   }
 }
 
@@ -416,8 +438,8 @@ async function logout() {
 }
 
 function selectNavigation(id: string) {
-  activeNavigation.value = id;
   isMobileNavOpen.value = false;
+  router.push({ name: navigationRoutes[id] ?? navigationRoutes.dashboard });
 }
 
 function dismissAlert(id: number) {

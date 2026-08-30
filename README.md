@@ -127,6 +127,20 @@ php artisan storage:link
 The second command exposes uploaded brand logos through `public/storage` when using the local
 filesystem disk. It is safe to run again if the link already exists.
 
+The seeded brands expect one source logo per brand in
+`database/seeders/assets/brands/logos/`:
+
+```text
+database/seeders/assets/brands/logos/lexical-labs.png
+database/seeders/assets/brands/logos/xo-health-group.png
+```
+
+During seeding, each source file is copied to the public disk under
+`storage/app/public/brands/{brand-id}/` and the database stores the relative path
+`brands/{brand-id}/{filename}` in `brands.logo_path`. The `storage:link` command makes the
+returned `logo_url` available to the backoffice. Changing a logo in Brand management stores the
+new upload in the same brand-scoped folder and removes the previous file.
+
 ## Authentication
 
 The `/admin` dashboard uses Laravel's `web` session guard. Sign-in is passwordless: open
@@ -154,6 +168,26 @@ do not receive management controls. The frontend keeps its short-lived JWT in
 `sessionStorage`; the server also maintains the browser session. `GET /api/user` requires a
 Bearer JWT, `POST /api/auth/token` renews one for an authenticated web session, and
 `POST /api/auth/logout` revokes the active JWT and ends the browser session.
+
+### Backoffice URLs
+
+Laravel serves the authenticated Blade shell for `/admin` and the supported backoffice paths.
+The backoffice Vue application uses HTML5 history for navigation within that shell, so these
+URLs can be bookmarked and refreshed directly:
+
+```text
+/admin
+/admin/brands
+/admin/brands/{id}
+/admin/campaigns
+/admin/samples
+/admin/participants
+/admin/locations
+/admin/reports
+```
+
+Laravel remains responsible for the route and authentication middleware. Vue Router handles
+the extensive client-side navigation after the shell loads. API requests remain under `/api`.
 
 ### Brand management
 

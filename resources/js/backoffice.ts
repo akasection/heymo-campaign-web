@@ -1,4 +1,5 @@
 import { createApp } from "vue";
-import Dashboard from "./pages/Backoffice/Dashboard.vue";
+import { RouterView } from "vue-router";
+import router from "./router";
 
-createApp(Dashboard).mount("#app");
+createApp(RouterView).use(router).mount("#app");

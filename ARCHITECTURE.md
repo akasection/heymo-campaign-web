@@ -540,3 +540,51 @@ These invariants bind the later generation and delivery tickets:
   their long-form instructions.
 - `resources/` is not Laravel's public web root, so runtime contracts remain server-side.
 - **README:** setup, seeded demo, end-to-end journey, and safety/design decisions.
+
+## 14. Web routing and page structure
+
+Every browser-facing page begins with a Laravel web route and a Blade shell. Laravel owns the
+initial URL contract, server-side middleware, CSRF or authentication metadata, and the initial
+HTML response. A route family may return the same Blade shell for several related URLs, but a
+client-side URL must never exist without a Laravel route that can serve its shell on direct
+navigation and browser refresh.
+
+### Shells and client workflows
+
+- A Blade shell is a small HTML envelope that loads the page's Vite entrypoint and mounts its
+  Vue application. It does not replace Laravel middleware or silently become an API endpoint.
+- Each shell has a clear Vue entrypoint and root component. Separate shells remain separate Vue
+  applications; they do not share client state implicitly.
+- Simple or static landing and public-facing pages default to Laravel route + Blade. They may
+  use Vue for local interactive islands, but do not gain a client router without a real
+  multi-view workflow. Static landing copy remains hand-authored and message-matched as defined
+  in section 4.
+- Extensive backoffice or public-facing workflows with multiple views, dynamic records, or
+  complex navigation may use Vue Router 4 inside their owning Blade shell. The router is scoped
+  to that shell and controls only the client-side portion of the route family.
+- Laravel remains the access-control boundary. `guest`, `auth`, and other route middleware are
+  registered in `routes/web.php` and run before the Blade shell is served. Client-side guards
+  may improve UX but never replace server enforcement.
+
+### Deep links and API separation
+
+Every Vue Router deep link must have a corresponding Laravel shell route that preserves the
+same middleware and returns the same Blade entrypoint. On refresh, the Vue application rebuilds
+its view from the URL and authorized API data; it must not rely on in-memory selection state.
+Laravel shell routes do not need to resolve client-side records unless the page explicitly
+requires server-rendered data.
+
+API endpoints remain under `routes/api.php`, use their own middleware, and return structured JSON
+only. They do not serve Blade views and are not substitutes for browser page routes.
+
+### New page checklist
+
+When adding a browser-facing page or route family:
+
+1. Add a Laravel web route with the correct `guest` or `auth` middleware.
+2. Add or reuse the appropriate Blade shell and its Vite entrypoint.
+3. Keep simple/static content in the shell; introduce a shell-scoped Vue Router only when the
+   workflow is genuinely extensive.
+4. Capture every supported client deep link at Laravel so direct navigation and refresh work.
+5. Reconstruct client state from URL parameters and authorized API data.
+6. Keep JSON endpoints in `routes/api.php` and review organization/security boundaries.

@@ -26,6 +26,13 @@
 - If a change would contradict either document, update the document first and
   flag the change rather than silently diverging.
 - `ARCHITECTURE.md` is finalised for T-01 (no provisional sections remain); treat all sections as binding when implementing T-02 and later.
+- **Page routing contract:** Before creating or changing a backoffice, landing, or public-facing
+  page, read `ARCHITECTURE.md` section 14. Every browser-facing URL must have a Laravel web route and
+  an appropriate Blade shell with the correct middleware. Keep simple/static pages in Laravel +
+  Blade; use Vue Router only for an extensive workflow inside that shell. Never create a
+  Vue-only URL, client-side deep link, or router fallback that Laravel cannot capture on direct
+  navigation and refresh. Reconstruct route state from URL parameters and authorized API data,
+  and keep JSON endpoints in `routes/api.php` rather than serving views from API routes.
 
 # Issue Tracking
 
