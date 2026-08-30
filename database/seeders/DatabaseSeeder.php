@@ -7,7 +7,9 @@ use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class DatabaseSeeder extends Seeder
 {
@@ -71,6 +73,10 @@ class DatabaseSeeder extends Seeder
         }
 
         $heymoOrganization = $organizations['heymo-org'];
+        $brandLogoFixtures = [
+            'lexical-labs' => 'lexical-labs.png',
+            'xo-health-group' => 'xo-health-group.png',
+        ];
 
         foreach ([
             [
@@ -102,13 +108,52 @@ class DatabaseSeeder extends Seeder
                 'body_font' => 'ibm_plex_sans',
             ],
         ] as $brandAttributes) {
-            Brand::query()->updateOrCreate(
+            $brand = Brand::query()->updateOrCreate(
                 [
                     'organization_id' => $heymoOrganization->id,
                     'slug' => $brandAttributes['slug'],
                 ],
                 $brandAttributes,
             );
+
+            if (! array_key_exists($brand->slug, $brandLogoFixtures)) {
+                throw new RuntimeException("Missing seeded brand logo mapping for slug: {$brand->slug}");
+            }
+
+            $this->seedBrandLogo($brand, $brandLogoFixtures[$brand->slug]);
+        }
+    }
+
+    private function seedBrandLogo(Brand $brand, string $fixtureName): void
+    {
+        $sourcePath = database_path("seeders/assets/brands/logos/{$fixtureName}");
+
+        if (! is_file($sourcePath)) {
+            throw new RuntimeException("Missing seeded brand logo fixture: {$sourcePath}");
+        }
+
+        $destinationPath = "brands/{$brand->id}/{$fixtureName}";
+        $disk = Storage::disk('public');
+        $contents = file_get_contents($sourcePath);
+
+        if ($contents === false || ! $disk->put($destinationPath, $contents)) {
+            throw new RuntimeException("Could not copy seeded brand logo fixture: {$sourcePath}");
+        }
+
+        $oldPath = $brand->logo_path;
+
+        try {
+            $brand->forceFill(['logo_path' => $destinationPath])->save();
+        } catch (\Throwable $exception) {
+            if ($oldPath !== $destinationPath) {
+                $disk->delete($destinationPath);
+            }
+
+            throw $exception;
+        }
+
+        if ($oldPath && $oldPath !== $destinationPath) {
+            $disk->delete($oldPath);
         }
     }
 }

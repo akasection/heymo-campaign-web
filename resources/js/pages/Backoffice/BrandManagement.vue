@@ -35,9 +35,10 @@
             :class="activeTab === 'active' ? 'tab-active' : ''"
             role="tab"
             :aria-selected="activeTab === 'active'"
-            @click="activeTab = 'active'"
+            @click="setActiveTab('active')"
           >
-            Active <span class="ml-1 tabular-nums">{{ activeBrands.length }}</span>
+            Active
+            <span class="ml-1 tabular-nums">{{ activeBrands.length }}</span>
           </button>
           <button
             type="button"
@@ -45,9 +46,10 @@
             :class="activeTab === 'archived' ? 'tab-active' : ''"
             role="tab"
             :aria-selected="activeTab === 'archived'"
-            @click="activeTab = 'archived'"
+            @click="setActiveTab('archived')"
           >
-            Archived <span class="ml-1 tabular-nums">{{ archivedBrands.length }}</span>
+            Archived
+            <span class="ml-1 tabular-nums">{{ archivedBrands.length }}</span>
           </button>
         </div>
 
@@ -59,7 +61,9 @@
         </div>
         <div v-else-if="!visibleBrands.length" class="rounded-md border border-dashed border-heymo-line px-4 py-10 text-center">
           <PaintBrush :size="28" class="mx-auto text-heymo-muted" aria-hidden="true" />
-          <p class="mt-3 text-sm font-bold text-heymo-navy">{{ activeTab === "active" ? "No active brands yet" : "No archived brands" }}</p>
+          <p class="mt-3 text-sm font-bold text-heymo-navy">
+            {{ activeTab === "active" ? "No active brands yet" : "No archived brands" }}
+          </p>
           <p class="mt-1 text-xs leading-5 text-heymo-muted">
             {{ activeTab === "active" ? "Create a profile to give future campaigns a distinct voice." : "Archived profiles will appear here." }}
           </p>
@@ -74,7 +78,7 @@
                   ? 'border-heymo-navy bg-heymo-sky'
                   : 'border-heymo-line bg-white hover:border-heymo-navy/40 hover:bg-slate-50'
               "
-              @click="selectBrand(brand)"
+              @click="selectVisibleBrand(brand)"
             >
               <span
                 class="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-md text-xs font-extrabold text-white"
@@ -97,8 +101,20 @@
       </Panel>
 
       <div class="min-w-0">
+        <Panel v-if="showBrandNotFound" title="Brand not found" description="This brand is unavailable in your workspace.">
+          <div class="grid min-h-80 place-items-center rounded-md border border-dashed border-heymo-line bg-slate-50 px-6 text-center">
+            <WarningCircle :size="34" class="text-heymo-muted" aria-hidden="true" />
+            <p class="mt-3 text-sm font-bold text-heymo-navy">That brand is not available</p>
+            <p class="mt-1 max-w-sm text-xs leading-5 text-heymo-muted">Choose an active brand from the portfolio to continue.</p>
+          </div>
+        </Panel>
+        <Panel v-else-if="hasBrandRoute && isLoading" title="Loading brand" description="Retrieving the saved brand profile.">
+          <div class="grid min-h-80 place-items-center">
+            <span class="loading loading-spinner text-heymo-red" aria-label="Loading brand"></span>
+          </div>
+        </Panel>
         <BrandForm
-          v-if="isEditorOpen"
+          v-else-if="isEditorOpen"
           :brand="editingBrand"
           :save-brand="saveBrand"
           :upload-logo="uploadLogo"
@@ -109,7 +125,8 @@
           <template #action>
             <div class="flex items-center gap-2">
               <button v-if="activeTab === 'active'" class="btn btn-outline btn-sm" @click="openEdit(selectedBrand)">
-                <PencilSimple :size="16" weight="bold" aria-hidden="true" /> Edit
+                <PencilSimple :size="16" weight="bold" aria-hidden="true" />
+                Edit
               </button>
               <button
                 v-if="activeTab === 'active'"
@@ -121,7 +138,8 @@
                 <Archive :size="17" weight="bold" aria-hidden="true" />
               </button>
               <button v-else class="btn btn-outline btn-sm" @click="restoreSelected">
-                <ArrowCounterClockwise :size="16" weight="bold" aria-hidden="true" /> Restore
+                <ArrowCounterClockwise :size="16" weight="bold" aria-hidden="true" />
+                Restore
               </button>
             </div>
           </template>
@@ -136,7 +154,16 @@
                 <div class="absolute -right-8 -top-10 size-32 rounded-full border-[18px] border-primary-content/15"></div>
                 <div class="relative">
                   <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-primary-content/70">Identity preview</p>
-                  <p class="mt-10 max-w-[12rem] text-2xl font-extrabold leading-tight" :style="{ fontFamily: selectedBrand.heading_font_stack }">
+                  <div class="mt-6 flex h-24 w-full items-center justify-center rounded-md bg-white px-4 py-3">
+                    <img
+                      v-if="selectedBrand.logo_url"
+                      :src="selectedBrand.logo_url"
+                      :alt="`${selectedBrand.name} logo`"
+                      class="max-h-full max-w-full object-contain"
+                    />
+                    <span v-else class="text-xl font-extrabold text-primary">{{ initials(selectedBrand.name) }}</span>
+                  </div>
+                  <p class="mt-6 max-w-[12rem] text-2xl font-extrabold leading-tight" :style="{ fontFamily: selectedBrand.heading_font_stack }">
                     {{ selectedBrand.name }}
                   </p>
                   <p class="mt-3 max-w-[13rem] text-xs leading-5 text-primary-content/80" :style="{ fontFamily: selectedBrand.body_font_stack }">
@@ -170,8 +197,12 @@
                 </div>
                 <dl class="grid gap-2 sm:grid-cols-2">
                   <div v-for="dimension in profileDimensions" :key="dimension.label" class="rounded-md bg-base-200 px-3 py-2.5">
-                    <dt class="text-[10px] font-bold uppercase tracking-[0.08em] text-heymo-muted">{{ dimension.label }}</dt>
-                    <dd class="mt-1 text-xs font-extrabold text-heymo-navy">{{ dimension.value }}</dd>
+                    <dt class="text-[10px] font-bold uppercase tracking-[0.08em] text-heymo-muted">
+                      {{ dimension.label }}
+                    </dt>
+                    <dd class="mt-1 text-xs font-extrabold text-heymo-navy">
+                      {{ dimension.value }}
+                    </dd>
                   </div>
                 </dl>
               </div>
@@ -208,7 +239,8 @@ import {
   PhPlus as Plus,
   PhWarningCircle as WarningCircle,
 } from "@phosphor-icons/vue";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import Panel from "../../components/Backoffice/Panel.vue";
 import { useBrands } from "../../composables/useBrands";
 import { brandThemeStyle } from "../../lib/brands";
@@ -216,6 +248,8 @@ import BrandForm from "./BrandForm.vue";
 import type { Brand } from "../../lib/brands";
 
 const props = defineProps<{ canManage: boolean }>();
+const route = useRoute();
+const router = useRouter();
 const {
   activeBrands,
   archivedBrands,
@@ -234,16 +268,49 @@ const isEditorOpen = ref(false);
 const editingBrand = ref<Brand | null>(null);
 
 const visibleBrands = computed(() => (activeTab.value === "active" ? activeBrands.value : archivedBrands.value));
+const hasBrandRoute = computed(() => route.name === "admin.brand");
+const routeBrandId = computed<number | null>(() => {
+  if (!hasBrandRoute.value) {
+    return null;
+  }
+
+  const rawId = route.params.id;
+  if (typeof rawId !== "string" || !/^[1-9]\d*$/.test(rawId)) {
+    return null;
+  }
+
+  const brandId = Number(rawId);
+  return Number.isSafeInteger(brandId) ? brandId : null;
+});
+const showBrandNotFound = computed(
+  () =>
+    hasBrandRoute.value &&
+    !isLoading.value &&
+    !errorMessage.value &&
+    (routeBrandId.value === null || !activeBrands.value.some(brand => brand.id === routeBrandId.value)),
+);
 const profileDimensions = computed(() => {
   if (!selectedBrand.value) {
     return [];
   }
 
   return [
-    { label: "Tone", value: selectedBrand.value.prompt_profile.voice.tone.label },
-    { label: "Flow", value: selectedBrand.value.prompt_profile.voice.flow.label },
-    { label: "Tense", value: selectedBrand.value.prompt_profile.voice.tense.label },
-    { label: "Reading level", value: selectedBrand.value.prompt_profile.voice.reading_level.label },
+    {
+      label: "Tone",
+      value: selectedBrand.value.prompt_profile.voice.tone.label,
+    },
+    {
+      label: "Flow",
+      value: selectedBrand.value.prompt_profile.voice.flow.label,
+    },
+    {
+      label: "Tense",
+      value: selectedBrand.value.prompt_profile.voice.tense.label,
+    },
+    {
+      label: "Reading level",
+      value: selectedBrand.value.prompt_profile.voice.reading_level.label,
+    },
   ];
 });
 
@@ -258,14 +325,20 @@ function initials(name: string): string {
 }
 
 function openCreate(): void {
+  activeTab.value = "active";
   editingBrand.value = null;
   isEditorOpen.value = true;
+
+  if (hasBrandRoute.value) {
+    router.push({ name: "admin.brands" });
+  }
 }
 
 function openEdit(brand: Brand): void {
   editingBrand.value = brand;
   selectBrand(brand);
   isEditorOpen.value = true;
+  router.push({ name: "admin.brand", params: { id: String(brand.id) } });
 }
 
 function closeEditor(): void {
@@ -277,6 +350,24 @@ function handleSaved(brand: Brand): void {
   selectBrand(brand);
   isEditorOpen.value = false;
   editingBrand.value = null;
+  router.replace({ name: "admin.brand", params: { id: String(brand.id) } });
+}
+
+function setActiveTab(tab: "active" | "archived"): void {
+  activeTab.value = tab;
+  selectBrand((tab === "active" ? activeBrands.value : archivedBrands.value)[0] ?? null);
+
+  if (hasBrandRoute.value) {
+    router.push({ name: "admin.brands" });
+  }
+}
+
+function selectVisibleBrand(brand: Brand): void {
+  selectBrand(brand);
+
+  if (activeTab.value === "active") {
+    router.push({ name: "admin.brand", params: { id: String(brand.id) } });
+  }
 }
 
 async function archiveSelected(): Promise<void> {
@@ -285,6 +376,8 @@ async function archiveSelected(): Promise<void> {
   }
 
   await archiveBrand(selectedBrand.value.id);
+  activeTab.value = "active";
+  await router.replace({ name: "admin.brands" });
 }
 
 async function restoreSelected(): Promise<void> {
@@ -292,9 +385,32 @@ async function restoreSelected(): Promise<void> {
     return;
   }
 
-  await restoreBrand(selectedBrand.value.id);
+  const brandId = selectedBrand.value.id;
+  await restoreBrand(brandId);
   activeTab.value = "active";
+  await router.replace({
+    name: "admin.brand",
+    params: { id: String(brandId) },
+  });
 }
+
+watch(
+  [activeBrands, archivedBrands, hasBrandRoute, routeBrandId],
+  () => {
+    if (hasBrandRoute.value) {
+      const brand = routeBrandId.value === null ? null : (activeBrands.value.find(item => item.id === routeBrandId.value) ?? null);
+      selectBrand(brand);
+      activeTab.value = "active";
+      return;
+    }
+
+    const availableBrands = activeTab.value === "active" ? activeBrands.value : archivedBrands.value;
+    if (!selectedBrand.value || !availableBrands.some(brand => brand.id === selectedBrand.value?.id)) {
+      selectBrand(availableBrands[0] ?? null);
+    }
+  },
+  { immediate: true },
+);
 
 onMounted(() => {
   if (props.canManage) {
