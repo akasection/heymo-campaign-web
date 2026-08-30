@@ -44,7 +44,10 @@
 
 - Limit unit tests primarily to self-contained, pure-function utilities with
   minimal dependence on Laravel or Vue framework behavior.
+- Unit tests means unit. Do not test the framework. Do not create a test that imposes a series of flows.
 - Avoid adding unit tests for framework-coupled Laravel or Vue files unless the
   behavior cannot be covered effectively at another test level.
-- For frontend work, skip Vue component tests for now and focus only on
-  TypeScript utility tests.
+- For frontend work, skip Vue "page" and "container" components unit testing for now
+  as those components may tightly couple with each other and prone to break periodically.
+  Simple Vue components that can be mounted without too requiring lots of mocks/stubs can be unit tested.
+- Do not eagerly write feature tests. Ask the user if they want to. Also ask what range of scope they want to cover.

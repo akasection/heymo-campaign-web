@@ -122,6 +122,9 @@ importers:
       concurrently:
         specifier: ^10.0.5
         version: 10.0.5
+      daisyui:
+        specifier: ^5.7.22
+        version: 5.7.22
       laravel-vite-plugin:
         specifier: ^3.2.0
         version: 3.2.0(vite@8.2.2(jiti@2.7.0))
@@ -841,6 +844,9 @@ packages:
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
+
+  daisyui@5.7.22:
+    resolution: {integrity: sha512-pYii+2NCN0+OIL6Lpuc054LK0QJeNv+GRK9UzN1GRmjdYhYO6WFl0QLoj5oPcitPD7o+okiiI0SKFkn641TxmA==}
 
   destr@2.0.5:
     resolution: {integrity: sha512-ugFTXCtDZunbzasqBxrK93Ik/DRYsO6S/fedkWEMKqt04xZ4csmnmwGDBAb07QWNaGMAmnTIemsYZCksjATwsA==}
@@ -1671,6 +1677,8 @@ snapshots:
       yargs: 18.0.0
 
   csstype@3.2.3: {}
+
+  daisyui@5.7.22: {}
 
   destr@2.0.5: {}
 

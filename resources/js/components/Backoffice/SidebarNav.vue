@@ -7,7 +7,11 @@
         </span>
         <span class="text-xl font-extrabold tracking-[0.02em]">heymo<span class="text-heymo-red">!</span></span>
       </div>
-      <button class="heymo-icon-button border-white/20 bg-transparent text-white lg:hidden" aria-label="Close navigation" @click="$emit('close')">
+      <button
+        class="btn btn-square btn-ghost h-10 w-10 border border-white/20 bg-transparent text-white lg:hidden"
+        aria-label="Close navigation"
+        @click="$emit('close')"
+      >
         <X :size="20" weight="bold" aria-hidden="true" />
       </button>
     </div>

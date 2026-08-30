@@ -15,15 +15,15 @@ marketing email, and provider API keys.
 
 **Assets to protect**
 
-| Asset                                  | Sensitivity                    |
-| -------------------------------------- | ------------------------------ |
-| Visitor PII (email, age, sex)          | High                           |
-| Stated health concern / intent answers | High                           |
-| Consent & suppression records          | High (legal)                   |
-| Approved claims & brand constraints    | Medium (business + compliance) |
-| Generated email bodies                 | High                           |
-| Admin accounts & sessions              | High                           |
-| LLM provider keys                      | Critical                       |
+| Asset                                                 | Sensitivity                    |
+| ----------------------------------------------------- | ------------------------------ |
+| Visitor PII (email, age, sex)                         | High                           |
+| Stated health concern / intent answers                | High                           |
+| Consent & suppression records                         | High (legal)                   |
+| Deterministic evidence/proof data & brand constraints | Medium (business + compliance) |
+| Generated email bodies                                | High                           |
+| Admin accounts & sessions                             | High                           |
+| LLM provider keys                                     | Critical                       |
 
 **Threat actors**
 
@@ -77,8 +77,9 @@ marketing email, and provider API keys.
 
 **Required for the domain (T-02 / T-05 / T-06):**
 
-- Register Eloquent **policies** in `AuthServiceProvider` for `Brand`, `ApprovedClaim`,
-  `Angle`, `Visitor`, and `Campaign`.
+- Register Eloquent **policies** in `AuthServiceProvider` for `Brand`, `Angle`, `Visitor`,
+  and `Campaign`. If the project later chooses a relational `ApprovedClaim` enrichment,
+  register and scope its policy as an additive control; it is not a required domain policy.
 - Enforce **organization scoping** on every query: a user may only read/mutate entities
   owned by their own `organization_id`. Cross-org reads are a release blocker.
 
@@ -111,7 +112,9 @@ marketing email, and provider API keys.
 ## 6. LLM & prompt-injection security
 
 The model receives structured prompt payloads assembled from visitor free-text
-(`sub_interest`, `trigger`, `concern`), angle copy, brand constraints, and approved claims.
+(`sub_interest`, `trigger`, `concern`), angle copy, brand constraints, and deterministic
+evidence/proof entries when factual content requires them. The storage shape may be relational,
+configured, or block-based; a model named `ApprovedClaim` is optional enrichment.
 
 - **Treat visitor free-text as untrusted data**, never as instructions: delimit it clearly
   in the prompt and instruct the model that it is input, not directives.
@@ -171,13 +174,13 @@ The model receives structured prompt payloads assembled from visitor free-text
 
 ## 11. Compliance checklist (PRD guardrails → control)
 
-| Guardrail                                       | Security control                                                                                 |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| No unapproved health claims                     | Claims are DB records; model selects IDs only; deterministic validator rejects free-text claims. |
-| No clinical inference from demographics         | Presentation profile computed in code; demographics never passed as clinical basis.              |
-| No false urgency / scarcity / hidden conditions | Deterministic offer/next-step; validator scans model prose.                                      |
-| Consent & suppression enforced                  | Consent gate + pre-send re-check + durable suppression.                                          |
-| Subject lines accurate                          | Subject validated against body before send.                                                      |
+| Guardrail                                       | Security control                                                                                                                                        |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No unapproved health claims                     | A deterministic evidence source defines allowed facts; the model selects evidence IDs only; the validator rejects unknown IDs and model-authored facts. |
+| No clinical inference from demographics         | Presentation profile computed in code; demographics never passed as clinical basis.                                                                     |
+| No false urgency / scarcity / hidden conditions | Deterministic offer/next-step; validator scans model prose.                                                                                             |
+| Consent & suppression enforced                  | Consent gate + pre-send re-check + durable suppression.                                                                                                 |
+| Subject lines accurate                          | Subject validated against body before send.                                                                                                             |
 
 ---
 
