@@ -18,3 +18,4 @@ yarn-error.log
 build.log
 resources/js/lib/angles.ts
 .playwright-mcp/console-*.log
+.playwright-mcp/page-*.yml
