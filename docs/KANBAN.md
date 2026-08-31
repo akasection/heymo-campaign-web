@@ -2,6 +2,53 @@
 
 ## Backlog
 
+### B-01 Add consented SMS as a persisted, non-delivery branch
+
+- tags: [bonus, sms, consent, campaign]
+- priority: medium
+- workload: Hard
+
+  ```md
+  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-08 Implement
+  intent capture, explicit consent, and suppression handling; T-09 Generate and validate the
+  three-email personalised welcome sequence; T-11 Build the admin audit trail and angle
+  performance dashboard.
+
+  Generate concise SMS for confirmation, a single relevant objection, or a truthful deadline.
+  Persist rather than integrate a provider. Enforce separate SMS consent, quiet hours,
+  frequency caps, and a simple opt-out state. Surface the rationale beside campaign emails.
+  ```
+
+### B-02 Add post-welcome engagement branching
+
+- tags: [bonus, automation, analytics]
+- priority: medium
+- workload: Hard
+
+  ```md
+  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-09 Generate
+  and validate the three-email personalised welcome sequence; T-10 Queue, send, and observe
+  campaign email delivery; T-11 Build the admin audit trail and angle performance dashboard.
+
+  Model open/click/quiet events and select a bounded, pre-approved follow-up path. Keep the
+  evidence of the branch decision visible in the visitor audit view.
+  ```
+
+### B-03 Add side-by-side angle performance comparison
+
+- tags: [bonus, reporting, analytics]
+- priority: low
+- workload: Normal
+
+  ```md
+  **Dependencies:** T-11 Build the admin audit trail and angle performance dashboard.
+
+  Extend the dashboard beyond core counts with an easy-to-scan comparison of capture and consent
+  performance across angles. Avoid causal claims from the small demo data set.
+  ```
+
+## Todo
+
 ### T-02 Create the campaign domain and immutable audit schema
 
 - tags: [backend, database, audit, core]
@@ -50,64 +97,19 @@
   timeout, rate limit, or unexpected provider response, and a job can be retried safely.
   ```
 
-### T-06 Build authenticated angle management
-
-- tags: [backend, frontend, admin, angle]
-- priority: high
-- workload: Hard
-- steps:
-  - [ ] Create, edit, archive, and list angles scoped to a brand.
-  - [ ] Capture all PRD angle fields and deterministic proof references; support optional evidence enrichment.
-  - [ ] Validate that promise, proof, offer, and next step are present and truthful.
-
-  ```md
-  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
-  authenticated admin access and authorisation; T-05 Build brand management settings.
-
-  Implement the PRD fields: audience, trigger moment, primary job, tension, desired outcome,
-  single promise, proof, objection, offer, tone, and next step. Treat angle data as campaign
-  strategy and landing-page reference; it is not a runtime page-builder.
-
-  **Done when:** an admin can see which brand owns every angle, configure deterministic proof,
-  optionally select brand-scoped evidence enrichment, and archive an angle without breaking
-  historical campaign audit records.
-  ```
-
-### T-07 Build three hand-authored, message-matched landing pages
-
-- tags: [frontend, landing-pages, vue, blade]
-- priority: high
-- workload: Hard
-- steps:
-  - [ ] Build one static page each for fatigue/low energy, athletic performance, and family-history concern.
-  - [ ] Apply the owning brand's visual identity without dynamically composing pages from angle records.
-  - [ ] Add a clear entry point to the capture quiz and preserve source-page context.
-
-  ```md
-  **Dependencies:** T-05 Build brand management settings; T-06 Build
-  authenticated angle management.
-
-  These pages are deliberately hand-written Blade templates/Vue components. Each must make its
-  angle unmistakable before the visitor sees a generic product catalogue. The stored landing
-  identifier maps the page to a seeded angle for capture and reporting.
-
-  **Done when:** all three URLs load directly, present distinct angle-led copy, and retain their
-  landing identifier and angle context when the quiz opens.
-  ```
-
 ### T-08 Implement intent capture, explicit consent, and suppression handling
 
 - tags: [backend, frontend, capture, consent, safety]
 - priority: high
 - workload: Extreme
 - steps:
-  - [ ] Build the short quiz/pop-up and public submission endpoint.
-  - [ ] Validate and persist age, sex, sub-interest, trigger, concern, page/angle, timestamp, email, and consent.
+  - [x] Build the short quiz/pop-up and public submission endpoint.
+  - [x] Validate and persist age group, sex, sub-interest, trigger, concern, page/angle, timestamp, email, and consent.
   - [ ] Provide unsubscribe/suppression handling that prevents future sends.
 
   ```md
   **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-06 Build
-  authenticated angle management; T-07 Build three hand-authored, message-matched landing
+  authenticated angle management; T-07 Build four hand-authored, message-matched landing
   pages.
 
   Each captured field must affect campaign tone, emphasis, or presentation. Record affirmative
@@ -116,8 +118,8 @@
   consent. Do not collect clinical information beyond the stated concern.
 
   **Done when:** invalid submissions cannot create sends, the confirmation path gives a clear
-  pending/generated state, and a withdrawal or conversion excludes the visitor from queued and
-  future delivery.
+  pending/generated state, and a withdrawal or conversion excludes the visitor from queued
+  and future delivery.
   ```
 
 ### T-09 Generate and validate the three-email personalised welcome sequence
@@ -180,7 +182,7 @@
 - priority: high
 - workload: Hard
 - steps:
-  - [ ] Seed an administrator, two contrasting brands, three angles, optional evidence enrichment, and landing mappings.
+  - [ ] Seed an administrator, two contrasting brands, four topic angles, optional evidence enrichment, and landing mappings.
   - [ ] Seed diverse consented, suppressed, and failed-generation visitor histories.
   - [ ] Seed authored/validated sample campaigns so review does not need an API key.
   - [ ] Verify a clean reset and reseed from an empty database.
@@ -213,7 +215,7 @@
 
   ```md
   **Dependencies:** T-01 Define the campaign contract and safety policy; T-04 Configure
-  provider-neutral LLM and mail integration; T-07 Build three hand-authored, message-matched
+  provider-neutral LLM and mail integration; T-07 Build four hand-authored, message-matched
   landing pages; T-08 Implement intent capture, explicit consent, and suppression handling;
   T-09 Generate and validate the three-email personalised welcome sequence; T-10 Queue, send,
   and observe campaign email delivery; T-11 Build the admin audit trail and angle performance
@@ -251,53 +253,6 @@
   invalid copy means no send, and materially different inputs yield different safe campaigns.
   ```
 
-### B-01 Add consented SMS as a persisted, non-delivery branch
-
-- tags: [bonus, sms, consent, campaign]
-- priority: medium
-- workload: Hard
-
-  ```md
-  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-08 Implement
-  intent capture, explicit consent, and suppression handling; T-09 Generate and validate the
-  three-email personalised welcome sequence; T-11 Build the admin audit trail and angle
-  performance dashboard.
-
-  Generate concise SMS for confirmation, a single relevant objection, or a truthful deadline.
-  Persist rather than integrate a provider. Enforce separate SMS consent, quiet hours,
-  frequency caps, and a simple opt-out state. Surface the rationale beside campaign emails.
-  ```
-
-### B-02 Add post-welcome engagement branching
-
-- tags: [bonus, automation, analytics]
-- priority: medium
-- workload: Hard
-
-  ```md
-  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-09 Generate
-  and validate the three-email personalised welcome sequence; T-10 Queue, send, and observe
-  campaign email delivery; T-11 Build the admin audit trail and angle performance dashboard.
-
-  Model open/click/quiet events and select a bounded, pre-approved follow-up path. Keep the
-  evidence of the branch decision visible in the visitor audit view.
-  ```
-
-### B-03 Add side-by-side angle performance comparison
-
-- tags: [bonus, reporting, analytics]
-- priority: low
-- workload: Normal
-
-  ```md
-  **Dependencies:** T-11 Build the admin audit trail and angle performance dashboard.
-
-  Extend the dashboard beyond core counts with an easy-to-scan comparison of capture and consent
-  performance across angles. Avoid causal claims from the small demo data set.
-  ```
-
-## Todo
-
 ## In Progress
 
 ### T-11 Build the admin audit trail and angle performance dashboard
@@ -321,13 +276,61 @@
   campaign inputs/presentation profile -> policy decision -> generated emails -> actual delivery
   events. Expose enough detail to audit the result without placing secrets or API keys in the UI.
 
-  **Done when:** the aggregate view compares all three angles and a single visitor page clearly
+  **Done when:** the aggregate view compares all four angles and a single visitor page clearly
   answers what was generated, why it was generated, and whether it was sent.
   ```
 
 ## Review / QA
 
 ## Done
+
+### T-06 Build authenticated angle management
+
+- tags: [backend, frontend, admin, angle]
+- priority: high
+- workload: Hard
+- steps:
+  - [x] Create, edit, archive, and list angles scoped to a brand.
+  - [x] Capture all PRD angle fields and deterministic proof references; support optional evidence enrichment.
+  - [x] Validate that promise, proof, offer, and next step are present and truthful.
+
+  ```md
+  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
+  authenticated admin access and authorisation; T-05 Build brand management settings.
+
+  Implement the PRD fields: audience, trigger moment, primary job, tension, desired outcome,
+  single promise, proof, objection, offer, tone, and next step. Treat angle data as campaign
+  strategy and landing-page reference; it is not a runtime page-builder.
+
+  **Done when:** an admin can see which brand owns every angle, configure deterministic proof,
+  optionally select brand-scoped evidence enrichment, and archive an angle without breaking
+  historical campaign audit records.
+  ```
+
+### T-07 Build four hand-authored, message-matched landing pages
+
+- tags: [frontend, landing-pages, vue, blade]
+- priority: high
+- workload: Hard
+- steps:
+  - [x] Build one static page each for fatigue, obesity/weight management, pre-marital check, and athletic performance.
+  - [x] Apply the selected Brand's sanitized visual identity without dynamically composing pages from angle records.
+  - [x] Add a dedicated quiz route with an inline stepper and preserve source-page context.
+
+  ```md
+  **Dependencies:** T-05 Build brand management settings; T-06 Build
+  authenticated angle management.
+
+  These pages are deliberately hand-written Blade templates/Vue components. Each must make its
+  angle unmistakable before the visitor sees a generic product catalogue. The public route uses
+  a numeric Brand id plus an allowlisted landing identifier, then maps that identifier to a
+  seeded Brand-owned Angle for capture and reporting. Runtime Brand data is limited to a safe
+  presentation DTO; page copy and quiz questions remain authored code.
+
+  **Done when:** all four landing URLs and quiz URLs load directly, present distinct angle-led
+  copy, apply the selected Brand presentation, and retain their landing identifier and Angle
+  context when the quiz opens.
+  ```
 
 ### T-05 Build brand management settings
 

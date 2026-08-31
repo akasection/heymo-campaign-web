@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Angle;
 use App\Models\Brand;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -13,6 +14,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
+        Angle::class => \App\Policies\AnglePolicy::class,
         Brand::class => \App\Policies\BrandPolicy::class,
     ];
 

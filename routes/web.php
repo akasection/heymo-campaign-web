@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LandingPageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,10 +20,24 @@ Route::get('/', function () {
 
 Route::view('login', 'AdminLogin.login')->middleware('guest')->name('login');
 
+Route::get('angles/{brandId}/{landingIdentifier}/quiz', [LandingPageController::class, 'quiz'])
+    ->whereNumber('brandId')
+    ->whereIn('landingIdentifier', array_keys(config('landing-pages', [])))
+    ->name('landing.quiz');
+Route::get('angles/{brandId}/{landingIdentifier}', [LandingPageController::class, 'show'])
+    ->whereNumber('brandId')
+    ->whereIn('landingIdentifier', array_keys(config('landing-pages', [])))
+    ->name('landing.page');
+
 Route::middleware('auth')->group(function () {
     Route::view('admin', 'Backoffice.dashboard')->name('admin.dashboard');
     Route::view('admin/brands', 'Backoffice.dashboard')->name('admin.brands');
     Route::view('admin/brands/{id}', 'Backoffice.dashboard')->whereNumber('id')->name('admin.brand');
+    Route::view('admin/angles/{brandId?}', 'Backoffice.dashboard')->whereNumber('brandId')->name('admin.angles');
+    Route::view('admin/angles/{brandId}/{angleId}', 'Backoffice.dashboard')
+        ->whereNumber('brandId')
+        ->whereNumber('angleId')
+        ->name('admin.angle');
     Route::view('admin/campaigns', 'Backoffice.dashboard')->name('admin.campaigns');
     Route::view('admin/samples', 'Backoffice.dashboard')->name('admin.samples');
     Route::view('admin/participants', 'Backoffice.dashboard')->name('admin.participants');

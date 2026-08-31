@@ -33,6 +33,7 @@ Persist these PRD fields as queryable columns:
 
 - `brand_id`
 - `name` and stable, Brand-scoped `slug` for administration and future landing identifiers
+- optional `landing_identifier` selected from the hand-authored landing-page registry
 - `audience`
 - `trigger_moment`
 - `primary_job`
@@ -68,6 +69,8 @@ and `matter_of_fact`. Do not make the model infer or invent Angle tone from arbi
 5. Keep the proof and strategy fields as structured, bounded columns; do not store the entire
    Angle as an opaque JSON blob.
 6. Generate the slug server-side on create and keep it stable when the Angle name changes.
+7. Allow an administrator to assign or reselect a landing identifier. Enforce at most one
+   active Angle per Brand and landing identifier; an Angle may remain unassigned.
 
 ## Authorization and API
 
@@ -116,6 +119,7 @@ The page should provide:
 - compact cards/table rows showing the Angle name, Brand, tone, proof state, and archive state;
 - a structured editor for all 11 PRD fields;
 - a readable proof/offer/next-step review area;
+- an assigned landing-page label and full copyable URL, or an explicit unassigned state;
 - loading, empty, validation, and API error states; and
 - archive/restore actions restricted to administrators.
 
@@ -129,14 +133,17 @@ Tone/Tense sign-off matrix; that remains Brand-level generation groundwork.
 
 ## Landing-page boundary
 
-T-06 stores strategy and stable slugs. It does not create landing pages or decide which Angle a
-visitor receives. T-07 will hand-author static pages and map their stable identifiers to seeded
-Angles. A newly created Angle may have no page until a developer authors one; that is expected.
+T-06 stores strategy, stable slugs, and the optional admin-selected landing assignment. The combined implementation slice adds four hand-authored
+landing identifiers (`fatigue`, `obesity`, `premarital-check`, and `athletic-performance`) and
+resolves a numeric Brand id plus identifier through an allowlisted registry. Runtime data only
+supplies a sanitized visual presentation; page copy and quiz questions remain code-owned. A
+newly created Angle may have no page until a developer authors one; that is expected.
 
 ## Verification
 
-No feature tests are planned for this slice. Add only pure utility coverage for offer validation,
-text normalization, and any deterministic prompt/presentation mapping. Verify the rest through:
+No new feature tests or Vue component tests are planned for this slice. Add only pure utility
+coverage for offer validation, text normalization, and any deterministic prompt/presentation
+mapping if needed. Verify the rest through:
 
 - frontend lint and the existing TypeScript/Vite build;
 - non-destructive migration/bootstrap checks;

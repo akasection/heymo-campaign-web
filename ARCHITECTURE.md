@@ -22,7 +22,7 @@ The loop in full:
 
 ```
 Landing page (static, angle-bound)
-  -> capture quiz (intent + demographics + explicit consent)
+  -> capture quiz (intent + preferred form of address + age group + sex + explicit consent)
   -> campaign generation (LLM prose + deterministic facts/blocks)
   -> policy validation (deterministic code)
   -> queued delivery (consent + suppression re-checked at send time)
@@ -53,8 +53,9 @@ Landing page (static, angle-bound)
    from the evidence source supplied by the server, but it cannot create the evidence text.
 4. **The angle is chosen by the landing page, not by quiz answers.** The quiz captures
    intent _within_ an angle.
-5. **Demographics shape presentation, never clinical claims.** Age and sex select a
-   computed presentation profile; they cannot become a basis for clinical inference.
+5. **Demographics shape presentation, never clinical claims.** A selected age group and sex
+   select a computed presentation profile; the exact age is never stored and neither field can
+   become a basis for clinical inference.
 6. **All audit records are append-only and immutable.** A review can reconstruct the full
    chain at any time.
 7. **The visitor arrives with latent intent, not a made-up mind.** The campaign converts a
@@ -79,8 +80,8 @@ Landing page (static, angle-bound)
 | `Brand`                            | Organization            | Visual identity, voice, reading level, sign-off, required/avoided language, and generation constraints. |
 | `Angle`                            | Brand                   | Strategic anchor: the 11 PRD fields. Not a headline and not a matcher.                                  |
 | `LandingPage` (landing identifier) | Angle                   | Stable mapping from a hand-authored page to an angle.                                                   |
-| `Visitor`                          | -                       | Demographics and email address for the person being messaged.                                           |
-| `IntentResponse`                   | Visitor                 | One immutable capture of sub-interest, trigger, concern, page, angle, and timestamp.                    |
+| `Visitor`                          | -                       | Preferred form of address, demographics, and email address for the person being messaged.               |
+| `IntentResponse`                   | Visitor                 | One immutable capture of age group, sex, sub-interest, trigger, concern, page, angle, and timestamp.    |
 | `ConsentRecord`                    | Visitor                 | Affirmative channel consent with source, timestamp, policy/version, and exact address.                  |
 | `Suppression`                      | Visitor                 | Durable opt-out or conversion state that blocks queued and future delivery.                             |
 | `Campaign`                         | Visitor + Angle + Brand | One campaign created from a capture and its generation inputs.                                          |
@@ -158,40 +159,51 @@ angle-to-evidence selection relation without changing the minimum visitor-to-cam
 
 ## 4. Landing page -> angle -> brand
 
-A static landing page inherits its brand through the chain `page -> angle -> brand`.
+A landing page resolves its brand and angle through the chain `page -> brand -> angle`.
+The public URL includes the numeric Brand id because Brand slugs are unique only within an
+organization: `/angles/{brandId}/{landingIdentifier}`.
 
-### Binding: authored, not composed
+### Binding: authored page, deterministic presentation
 
-- The page **copy is authored with a specific angle in mind** (it must message-match the
-  angle) and is **hand-written in the owning brand's visual identity and voice**.
-- The page does **not** read angle or brand records at runtime, and does **not** embed the
-  angle's data. It carries only a stable landing identifier.
-- At capture, the identifier resolves to the current active angle record, which is the
-  authoritative generation input.
+- The page **copy and quiz questions are authored in code** for one stable landing identifier;
+  they are not composed from Angle or Brand records and there is no page builder.
+- The page may read a sanitized runtime presentation DTO containing the selected Brand's name,
+  logo URL, colors, and approved font stacks. It must not receive the Brand prompt profile,
+  preferred/avoided terms, provider settings, or unrestricted Angle strategy data.
+- Each Angle may be assigned one allowlisted `landing_identifier` by an administrator. An active
+  Brand can assign each hand-authored page to at most one Angle, while an Angle may remain
+  unassigned until a page is selected.
+- At capture, the landing identifier resolves to the current active Brand-owned Angle. The
+  active Angle is the authoritative generation input for later campaigns.
 
 ```
-Landing page (static, hand-written copy)
-   └── landing_identifier: "fatigue-low-energy"    <- fixed, seeded
+Landing page (hand-authored copy and quiz)
+  |-- landing_identifier: "fatigue"            <- fixed, allowlisted
+  |-- brand_id: 1                               <- explicit public route context
 
 Angle record (dynamic, admin-managed)
-   └── slug: "fatigue-low-energy"                   <- resolved at capture
+  |-- brand_id: 1
+  |-- slug: "fatigue"                           <- stable strategy identifier
+  |-- landing_identifier: "fatigue"             <- selected in backoffice
 ```
 
 ### Consequences
 
-- **Admin edits to an angle** change future campaign generation, not the page copy.
-  Possible drift between page copy and angle record is accepted in this demo.
-- **Admin edits to a brand** change live email generation and the admin UI, but do **not**
-  re-skin static pages.
-- **Brand tokens live in two places**: the Brand record is authoritative for the campaign
-  pipeline, while the page keeps its authored CSS/copy snapshot.
+- **Admin edits to an Angle** change future campaign generation and may change which static page
+  receives new visitors, not the hand-authored page copy or quiz. Possible drift is accepted in
+  this demo.
+- **Admin edits to a Brand** change live email generation and future page presentation, but do
+  not dynamically rewrite page copy or quiz questions.
+- **Brand visual tokens are runtime-selected** from the active Brand record. Brand voice and
+  generation constraints remain server-side campaign inputs, never public page data.
 - Brand constraints are machine-enforced on generated copy. Hand-written landing pages are
   reviewed as authored application code.
 
 ### Edge cases
 
-- **Archived angle** -> the page identifier stops resolving -> capture rejects with a clear
-  "campaign unavailable" state; no mid-generation failure. Historical audit records remain.
+- **Archived Brand or Angle** -> the page or quiz identifier stops resolving -> the route returns
+  a clear unavailable state and capture rejects with "campaign unavailable". Historical audit
+  records remain.
 - **Angle without a page** -> an admin-created angle has no entry point until a developer
   hand-writes a page for it. This is deliberate scope, not a page-builder gap.
 - **Eligibility rule** -> an angle may generate campaigns only if an active landing
@@ -353,7 +365,8 @@ validated model core (subject + headline + bounded body prose)
 
 ### Presentation profile (demographics)
 
-Age and sex map through a fixed lookup table in code to a presentation profile:
+Age group and sex map through a fixed lookup table in code to a presentation profile. The system
+stores the selected age group, not the visitor's exact age:
 
 - vocabulary register, sentence length/pacing, and reassurance versus brevity;
 - typography, type size, visual density, and imagery tone.
@@ -484,7 +497,7 @@ The evidence source supplies the same entries to both visitors:
 
 |                      | Visitor A                                                              | Visitor B                                                              |
 | -------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Age / sex            | 28, female                                                             | 55, male                                                               |
+| Age group / sex      | 18-29, female                                                          | 45-59, male                                                            |
 | Sub-interest         | "always drained after workouts"                                        | "energy crashes mid-afternoon"                                         |
 | Concern              | "low iron"                                                             | "thyroid in the family"                                                |
 | Presentation profile | Short sentences, low reassurance, compact layout, lighter type density | Longer sentences, higher reassurance, more breathing room, larger type |
@@ -557,8 +570,9 @@ navigation and browser refresh.
   applications; they do not share client state implicitly.
 - Simple or static landing and public-facing pages default to Laravel route + Blade. They may
   use Vue for local interactive islands, but do not gain a client router without a real
-  multi-view workflow. Static landing copy remains hand-authored and message-matched as defined
-  in section 4.
+  multi-view workflow. Static landing copy and quiz questions remain hand-authored and
+  message-matched as defined in section 4. Runtime Brand selection is limited to the
+  sanitized presentation DTO described there.
 - Extensive backoffice or public-facing workflows with multiple views, dynamic records, or
   complex navigation may use Vue Router 4 inside their owning Blade shell. The router is scoped
   to that shell and controls only the client-side portion of the route family.
@@ -587,4 +601,6 @@ When adding a browser-facing page or route family:
    workflow is genuinely extensive.
 4. Capture every supported client deep link at Laravel so direct navigation and refresh work.
 5. Reconstruct client state from URL parameters and authorized API data.
-6. Keep JSON endpoints in `routes/api.php` and review organization/security boundaries.
+6. Keep JSON endpoints in `routes/api.php` and review organization/security boundaries. Public
+   landing and capture routes must re-resolve the Brand and allowlisted landing identifier on
+   the server; browser-provided Angle ids or private Brand settings are never authoritative.
