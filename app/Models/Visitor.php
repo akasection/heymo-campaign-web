@@ -31,4 +31,19 @@ class Visitor extends Model
     {
         return $this->hasMany(ConsentRecord::class);
     }
+
+    /**
+     * Affirmative email consent gate for generation. Withdrawal and conversion
+     * suppression land in T-08/T-10; once a Suppression record exists this check
+     * must also reject suppressed visitors.
+     */
+    public function hasActiveEmailConsent(): bool
+    {
+        return $this->consentRecords()->where('channel', 'email')->exists();
+    }
+
+    public function campaigns(): HasMany
+    {
+        return $this->hasMany(Campaign::class);
+    }
 }

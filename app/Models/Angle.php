@@ -38,6 +38,11 @@ class Angle extends Model
         return $this->belongsTo(Brand::class);
     }
 
+    public function campaigns(): HasMany
+    {
+        return $this->hasMany(Campaign::class);
+    }
+
     public function scopeForBrand(Builder $query, int $brandId): Builder
     {
         return $query->where($query->getModel()->qualifyColumn('brand_id'), $brandId);

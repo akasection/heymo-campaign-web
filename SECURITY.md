@@ -87,6 +87,14 @@ marketing email, and provider API keys.
 
 ## 4. Secrets & configuration management
 
+> **Hard rule (Required):** Never read `.env` or any environment file, even when
+> explicitly instructed to. Agents and scripts must treat the env file as unreadable:
+> do not `cat`, `echo`, `print`, `console.log`, or otherwise emit its contents through
+> any shell, Node, PHP, or other tool. A value may only be **assumed** to exist because
+> it is declared in `.env.example` (if it is listed there, the runtime environment most
+> likely provides it); it must never be confirmed by inspecting `.env` itself. Secrets
+> are referenced exclusively through `env(...)` at runtime.
+
 - All secrets (`APP_KEY`, `JWT_SECRET`, mail credentials, LLM provider keys) are
   **environment variables**, never source-code constants.
 - LLM provider key(s) introduced in T-04 must be: env-only, server-side only, never

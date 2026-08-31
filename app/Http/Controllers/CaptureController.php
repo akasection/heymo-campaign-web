@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CaptureRequest;
+use App\Jobs\GenerateCampaign;
 use App\Models\Angle;
 use App\Models\Brand;
 use App\Models\Visitor;
@@ -29,7 +30,9 @@ class CaptureController extends Controller
             ], 422);
         }
 
-        DB::transaction(function () use ($data, $brand, $angle): void {
+        $intentResponseId = null;
+
+        DB::transaction(function () use ($data, $brand, $angle, &$intentResponseId): void {
             $visitor = Visitor::query()->updateOrCreate(
                 [
                     'brand_id' => $brand->id,
@@ -40,7 +43,7 @@ class CaptureController extends Controller
                 ],
             );
 
-            $visitor->intentResponses()->create([
+            $intentResponse = $visitor->intentResponses()->create([
                 'angle_id' => $angle->id,
                 'landing_identifier' => $data['landing_identifier'],
                 'age_group' => $data['age_group'],
@@ -58,7 +61,15 @@ class CaptureController extends Controller
                 'policy_version' => config('capture.consent_policy_version'),
                 'consented_at' => now(),
             ]);
+
+            $intentResponseId = $intentResponse->id;
         });
+
+        if ($intentResponseId !== null) {
+            // Generation runs on the queue so provider latency never blocks the
+            // capture request. The LLM is never reachable from the frontend.
+            GenerateCampaign::dispatch($intentResponseId);
+        }
 
         return response()->json([
             'status' => 'captured',
