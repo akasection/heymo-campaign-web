@@ -42,5 +42,7 @@
         <span>Questions are saved only after you choose email updates.</span>
       </div>
     </footer>
+
+    @stack('scripts')
   </body>
 </html>

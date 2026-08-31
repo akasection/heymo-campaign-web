@@ -24,3 +24,7 @@
     ></div>
   </main>
 @endsection
+
+@push('scripts')
+  @vite(['resources/js/campaign.ts'])
+@endpush

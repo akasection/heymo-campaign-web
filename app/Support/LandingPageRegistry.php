@@ -27,7 +27,13 @@ class LandingPageRegistry
      */
     public function choiceValues(string $identifier, string $field): array
     {
-        $options = $this->definition($identifier)['quiz'][$field]['options'] ?? [];
+        $definition = $this->definition($identifier);
+
+        if ($definition === null) {
+            return [];
+        }
+
+        $options = $definition['quiz'][$field]['options'] ?? [];
 
         return array_values(array_filter(array_map(
             static fn (mixed $option): ?string => is_array($option) && is_string($option['value'] ?? null) ? $option['value'] : null,

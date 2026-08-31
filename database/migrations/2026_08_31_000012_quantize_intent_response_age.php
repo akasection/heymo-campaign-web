@@ -33,7 +33,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('intent_responses', function (Blueprint $table) {
-            $table->unsignedSmallInteger('age')->nullable()->after('age_group');
+            $table->unsignedSmallInteger('age')->after('age_group');
         });
 
         Schema::table('intent_responses', function (Blueprint $table) {
