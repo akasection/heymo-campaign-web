@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\AngleController;
 use App\Http\Controllers\Auth\PasswordlessLoginController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CaptureController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +35,8 @@ Route::middleware('auth.jwt')->get('user', function (Request $request) {
     return response()->json($request->user()->toAuthPayload());
 });
 
+Route::post('capture', [CaptureController::class, 'store'])->middleware(['web', 'throttle:capture']);
+
 Route::prefix('brands')->middleware(['web', 'auth.jwt'])->group(function () {
     Route::get('options', [BrandController::class, 'options']);
     Route::get('/', [BrandController::class, 'index']);
@@ -42,4 +46,14 @@ Route::prefix('brands')->middleware(['web', 'auth.jwt'])->group(function () {
     Route::delete('{brand}', [BrandController::class, 'destroy']);
     Route::post('{brand}/restore', [BrandController::class, 'restore']);
     Route::post('{brand}/logo', [BrandController::class, 'uploadLogo']);
+});
+
+Route::prefix('brands/{brand}/angles')->middleware(['web', 'auth.jwt'])->group(function () {
+    Route::get('options', [AngleController::class, 'options']);
+    Route::get('/', [AngleController::class, 'index']);
+    Route::post('/', [AngleController::class, 'store']);
+    Route::get('{angle}', [AngleController::class, 'show']);
+    Route::put('{angle}', [AngleController::class, 'update']);
+    Route::delete('{angle}', [AngleController::class, 'destroy']);
+    Route::post('{angle}/restore', [AngleController::class, 'restore']);
 });

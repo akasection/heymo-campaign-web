@@ -6,6 +6,7 @@ use App\Models\AuthSession;
 use App\Services\JwtService;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 
 class AuthenticateJwt
@@ -34,6 +35,7 @@ class AuthenticateJwt
             }
 
             $request->setUserResolver(fn () => $user);
+            Auth::setUser($user);
             $request->attributes->set('auth_session', $authSession);
             $request->attributes->set('jwt_claims', $claims);
 

@@ -122,6 +122,8 @@ class DatabaseSeeder extends Seeder
 
             $this->seedBrandLogo($brand, $brandLogoFixtures[$brand->slug]);
         }
+
+        $this->call(AngleSeeder::class);
     }
 
     private function seedBrandLogo(Brand $brand, string $fixtureName): void

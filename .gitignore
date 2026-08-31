@@ -16,3 +16,5 @@ yarn-error.log
 /.fleet
 /.idea
 build.log
+resources/js/lib/angles.ts
+.playwright-mcp/console-*.log

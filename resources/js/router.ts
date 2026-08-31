@@ -23,6 +23,18 @@ const router = createRouter({
       meta: { navigationId: "brands" },
     },
     {
+      path: "/angles/:brandId(\\d+)?",
+      name: "admin.angles",
+      component: Dashboard,
+      meta: { navigationId: "angles" },
+    },
+    {
+      path: "/angles/:brandId(\\d+)/:angleId(\\d+)",
+      name: "admin.angle",
+      component: Dashboard,
+      meta: { navigationId: "angles" },
+    },
+    {
       path: "/campaigns",
       name: "admin.campaigns",
       component: Dashboard,

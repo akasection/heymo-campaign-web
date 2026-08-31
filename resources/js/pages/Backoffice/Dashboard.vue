@@ -75,6 +75,8 @@
 
         <BrandManagement v-if="isAuthReady && activeNavigation === 'brands'" :can-manage="canManageBackoffice" />
 
+        <AngleManagement v-else-if="isAuthReady && activeNavigation === 'angles'" :can-manage="canManageBackoffice" />
+
         <div v-else-if="isAuthReady" class="mx-auto max-w-[1600px] p-4 sm:p-6 lg:p-8">
           <div class="mb-6 flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
             <div>
@@ -333,6 +335,7 @@ import {
   PhPulse as Pulse,
   PhSignOut as SignOut,
   PhSquaresFour as SquaresFour,
+  PhTarget as Target,
   PhUsersThree as UsersThree,
   PhWarningCircle as WarningCircle,
   PhX as X,
@@ -346,6 +349,7 @@ import SidebarNav from "../../components/Backoffice/SidebarNav.vue";
 import StatTile from "../../components/Backoffice/StatTile.vue";
 import StatusBadge from "../../components/Backoffice/StatusBadge.vue";
 import { ApiError, apiFetch, clearAccessToken, saveAccessToken } from "../../lib/auth";
+import AngleManagement from "./AngleManagement.vue";
 import BrandManagement from "./BrandManagement.vue";
 import {
   campaignProgress,
@@ -367,6 +371,7 @@ const navigationItems: {
 }[] = [
   { id: "dashboard", label: "Dashboard", icon: SquaresFour },
   { id: "brands", label: "Brands", icon: Drop },
+  { id: "angles", label: "Angles", icon: Target },
   { id: "campaigns", label: "Campaigns", icon: ChartLineUp, count: "18" },
   { id: "samples", label: "Samples", icon: Flask, count: "433" },
   { id: "participants", label: "Participants", icon: UsersThree },
@@ -388,6 +393,7 @@ const router = useRouter();
 const navigationRoutes: Record<string, string> = {
   dashboard: "admin.dashboard",
   brands: "admin.brands",
+  angles: "admin.angles",
   campaigns: "admin.campaigns",
   samples: "admin.samples",
   participants: "admin.participants",
