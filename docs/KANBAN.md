@@ -104,7 +104,7 @@
 - workload: Extreme
 - steps:
   - [x] Build the short quiz/pop-up and public submission endpoint.
-  - [x] Validate and persist age, sex, sub-interest, trigger, concern, page/angle, timestamp, email, and consent.
+  - [x] Validate and persist age group, sex, sub-interest, trigger, concern, page/angle, timestamp, email, and consent.
   - [ ] Provide unsubscribe/suppression handling that prevents future sends.
 
   ```md

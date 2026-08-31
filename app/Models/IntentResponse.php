@@ -14,7 +14,7 @@ class IntentResponse extends Model
         'visitor_id',
         'angle_id',
         'landing_identifier',
-        'age',
+        'age_group',
         'sex',
         'sub_interest',
         'trigger',
@@ -23,7 +23,6 @@ class IntentResponse extends Model
     ];
 
     protected $casts = [
-        'age' => 'integer',
         'captured_at' => 'datetime',
     ];
 

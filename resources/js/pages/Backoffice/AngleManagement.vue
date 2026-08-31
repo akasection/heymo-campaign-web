@@ -193,7 +193,9 @@
               <p v-else class="mt-3 rounded-md bg-slate-50 px-3 py-2.5 text-xs leading-5 text-heymo-muted">
                 No static landing page is assigned. Edit this Angle to select one of the available page variants.
               </p>
-              <p v-if="copyError" class="mt-2 text-xs font-semibold text-heymo-red" role="status">{{ copyError }}</p>
+              <p v-if="copyError" class="mt-2 text-xs font-semibold text-heymo-red" role="status">
+                {{ copyError }}
+              </p>
             </div>
 
             <div>

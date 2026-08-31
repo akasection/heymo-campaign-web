@@ -1,0 +1,47 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Lexical Labs logo Lexical Labs" [ref=e4] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/angles/1/fatigue
+        - img "Lexical Labs logo" [ref=e6]
+        - generic [ref=e7]: Lexical Labs
+      - generic [ref=e8]: Private health context, made clearer
+  - main [ref=e9]:
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - link "Back to the page" [ref=e13] [cursor=pointer]:
+          - /url: /angles/1/fatigue
+        - generic [ref=e17]: Lexical Labs
+      - generic [ref=e18]:
+        - complementary [ref=e19]:
+          - generic [ref=e20]:
+            - img "Lexical Labs logo" [ref=e22]
+            - generic [ref=e23]: Lexical Labs
+          - paragraph [ref=e24]: A short check-in
+          - heading "Let us meet the moment you are in" [level=1] [ref=e25]
+          - paragraph [ref=e26]: A few answers help us keep the next step relevant to your kind of tiredness.
+          - generic [ref=e27]:
+            - paragraph [ref=e28]: What we will use
+            - list [ref=e29]:
+              - listitem [ref=e30]: Your answers, in your words
+              - listitem [ref=e34]: A topic-specific next conversation
+              - listitem [ref=e38]: Email only after your clear consent
+        - region [ref=e42]:
+          - generic [ref=e43]:
+            - generic "Quiz progress" [ref=e44]
+            - generic [ref=e51]: Step 1 of 6
+          - generic [ref=e52]:
+            - generic [ref=e53]:
+              - paragraph [ref=e54]: Start with you
+              - heading "How should we call you?" [level=2] [ref=e55]
+              - paragraph [ref=e56]: Use your first name or a nickname - whichever feels right for this conversation.
+              - generic [ref=e57]: What should we call you?
+              - textbox "What should we call you?" [ref=e58]:
+                - /placeholder: e.g. Jamie or J
+            - generic [ref=e59]:
+              - generic [ref=e60]: You can go back at any time.
+              - button "Continue" [ref=e61] [cursor=pointer]
+  - contentinfo [ref=e66]:
+    - generic [ref=e67]:
+      - generic [ref=e68]: Lexical Labs helps you review information. It does not diagnose or replace professional care.
+      - generic [ref=e69]: Questions are saved only after you choose email updates.

@@ -1,6 +1,6 @@
 import { createApp } from "vue";
 import QuizPage from "./pages/LandingPages/QuizPage.vue";
-import type { BrandPresentation, QuizDefinition } from "./lib/landing";
+import type { AgeGroupOption, BrandPresentation, QuizDefinition } from "./lib/landing";
 
 const appElement = document.querySelector<HTMLElement>("#quiz-app");
 
@@ -17,13 +17,15 @@ function parseJson<T>(value: string | undefined): T | null {
 }
 
 if (appElement) {
-  const { brandId: rawBrandId, presentation: rawPresentation, quiz: rawQuiz, landingIdentifier } = appElement.dataset;
+  const { ageGroups: rawAgeGroups, brandId: rawBrandId, presentation: rawPresentation, quiz: rawQuiz, landingIdentifier } = appElement.dataset;
   const brandId = Number(rawBrandId);
+  const ageGroups = parseJson<AgeGroupOption[]>(rawAgeGroups);
   const presentation = parseJson<BrandPresentation>(rawPresentation);
   const quiz = parseJson<QuizDefinition>(rawQuiz);
 
-  if (Number.isSafeInteger(brandId) && presentation && quiz && landingIdentifier) {
+  if (Number.isSafeInteger(brandId) && ageGroups && presentation && quiz && landingIdentifier) {
     createApp(QuizPage, {
+      ageGroups,
       brandId,
       landingIdentifier,
       presentation,

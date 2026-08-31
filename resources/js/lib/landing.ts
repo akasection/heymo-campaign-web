@@ -3,6 +3,10 @@ type LandingOption = {
   label: string;
 };
 
+type AgeGroupOption = LandingOption & {
+  description: string;
+};
+
 type QuizDefinition = {
   title: string;
   description: string;
@@ -29,7 +33,8 @@ type BrandPresentation = {
 };
 
 type CaptureForm = {
-  age: string;
+  preferred_name: string;
+  age_group: string;
   sex: string;
   sub_interest: string;
   trigger: string;
@@ -38,4 +43,4 @@ type CaptureForm = {
   consent: boolean;
 };
 
-export type { BrandPresentation, CaptureForm, LandingOption, QuizDefinition };
+export type { AgeGroupOption, BrandPresentation, CaptureForm, LandingOption, QuizDefinition };

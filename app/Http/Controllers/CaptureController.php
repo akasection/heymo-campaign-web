@@ -30,15 +30,20 @@ class CaptureController extends Controller
         }
 
         DB::transaction(function () use ($data, $brand, $angle): void {
-            $visitor = Visitor::query()->firstOrCreate([
-                'brand_id' => $brand->id,
-                'email' => $data['email'],
-            ]);
+            $visitor = Visitor::query()->updateOrCreate(
+                [
+                    'brand_id' => $brand->id,
+                    'email' => $data['email'],
+                ],
+                [
+                    'preferred_name' => $data['preferred_name'],
+                ],
+            );
 
             $visitor->intentResponses()->create([
                 'angle_id' => $angle->id,
                 'landing_identifier' => $data['landing_identifier'],
-                'age' => $data['age'],
+                'age_group' => $data['age_group'],
                 'sex' => $data['sex'],
                 'sub_interest' => $data['sub_interest'],
                 'trigger' => $data['trigger'],

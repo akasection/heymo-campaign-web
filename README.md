@@ -262,8 +262,12 @@ identifier, so it remains directly usable outside the backoffice.
 The public pages are hand-authored Blade templates with topic-specific copy and quiz questions.
 The URL-selected Brand contributes only a sanitized visual presentation (name, logo, colors,
 and approved font stacks). The page never receives private writing constraints or unrestricted
-Angle data. The quiz captures age, sex, one topic-specific sub-interest, the trigger that led
-the visitor to look, a stated concern, an email address, and explicit email consent.
+Angle data. The quiz first asks how the visitor would like to be addressed, accepting a first
+name or nickname, then captures an adult age group, sex, one topic-specific sub-interest, the
+trigger that led the visitor to look, a stated concern, an email address, and explicit email
+consent. Exact ages are not stored. The available groups are `18-29`, `30-44`, `45-59`, `60-74`,
+and `75+`; under-18 visitors require a separate guardian-consent flow and are not accepted by
+this campaign.
 
 `POST /api/capture` re-resolves the active Brand, landing identifier, and Brand-owned Angle on
 the server. It writes a Visitor, immutable IntentResponse, and affirmative ConsentRecord in one

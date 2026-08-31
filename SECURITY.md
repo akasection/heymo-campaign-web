@@ -10,14 +10,14 @@
 ## 1. Scope & threat model
 
 The system processes **sensitive personal data** in **regulated territory** (US DTC blood
-testing): demographics (age, sex), a stated health concern, email consent, generated
+testing): demographics (age group, sex), a stated health concern, email consent, generated
 marketing email, and provider API keys.
 
 **Assets to protect**
 
 | Asset                                                 | Sensitivity                    |
 | ----------------------------------------------------- | ------------------------------ |
-| Visitor PII (email, age, sex)                         | High                           |
+| Visitor PII (preferred name, email, age group, sex)   | High                           |
 | Stated health concern / intent answers                | High                           |
 | Consent & suppression records                         | High (legal)                   |
 | Deterministic evidence/proof data & brand constraints | Medium (business + compliance) |
@@ -99,8 +99,9 @@ marketing email, and provider API keys.
 
 ## 5. Data protection & PII
 
-- **Minimisation** (PRD): collect only fields that change the experience. No clinical data
-  beyond the stated concern.
+- **Minimisation** (PRD): collect only fields that change the experience. The preferred name
+  is used for the visitor's greeting and later campaign personalisation; no clinical data is
+  collected beyond the stated concern.
 - OTP codes are hashed; raw codes are never persisted.
 - Consent is stored **separately** from the profile, with source, timestamp,
   policy/version, and the exact submitted address (see `ARCHITECTURE.md` §3).

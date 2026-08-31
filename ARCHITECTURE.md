@@ -22,7 +22,7 @@ The loop in full:
 
 ```
 Landing page (static, angle-bound)
-  -> capture quiz (intent + demographics + explicit consent)
+  -> capture quiz (intent + preferred form of address + age group + sex + explicit consent)
   -> campaign generation (LLM prose + deterministic facts/blocks)
   -> policy validation (deterministic code)
   -> queued delivery (consent + suppression re-checked at send time)
@@ -53,8 +53,9 @@ Landing page (static, angle-bound)
    from the evidence source supplied by the server, but it cannot create the evidence text.
 4. **The angle is chosen by the landing page, not by quiz answers.** The quiz captures
    intent _within_ an angle.
-5. **Demographics shape presentation, never clinical claims.** Age and sex select a
-   computed presentation profile; they cannot become a basis for clinical inference.
+5. **Demographics shape presentation, never clinical claims.** A selected age group and sex
+   select a computed presentation profile; the exact age is never stored and neither field can
+   become a basis for clinical inference.
 6. **All audit records are append-only and immutable.** A review can reconstruct the full
    chain at any time.
 7. **The visitor arrives with latent intent, not a made-up mind.** The campaign converts a
@@ -79,8 +80,8 @@ Landing page (static, angle-bound)
 | `Brand`                            | Organization            | Visual identity, voice, reading level, sign-off, required/avoided language, and generation constraints. |
 | `Angle`                            | Brand                   | Strategic anchor: the 11 PRD fields. Not a headline and not a matcher.                                  |
 | `LandingPage` (landing identifier) | Angle                   | Stable mapping from a hand-authored page to an angle.                                                   |
-| `Visitor`                          | -                       | Demographics and email address for the person being messaged.                                           |
-| `IntentResponse`                   | Visitor                 | One immutable capture of sub-interest, trigger, concern, page, angle, and timestamp.                    |
+| `Visitor`                          | -                       | Preferred form of address, demographics, and email address for the person being messaged.               |
+| `IntentResponse`                   | Visitor                 | One immutable capture of age group, sex, sub-interest, trigger, concern, page, angle, and timestamp.    |
 | `ConsentRecord`                    | Visitor                 | Affirmative channel consent with source, timestamp, policy/version, and exact address.                  |
 | `Suppression`                      | Visitor                 | Durable opt-out or conversion state that blocks queued and future delivery.                             |
 | `Campaign`                         | Visitor + Angle + Brand | One campaign created from a capture and its generation inputs.                                          |
@@ -364,7 +365,8 @@ validated model core (subject + headline + bounded body prose)
 
 ### Presentation profile (demographics)
 
-Age and sex map through a fixed lookup table in code to a presentation profile:
+Age group and sex map through a fixed lookup table in code to a presentation profile. The system
+stores the selected age group, not the visitor's exact age:
 
 - vocabulary register, sentence length/pacing, and reassurance versus brevity;
 - typography, type size, visual density, and imagery tone.
@@ -495,7 +497,7 @@ The evidence source supplies the same entries to both visitors:
 
 |                      | Visitor A                                                              | Visitor B                                                              |
 | -------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Age / sex            | 28, female                                                             | 55, male                                                               |
+| Age group / sex      | 18-29, female                                                          | 45-59, male                                                            |
 | Sub-interest         | "always drained after workouts"                                        | "energy crashes mid-afternoon"                                         |
 | Concern              | "low iron"                                                             | "thyroid in the family"                                                |
 | Presentation profile | Short sentences, low reassurance, compact layout, lighter type density | Longer sentences, higher reassurance, more breathing room, larger type |

@@ -16,7 +16,7 @@
         <CheckCircle :size="30" weight="fill" aria-hidden="true" />
       </div>
       <p class="mt-6 quiz-kicker" style="color: var(--brand-primary)">You are in the right place</p>
-      <h1 class="mt-3 quiz-title">Your context is saved.</h1>
+      <h1 class="mt-3 quiz-title">Thanks, {{ form.preferred_name }}.</h1>
       <p class="mx-auto mt-4 max-w-md text-sm leading-7 text-heymo-muted">
         {{ successMessage }}
       </p>
@@ -78,28 +78,44 @@
           <span class="text-[10px] font-black uppercase tracking-[0.14em] text-heymo-muted">Step {{ currentStep + 1 }} of {{ steps.length }}</span>
         </div>
 
-        <form class="mt-10" @submit.prevent="submit">
+        <form class="mt-10" @submit.prevent="handleFormSubmit">
           <div v-if="currentStep === 0">
-            <p class="quiz-kicker" style="color: var(--brand-primary)">Start with the basics</p>
-            <h2 id="quiz-step-title" class="mt-3 quiz-step-title">Who are we speaking with?</h2>
+            <p class="quiz-kicker" style="color: var(--brand-primary)">Start with you</p>
+            <h2 id="quiz-step-title" class="mt-3 quiz-step-title">How should we call you?</h2>
+            <p class="mt-3 text-sm leading-6 text-heymo-muted">Use your first name or a nickname - whichever feels right for this conversation.</p>
+            <label for="capture-preferred-name" class="quiz-label mt-8">What should we call you?</label>
+            <input
+              id="capture-preferred-name"
+              v-model="form.preferred_name"
+              type="text"
+              autocomplete="given-name"
+              maxlength="80"
+              class="input input-lg mt-2 w-full"
+              placeholder="e.g. Jamie or J"
+            />
+            <p v-if="fieldError('preferred_name')" class="quiz-error">
+              {{ fieldError("preferred_name") }}
+            </p>
+          </div>
+
+          <div v-else-if="currentStep === 1">
+            <p class="quiz-kicker" style="color: var(--brand-primary)">A little context about you</p>
+            <h2 id="quiz-step-title" class="mt-3 quiz-step-title">How can we make this feel relevant?</h2>
             <p class="mt-3 text-sm leading-6 text-heymo-muted">
-              Age and sex help us choose a useful presentation style. They do not change what your results mean.
+              Your age group and sex help us choose a useful presentation style. We do not store your exact age or use these details to infer what
+              your results mean.
             </p>
             <div class="mt-8 grid gap-5 sm:grid-cols-2">
               <div>
-                <label for="capture-age" class="quiz-label">Age</label>
-                <input
-                  id="capture-age"
-                  v-model="form.age"
-                  type="number"
-                  inputmode="numeric"
-                  min="18"
-                  max="120"
-                  class="input input-lg mt-2 w-full"
-                  placeholder="Your age"
-                />
-                <p v-if="fieldError('age')" class="quiz-error">
-                  {{ fieldError("age") }}
+                <label for="capture-age-group" class="quiz-label">Age group</label>
+                <select id="capture-age-group" v-model="form.age_group" class="select select-lg mt-2 w-full">
+                  <option value="">Choose an age range</option>
+                  <option v-for="ageGroup in ageGroups" :key="ageGroup.value" :value="ageGroup.value">
+                    {{ ageGroup.label }} - {{ ageGroup.description }}
+                  </option>
+                </select>
+                <p v-if="fieldError('age_group')" class="quiz-error">
+                  {{ fieldError("age_group") }}
                 </p>
               </div>
               <div>
@@ -118,7 +134,7 @@
             </div>
           </div>
 
-          <div v-else-if="currentStep === 1">
+          <div v-else-if="currentStep === 2">
             <p class="quiz-kicker" style="color: var(--brand-primary)">Your focus</p>
             <h2 id="quiz-step-title" class="mt-3 quiz-step-title">
               {{ quiz.sub_interest.label }}
@@ -160,7 +176,7 @@
             </p>
           </div>
 
-          <div v-else-if="currentStep === 2">
+          <div v-else-if="currentStep === 3">
             <p class="quiz-kicker" style="color: var(--brand-primary)">The moment</p>
             <h2 id="quiz-step-title" class="mt-3 quiz-step-title">
               {{ quiz.trigger.label }}
@@ -202,7 +218,7 @@
             </p>
           </div>
 
-          <div v-else-if="currentStep === 3">
+          <div v-else-if="currentStep === 4">
             <p class="quiz-kicker" style="color: var(--brand-primary)">Your words</p>
             <h2 id="quiz-step-title" class="mt-3 quiz-step-title">
               {{ quiz.concern_label }}
@@ -302,18 +318,20 @@ import {
 } from "@phosphor-icons/vue";
 import { computed, reactive, ref } from "vue";
 import { ApiError, apiFetch } from "../../lib/auth";
-import type { BrandPresentation, CaptureForm, QuizDefinition } from "../../lib/landing";
+import type { AgeGroupOption, BrandPresentation, CaptureForm, QuizDefinition } from "../../lib/landing";
 
 type Props = {
+  ageGroups: AgeGroupOption[];
   brandId: number;
   landingIdentifier: string;
   presentation: BrandPresentation;
   quiz: QuizDefinition;
 };
 
-const props = defineProps<Props>();
+const { ageGroups, brandId, landingIdentifier, presentation, quiz } = defineProps<Props>();
 const form = reactive<CaptureForm>({
-  age: "",
+  preferred_name: "",
+  age_group: "",
   sex: "",
   sub_interest: "",
   trigger: "",
@@ -326,15 +344,15 @@ const status = ref<"idle" | "submitting" | "success">("idle");
 const errors = ref<Record<string, string>>({});
 const formError = ref("");
 const successMessage = ref("");
-const steps = [{ key: "profile" }, { key: "focus" }, { key: "moment" }, { key: "words" }, { key: "permission" }];
+const steps = [{ key: "name" }, { key: "profile" }, { key: "focus" }, { key: "moment" }, { key: "words" }, { key: "permission" }];
 
 const themeStyle = computed(() => ({
-  "--brand-primary": props.presentation.primary_color,
-  "--brand-secondary": props.presentation.secondary_color,
-  "--brand-heading": props.presentation.heading_font,
-  "--brand-body": props.presentation.body_font,
+  "--brand-primary": presentation.primary_color,
+  "--brand-secondary": presentation.secondary_color,
+  "--brand-heading": presentation.heading_font,
+  "--brand-body": presentation.body_font,
 }));
-const landingUrl = computed(() => `/angles/${props.brandId}/${props.landingIdentifier}`);
+const landingUrl = computed(() => `/angles/${brandId}/${landingIdentifier}`);
 
 function fieldError(field: string): string {
   return errors.value[field] ?? "";
@@ -345,28 +363,33 @@ function validateStep(): boolean {
   formError.value = "";
 
   if (currentStep.value === 0) {
-    const age = Number(form.age);
-    if (!Number.isInteger(age) || age < 18 || age > 120) {
-      errors.value.age = "Enter an age between 18 and 120.";
+    if (!form.preferred_name.trim()) {
+      errors.value.preferred_name = "Tell us what you would like us to call you.";
+    }
+  }
+
+  if (currentStep.value === 1) {
+    if (!form.age_group) {
+      errors.value.age_group = "Choose an age range to continue.";
     }
     if (!form.sex) {
       errors.value.sex = "Choose an option to continue.";
     }
   }
 
-  if (currentStep.value === 1 && !form.sub_interest) {
+  if (currentStep.value === 2 && !form.sub_interest) {
     errors.value.sub_interest = "Choose the focus that fits best.";
   }
 
-  if (currentStep.value === 2 && !form.trigger) {
+  if (currentStep.value === 3 && !form.trigger) {
     errors.value.trigger = "Choose what brought you here.";
   }
 
-  if (currentStep.value === 3 && !form.concern.trim()) {
+  if (currentStep.value === 4 && !form.concern.trim()) {
     errors.value.concern = "Add a few words so the next step stays personal.";
   }
 
-  if (currentStep.value === 4) {
+  if (currentStep.value === 5) {
     if (!/^\S+@\S+\.\S+$/.test(form.email)) {
       errors.value.email = "Enter a valid email address.";
     }
@@ -382,6 +405,15 @@ function next(): void {
   if (validateStep()) {
     currentStep.value = Math.min(currentStep.value + 1, steps.length - 1);
   }
+}
+
+function handleFormSubmit(): void {
+  if (currentStep.value === steps.length - 1) {
+    void submit();
+    return;
+  }
+
+  next();
 }
 
 function previous(): void {
@@ -401,9 +433,10 @@ async function submit(): Promise<void> {
     const response = await apiFetch<{ message: string }>("/api/capture", {
       method: "POST",
       body: JSON.stringify({
-        brand_id: props.brandId,
-        landing_identifier: props.landingIdentifier,
-        age: Number(form.age),
+        brand_id: brandId,
+        landing_identifier: landingIdentifier,
+        preferred_name: form.preferred_name.trim(),
+        age_group: form.age_group,
         sex: form.sex,
         sub_interest: form.sub_interest,
         trigger: form.trigger,

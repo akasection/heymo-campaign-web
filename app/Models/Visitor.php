@@ -13,6 +13,7 @@ class Visitor extends Model
 
     protected $fillable = [
         'brand_id',
+        'preferred_name',
         'email',
     ];
 

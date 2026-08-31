@@ -48,8 +48,12 @@
               }}{{ page.assigned_angle_id !== null && page.assigned_angle_id !== angle?.id ? ` (Used by ${page.assigned_angle_name})` : "" }}
             </option>
           </select>
-          <p v-if="selectedLandingPage?.description" class="mt-1.5 text-[11px] leading-4 text-heymo-muted">{{ selectedLandingPage.description }}</p>
-          <p v-if="fieldError('landing_identifier')" class="mt-1.5 text-xs font-semibold text-heymo-red">{{ fieldError("landing_identifier") }}</p>
+          <p v-if="selectedLandingPage?.description" class="mt-1.5 text-[11px] leading-4 text-heymo-muted">
+            {{ selectedLandingPage.description }}
+          </p>
+          <p v-if="fieldError('landing_identifier')" class="mt-1.5 text-xs font-semibold text-heymo-red">
+            {{ fieldError("landing_identifier") }}
+          </p>
         </div>
       </fieldset>
 

@@ -24,7 +24,8 @@ class CaptureRequest extends FormRequest
         return [
             'brand_id' => ['required', 'integer', 'min:1'],
             'landing_identifier' => ['required', 'string', Rule::in($registry->identifiers())],
-            'age' => ['required', 'integer', 'between:18,120'],
+            'preferred_name' => ['required', 'string', 'max:'.config('capture.limits.preferred_name', 80)],
+            'age_group' => ['required', 'string', Rule::in(array_keys(config('capture.age_groups', [])))],
             'sex' => ['required', 'string', Rule::in(['female', 'male', 'intersex', 'prefer_not_to_say'])],
             'sub_interest' => ['required', 'string', 'max:255', Rule::in($registry->choiceValues($identifier, 'sub_interest'))],
             'trigger' => ['required', 'string', 'max:255', Rule::in($registry->choiceValues($identifier, 'trigger'))],
@@ -38,7 +39,7 @@ class CaptureRequest extends FormRequest
     {
         $input = $this->all();
 
-        foreach (['landing_identifier', 'sex', 'sub_interest', 'trigger', 'concern'] as $field) {
+        foreach (['landing_identifier', 'preferred_name', 'sex', 'sub_interest', 'trigger', 'concern'] as $field) {
             if (isset($input[$field]) && is_string($input[$field])) {
                 $input[$field] = preg_replace('/\\s+/u', ' ', trim($input[$field])) ?? '';
             }
