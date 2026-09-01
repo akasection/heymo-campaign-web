@@ -50,12 +50,7 @@
                   >{{ step.count }}/{{ step.total }}<span v-if="step.rate !== null"> · {{ step.rate }}%</span></span
                 >
               </div>
-              <progress
-                v-if="step.rate !== null"
-                class="progress progress-primary h-2 w-full"
-                :value="step.rate"
-                max="100"
-              >
+              <progress v-if="step.rate !== null" class="progress progress-primary h-2 w-full" :value="step.rate" max="100">
                 {{ step.rate }}
               </progress>
             </div>
