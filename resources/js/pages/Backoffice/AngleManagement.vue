@@ -1,11 +1,6 @@
 <template>
   <section class="mx-auto max-w-[1600px] p-4 sm:p-6 lg:p-8">
-    <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-      <div>
-        <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-heymo-red">Campaign strategy</p>
-        <h2 class="mt-1 text-2xl font-extrabold text-heymo-navy">Angles</h2>
-        <p class="mt-1 max-w-2xl text-sm text-heymo-muted">Give each campaign a coherent theory of why this person should care now.</p>
-      </div>
+    <div class="mb-6 flex justify-end">
       <button v-if="canManage && selectedBrandId" class="btn btn-primary" @click="openCreate">
         <Plus :size="18" weight="bold" aria-hidden="true" />
         New angle
