@@ -7,7 +7,6 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CaptureController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingEventController;
-use App\Http\Controllers\OpenTrackingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -63,11 +62,6 @@ Route::prefix('brands/{brand}/angles')->middleware(['web', 'auth.jwt'])->group(f
 });
 
 Route::post('landing', [LandingEventController::class, 'store'])->middleware(['web', 'throttle:landing']);
-
-Route::get('open/{openToken}', OpenTrackingController::class)
-    ->middleware('throttle:open')
-    ->where('openToken', '[0-9a-f-]{36}')
-    ->name('open.track');
 
 Route::middleware(['web', 'auth.jwt'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index']);

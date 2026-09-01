@@ -9,6 +9,7 @@ use App\Support\CaptureMetadata;
 use App\Support\LandingPageRegistry;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class LandingEventController extends Controller
 {
@@ -19,7 +20,7 @@ class LandingEventController extends Controller
         $data = $request->validate([
             'fingerprint' => ['required', 'uuid'],
             'brand_id' => ['required', 'integer', 'min:1'],
-            'landing_identifier' => ['required', 'string', 'max:80'],
+            'landing_identifier' => ['required', 'string', 'max:80', Rule::in($this->registry->identifiers())],
             'attribution' => ['nullable', 'array'],
             'device' => ['nullable', 'array'],
         ]);

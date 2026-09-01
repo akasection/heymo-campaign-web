@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LandingPageController;
+use App\Http\Controllers\OpenTrackingController;
 use App\Http\Controllers\UnsubscribeController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,11 @@ Route::get('angles/{brandId}/{landingIdentifier}', [LandingPageController::class
     ->whereNumber('brandId')
     ->whereIn('landingIdentifier', array_keys(config('landing-pages', [])))
     ->name('landing.page');
+
+Route::get('open/{openToken}', OpenTrackingController::class)
+    ->middleware('throttle:open')
+    ->where('openToken', '[0-9a-f-]{36}')
+    ->name('open.track');
 
 Route::get('unsubscribe/{visitor}', UnsubscribeController::class)
     ->middleware('signed')

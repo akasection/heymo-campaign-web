@@ -32,6 +32,6 @@ class OpenTrackingController extends Controller
 
     private function transparentPixel(): string
     {
-        return base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', true);
+        return base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', true) ?: '';
     }
 }

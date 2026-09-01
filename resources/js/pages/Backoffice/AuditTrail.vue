@@ -85,8 +85,12 @@
               v-for="record in trail.records.value"
               v-else
               :key="record.id"
-              class="cursor-pointer transition hover:bg-slate-50"
+              class="cursor-pointer transition hover:bg-slate-50 focus-visible:bg-slate-50"
+              tabindex="0"
+              :aria-label="`Open ${record.visitor.preferred_name || record.visitor.email} journey`"
               @click="openRecord(record)"
+              @keydown.enter.prevent="openRecord(record)"
+              @keydown.space.prevent="openRecord(record)"
             >
               <td class="px-5 py-3 whitespace-nowrap text-heymo-muted">
                 {{ formatDate(record.captured_at) }}
