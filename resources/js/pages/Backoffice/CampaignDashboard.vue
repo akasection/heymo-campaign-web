@@ -37,22 +37,28 @@
       </div>
 
       <Panel title="Funnel" description="How visitors move from landing to a sent email." class="mt-6">
-        <div class="space-y-4">
-          <div v-for="step in funnel" :key="step.key">
-            <div class="mb-1 flex items-center justify-between text-xs font-bold">
-              <span class="text-heymo-ink">{{ step.label }}</span>
-              <span class="tabular-nums text-heymo-muted"
-                >{{ step.count }}<span v-if="step.rate !== null"> · {{ step.rate }}%</span></span
+        <div class="flex flex-col gap-6 sm:flex-row sm:items-stretch">
+          <div class="flex shrink-0 flex-col items-center justify-center rounded-box bg-slate-50 px-8 py-6 sm:w-48 sm:border-r sm:border-heymo-line">
+            <span class="text-4xl font-extrabold tabular-nums text-heymo-navy">{{ totalLanded }}</span>
+            <span class="mt-1 text-center text-xs font-semibold uppercase tracking-[0.08em] text-heymo-muted">total visitors landed</span>
+          </div>
+          <div class="flex-1 space-y-4">
+            <div v-for="step in funnelSteps" :key="step.key">
+              <div class="mb-1 flex items-center justify-between text-xs font-bold">
+                <span class="text-heymo-ink">{{ step.label }}</span>
+                <span class="tabular-nums text-heymo-muted"
+                  >{{ step.count }}/{{ step.total }}<span v-if="step.rate !== null"> · {{ step.rate }}%</span></span
+                >
+              </div>
+              <progress
+                v-if="step.rate !== null"
+                class="progress progress-primary h-2 w-full"
+                :value="step.rate"
+                max="100"
               >
+                {{ step.rate }}
+              </progress>
             </div>
-            <progress
-              v-if="step.rate !== null"
-              class="progress progress-primary h-2 w-full"
-              :value="step.rate"
-              max="100"
-            >
-              {{ step.rate }}
-            </progress>
           </div>
         </div>
       </Panel>
@@ -135,6 +141,8 @@ const selectedBrandId = ref(0);
 const brands = computed(() => data.value?.brands ?? []);
 const overall = computed<OverallMetrics | null>(() => data.value?.overall ?? null);
 const funnel = computed<FunnelStep[]>(() => data.value?.funnel ?? []);
+const funnelSteps = computed<FunnelStep[]>(() => funnel.value.filter(step => step.key !== "landed"));
+const totalLanded = computed(() => overall.value?.landed_visitors ?? 0);
 const angles = computed<AngleMetric[]>(() => data.value?.angles ?? []);
 
 const metrics = computed(() => {

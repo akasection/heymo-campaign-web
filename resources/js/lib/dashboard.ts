@@ -22,6 +22,7 @@ export type FunnelStep = {
   key: string;
   label: string;
   count: number;
+  total: number;
   rate: number | null;
 };
 

@@ -94,10 +94,10 @@ class CampaignMetricsService
         $sent = (int) $overall['campaigns_sent'];
 
         return [
-            ['key' => 'landed', 'label' => 'Landed', 'count' => $landed, 'rate' => null],
-            ['key' => 'consented', 'label' => 'Consented', 'count' => $consented, 'rate' => $this->rate($consented, $landed)],
-            ['key' => 'generated', 'label' => 'Generated', 'count' => $generated, 'rate' => $this->rate($generated, $consented)],
-            ['key' => 'sent', 'label' => 'Sent', 'count' => $sent, 'rate' => $this->rate($sent, $generated)],
+            ['key' => 'landed', 'label' => 'Landed', 'count' => $landed, 'total' => $landed, 'rate' => null],
+            ['key' => 'consented', 'label' => 'Consented', 'count' => $consented, 'total' => $landed, 'rate' => $this->rate($consented, $landed)],
+            ['key' => 'generated', 'label' => 'Generated', 'count' => $generated, 'total' => $landed, 'rate' => $this->rate($generated, $landed)],
+            ['key' => 'sent', 'label' => 'Sent', 'count' => $sent, 'total' => $landed, 'rate' => $this->rate($sent, $landed)],
         ];
     }
 
