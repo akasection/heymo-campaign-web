@@ -1,7 +1,7 @@
 import { createApp } from "vue";
+import { sendLandingBeacon } from "./lib/tracking";
 import QuizPage from "./pages/LandingPages/QuizPage.vue";
 import type { AgeGroupOption, BrandPresentation, QuizDefinition } from "./lib/landing";
-import { sendLandingBeacon } from "./lib/tracking";
 
 const appElement = document.querySelector<HTMLElement>("#quiz-app");
 

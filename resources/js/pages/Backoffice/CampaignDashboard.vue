@@ -9,12 +9,16 @@
         <label for="dashboard-brand" class="text-[11px] font-bold uppercase tracking-[0.08em] text-heymo-muted">Brand</label>
         <select id="dashboard-brand" v-model="selectedBrandId" class="select select-bordered select-sm mt-1 w-full" @change="reload">
           <option :value="0">All brands</option>
-          <option v-for="brand in brands" :key="brand.id" :value="brand.id">{{ brand.name }}</option>
+          <option v-for="brand in brands" :key="brand.id" :value="brand.id">
+            {{ brand.name }}
+          </option>
         </select>
       </div>
     </div>
 
-    <div v-if="errorMessage" class="alert alert-soft alert-error mb-4 text-sm">{{ errorMessage }}</div>
+    <div v-if="errorMessage" class="alert alert-soft alert-error mb-4 text-sm">
+      {{ errorMessage }}
+    </div>
 
     <div v-if="isLoading" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <div v-for="index in 8" :key="index" class="skeleton h-24 rounded-lg"></div>
@@ -23,8 +27,12 @@
     <template v-else-if="overall">
       <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article v-for="metric in metrics" :key="metric.label" class="card card-border min-w-0 bg-base-100 p-4 text-base-content shadow-panel">
-          <p class="text-xs font-semibold uppercase tracking-[0.08em] text-heymo-muted">{{ metric.label }}</p>
-          <p class="mt-2 text-2xl font-extrabold tabular-nums text-heymo-navy">{{ metric.value }}</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.08em] text-heymo-muted">
+            {{ metric.label }}
+          </p>
+          <p class="mt-2 text-2xl font-extrabold tabular-nums text-heymo-navy">
+            {{ metric.value }}
+          </p>
         </article>
       </div>
 
@@ -33,9 +41,18 @@
           <div v-for="step in funnel" :key="step.key">
             <div class="mb-1 flex items-center justify-between text-xs font-bold">
               <span class="text-heymo-ink">{{ step.label }}</span>
-              <span class="tabular-nums text-heymo-muted">{{ step.count }}<span v-if="step.rate !== null"> · {{ step.rate }}%</span></span>
+              <span class="tabular-nums text-heymo-muted"
+                >{{ step.count }}<span v-if="step.rate !== null"> · {{ step.rate }}%</span></span
+              >
             </div>
-            <progress class="progress progress-primary h-2 w-full" :value="step.rate ?? 0" max="100">{{ step.rate ?? 0 }}</progress>
+            <progress
+              v-if="step.rate !== null"
+              class="progress progress-primary h-2 w-full"
+              :value="step.rate"
+              max="100"
+            >
+              {{ step.rate }}
+            </progress>
           </div>
         </div>
       </Panel>
@@ -60,17 +77,39 @@
             </thead>
             <tbody class="divide-y divide-heymo-line">
               <tr v-for="angle in angles" :key="angle.id" class="transition hover:bg-slate-50">
-                <td class="px-5 py-3 font-bold text-heymo-navy">{{ angle.name }}</td>
-                <td class="px-3 py-3 text-heymo-muted">{{ brandName(angle.brand_id) }}</td>
-                <td class="px-3 py-3 text-right tabular-nums text-heymo-muted">{{ angle.landed_visitors }}</td>
-                <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">{{ angle.captures }}</td>
-                <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">{{ angle.consented_visitors }}</td>
-                <td class="px-3 py-3 text-right tabular-nums text-heymo-muted">{{ rate(angle.consent_rate) }}</td>
-                <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">{{ angle.campaigns_generated }}</td>
-                <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">{{ angle.messages_sent }}</td>
-                <td class="px-3 py-3 text-right tabular-nums text-heymo-muted">{{ rate(angle.delivery_success_rate) }}</td>
-                <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">{{ angle.messages_opened }}</td>
-                <td class="px-5 py-3 text-right tabular-nums text-heymo-muted">{{ rate(angle.open_rate) }}</td>
+                <td class="px-5 py-3 font-bold text-heymo-navy">
+                  {{ angle.name }}
+                </td>
+                <td class="px-3 py-3 text-heymo-muted">
+                  {{ brandName(angle.brand_id) }}
+                </td>
+                <td class="px-3 py-3 text-right tabular-nums text-heymo-muted">
+                  {{ angle.landed_visitors }}
+                </td>
+                <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">
+                  {{ angle.captures }}
+                </td>
+                <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">
+                  {{ angle.consented_visitors }}
+                </td>
+                <td class="px-3 py-3 text-right tabular-nums text-heymo-muted">
+                  {{ rate(angle.consent_rate) }}
+                </td>
+                <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">
+                  {{ angle.campaigns_generated }}
+                </td>
+                <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">
+                  {{ angle.messages_sent }}
+                </td>
+                <td class="px-3 py-3 text-right tabular-nums text-heymo-muted">
+                  {{ rate(angle.delivery_success_rate) }}
+                </td>
+                <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">
+                  {{ angle.messages_opened }}
+                </td>
+                <td class="px-5 py-3 text-right tabular-nums text-heymo-muted">
+                  {{ rate(angle.open_rate) }}
+                </td>
               </tr>
               <tr v-if="angles.length === 0">
                 <td colspan="11" class="px-5 py-6 text-center text-sm text-heymo-muted">No angles with activity yet.</td>

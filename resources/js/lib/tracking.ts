@@ -90,7 +90,11 @@ export function detectDevice(): DeviceInfo {
   try {
     const data = (
       navigator as Navigator & {
-        userAgentData?: { platform?: string; mobile?: boolean; brands?: { brand?: string }[] };
+        userAgentData?: {
+          platform?: string;
+          mobile?: boolean;
+          brands?: { brand?: string }[];
+        };
       }
     ).userAgentData;
 

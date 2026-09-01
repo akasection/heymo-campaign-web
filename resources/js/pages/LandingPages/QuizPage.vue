@@ -318,8 +318,8 @@ import {
 } from "@phosphor-icons/vue";
 import { computed, reactive, ref } from "vue";
 import { ApiError, apiFetch } from "../../lib/auth";
-import type { AgeGroupOption, BrandPresentation, CaptureForm, QuizDefinition } from "../../lib/landing";
 import { captureMetadata } from "../../lib/tracking";
+import type { AgeGroupOption, BrandPresentation, CaptureForm, QuizDefinition } from "../../lib/landing";
 
 type Props = {
   ageGroups: AgeGroupOption[];

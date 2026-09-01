@@ -68,5 +68,19 @@ export function useAuditTrail() {
     void load();
   }
 
-  return { records, meta, page, perPage, brandId, angleId, search, isLoading, errorMessage, hasPagination, load, goToPage, resetAndReload };
+  return {
+    records,
+    meta,
+    page,
+    perPage,
+    brandId,
+    angleId,
+    search,
+    isLoading,
+    errorMessage,
+    hasPagination,
+    load,
+    goToPage,
+    resetAndReload,
+  };
 }

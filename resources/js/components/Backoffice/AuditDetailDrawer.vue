@@ -7,7 +7,9 @@
         <header class="sticky top-0 z-10 flex items-center justify-between border-b border-heymo-line bg-white px-5 py-4">
           <div class="min-w-0">
             <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-heymo-red">Audit trail</p>
-            <h2 class="truncate text-lg font-extrabold text-heymo-navy">{{ record.visitor.preferred_name || record.visitor.email }}</h2>
+            <h2 class="truncate text-lg font-extrabold text-heymo-navy">
+              {{ record.visitor.preferred_name || record.visitor.email }}
+            </h2>
           </div>
           <button class="btn btn-square btn-ghost btn-sm" aria-label="Close" @click="$emit('close')">
             <X :size="18" weight="bold" aria-hidden="true" />
@@ -20,28 +22,62 @@
         </div>
 
         <div v-else-if="errorMessage" class="p-6">
-          <div class="alert alert-soft alert-error text-sm">{{ errorMessage }}</div>
+          <div class="alert alert-soft alert-error text-sm">
+            {{ errorMessage }}
+          </div>
         </div>
 
         <div v-else-if="detail" class="flex-1 space-y-6 p-5">
           <section class="rounded-lg border border-heymo-line p-4">
             <h3 class="text-xs font-bold uppercase tracking-[0.08em] text-heymo-muted">Capture</h3>
             <dl class="mt-3 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
-              <div><dt class="text-[11px] font-semibold text-heymo-muted">Captured at</dt><dd class="font-semibold text-heymo-navy">{{ formatDate(detail.captured_at) }}</dd></div>
-              <div><dt class="text-[11px] font-semibold text-heymo-muted">Landing page</dt><dd class="font-semibold text-heymo-navy">{{ detail.landing_identifier }}</dd></div>
-              <div><dt class="text-[11px] font-semibold text-heymo-muted">Email</dt><dd class="font-semibold text-heymo-navy">{{ detail.visitor.email }}</dd></div>
-              <div><dt class="text-[11px] font-semibold text-heymo-muted">Age group / sex</dt><dd class="font-semibold text-heymo-navy">{{ detail.age_group }} · {{ detail.sex }}</dd></div>
-              <div><dt class="text-[11px] font-semibold text-heymo-muted">Session duration</dt><dd class="font-semibold text-heymo-navy">{{ formatDuration(detail.session_duration_seconds) }}</dd></div>
-              <div><dt class="text-[11px] font-semibold text-heymo-muted">Fingerprint</dt><dd class="break-all font-mono text-xs text-heymo-muted">{{ detail.fingerprint || "—" }}</dd></div>
+              <div>
+                <dt class="text-[11px] font-semibold text-heymo-muted">Captured at</dt>
+                <dd class="font-semibold text-heymo-navy">
+                  {{ formatDate(detail.captured_at) }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-[11px] font-semibold text-heymo-muted">Landing page</dt>
+                <dd class="font-semibold text-heymo-navy">
+                  {{ detail.landing_identifier }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-[11px] font-semibold text-heymo-muted">Email</dt>
+                <dd class="font-semibold text-heymo-navy">
+                  {{ detail.visitor.email }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-[11px] font-semibold text-heymo-muted">Age group / sex</dt>
+                <dd class="font-semibold text-heymo-navy">{{ detail.age_group }} · {{ detail.sex }}</dd>
+              </div>
+              <div>
+                <dt class="text-[11px] font-semibold text-heymo-muted">Session duration</dt>
+                <dd class="font-semibold text-heymo-navy">
+                  {{ formatDuration(detail.session_duration_seconds) }}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-[11px] font-semibold text-heymo-muted">Fingerprint</dt>
+                <dd class="break-all font-mono text-xs text-heymo-muted">
+                  {{ detail.fingerprint || "—" }}
+                </dd>
+              </div>
             </dl>
             <div class="mt-4 grid gap-3 sm:grid-cols-2">
               <div>
                 <dt class="text-[11px] font-semibold text-heymo-muted">Attribution</dt>
-                <dd class="mt-1 text-xs leading-5 text-heymo-ink">{{ attributionLabel(detail.attribution) }}</dd>
+                <dd class="mt-1 text-xs leading-5 text-heymo-ink">
+                  {{ attributionLabel(detail.attribution) }}
+                </dd>
               </div>
               <div>
                 <dt class="text-[11px] font-semibold text-heymo-muted">Device</dt>
-                <dd class="mt-1 text-xs leading-5 text-heymo-ink">{{ deviceLabel(detail.device) }}</dd>
+                <dd class="mt-1 text-xs leading-5 text-heymo-ink">
+                  {{ deviceLabel(detail.device) }}
+                </dd>
               </div>
             </div>
             <p class="mt-4 rounded-md bg-slate-50 p-3 text-xs leading-5 text-heymo-ink"><b>Concern:</b> {{ detail.concern }}</p>
@@ -61,11 +97,19 @@
           <section class="rounded-lg border border-heymo-line p-4">
             <h3 class="text-xs font-bold uppercase tracking-[0.08em] text-heymo-muted">Consent &amp; suppression</h3>
             <div class="mt-3 space-y-2">
-              <div v-for="consent in detail.consent_records" :key="`consent-${consent.consented_at}`" class="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div
+                v-for="consent in detail.consent_records"
+                :key="`consent-${consent.consented_at}`"
+                class="flex flex-wrap items-center justify-between gap-2 text-xs"
+              >
                 <span class="font-semibold text-heymo-navy">{{ consent.channel }} consent · {{ consent.policy_version }}</span>
                 <span class="text-heymo-muted">{{ formatDate(consent.consented_at) }} · {{ consent.source }}</span>
               </div>
-              <div v-for="suppression in detail.suppressions" :key="`suppression-${suppression.suppressed_at}`" class="flex flex-wrap items-center justify-between gap-2 rounded-md bg-rose-50 px-3 py-2 text-xs">
+              <div
+                v-for="suppression in detail.suppressions"
+                :key="`suppression-${suppression.suppressed_at}`"
+                class="flex flex-wrap items-center justify-between gap-2 rounded-md bg-rose-50 px-3 py-2 text-xs"
+              >
                 <span class="font-semibold text-heymo-red">Suppressed ({{ suppression.reason }})</span>
                 <span class="text-heymo-muted">{{ formatDate(suppression.suppressed_at) }}</span>
               </div>
@@ -93,13 +137,23 @@
                   <span class="text-xs font-bold text-heymo-navy">#{{ message.sequence_position }} · {{ message.role }}</span>
                   <span class="badge badge-soft" :class="messageStatusClass(message.status)">{{ message.status }}</span>
                 </div>
-                <p class="mt-1 text-sm font-semibold text-heymo-ink">{{ message.subject }}</p>
+                <p class="mt-1 text-sm font-semibold text-heymo-ink">
+                  {{ message.subject }}
+                </p>
                 <p class="mt-2 text-[11px] text-heymo-muted">
-                  Scheduled {{ formatDate(message.scheduled_at) }} · Sent {{ formatDate(message.sent_at) }} · Opened {{ formatDate(message.opened_at) }}
+                  Scheduled {{ formatDate(message.scheduled_at) }} · Sent {{ formatDate(message.sent_at) }} · Opened
+                  {{ formatDate(message.opened_at) }}
                 </p>
                 <div class="mt-2 flex flex-wrap gap-1">
-                  <span v-for="event in message.delivery_events" :key="`delivery-${event.created_at}`" class="badge badge-outline badge-xs">{{ event.status }}</span>
-                  <span v-for="event in message.engagement_events" :key="`engagement-${event.occurred_at}`" class="badge badge-soft badge-info badge-xs">{{ event.type }}</span>
+                  <span v-for="event in message.delivery_events" :key="`delivery-${event.created_at}`" class="badge badge-outline badge-xs">{{
+                    event.status
+                  }}</span>
+                  <span
+                    v-for="event in message.engagement_events"
+                    :key="`engagement-${event.occurred_at}`"
+                    class="badge badge-soft badge-info badge-xs"
+                    >{{ event.type }}</span
+                  >
                 </div>
               </div>
             </div>

@@ -1,16 +1,8 @@
 <template>
   <nav v-if="lastPage > 1" class="flex flex-col items-center justify-between gap-3 sm:flex-row" aria-label="Pagination">
-    <p class="text-xs font-semibold text-heymo-muted">
-      Page {{ currentPage }} of {{ lastPage }}
-    </p>
+    <p class="text-xs font-semibold text-heymo-muted">Page {{ currentPage }} of {{ lastPage }}</p>
     <div class="join">
-      <button
-        class="btn btn-outline btn-sm join-item"
-        :disabled="currentPage <= 1"
-        @click="$emit('change', currentPage - 1)"
-      >
-        Previous
-      </button>
+      <button class="btn btn-outline btn-sm join-item" :disabled="currentPage <= 1" @click="$emit('change', currentPage - 1)">Previous</button>
       <button
         v-for="pageNumber in pages"
         :key="pageNumber"
@@ -21,13 +13,7 @@
       >
         {{ pageNumber }}
       </button>
-      <button
-        class="btn btn-outline btn-sm join-item"
-        :disabled="currentPage >= lastPage"
-        @click="$emit('change', currentPage + 1)"
-      >
-        Next
-      </button>
+      <button class="btn btn-outline btn-sm join-item" :disabled="currentPage >= lastPage" @click="$emit('change', currentPage + 1)">Next</button>
     </div>
   </nav>
 </template>

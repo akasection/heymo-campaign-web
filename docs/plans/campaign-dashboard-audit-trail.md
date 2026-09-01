@@ -40,7 +40,7 @@
 6. `CaptureController::store`: persist `fingerprint` / `session_duration_seconds` / `attribution` / `device` on the `IntentResponse` create.
 7. New `LandingEventController@store` (public, fire-and-forget): resolve brand + angle from `brand_id` + `landing_identifier` (angle nullable), create `LandingEvent`, return 202. Route `POST /api/landing`, middleware `web` + new `landing` limiter.
 8. `RouteServiceProvider`: add `landing` limiter (per-IP, ~60/min).
-9. Frontend: add `ua-parser-js`; new `resources/js/lib/tracking.ts` with `ensureFingerprint()` (`crypto.randomUUID`, `localStorage` "heymo.fingerprint"), `readAttribution()` (`URLSearchParams` utm_* + `document.referrer`; blank → direct), `detectDevice()` (`userAgentData` then `ua-parser-js`), `sendLandingBeacon()` (fetch keepalive, once per session via `sessionStorage` "heymo.landed"), `getSessionDurationSeconds()` (vs `sessionStorage` "heymo.landed_at").
+9. Frontend: add `ua-parser-js`; new `resources/js/lib/tracking.ts` with `ensureFingerprint()` (`crypto.randomUUID`, `localStorage` "heymo.fingerprint"), `readAttribution()` (`URLSearchParams` utm\_\* + `document.referrer`; blank → direct), `detectDevice()` (`userAgentData` then `ua-parser-js`), `sendLandingBeacon()` (fetch keepalive, once per session via `sessionStorage` "heymo.landed"), `getSessionDurationSeconds()` (vs `sessionStorage` "heymo.landed_at").
 10. Wire beacon in `resources/js/campaign.ts` (runs on landing and quiz; skip if `#quiz-app` already beaconed). `QuizPage.vue` reads fingerprint/attribution/device + session duration and includes them in the `/api/capture` payload. Set "heymo.landed_at" at first landing.
 
 ### Phase B — Open tracking (parallel with A)

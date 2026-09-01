@@ -12,14 +12,24 @@
         <label for="audit-brand" class="text-[11px] font-bold uppercase tracking-[0.08em] text-heymo-muted">Brand</label>
         <select id="audit-brand" v-model="trail.brandId.value" class="select select-bordered select-sm mt-1 w-full" @change="onBrandChange">
           <option :value="null">All brands</option>
-          <option v-for="brand in brandOptions" :key="brand.id" :value="brand.id">{{ brand.name }}</option>
+          <option v-for="brand in brandOptions" :key="brand.id" :value="brand.id">
+            {{ brand.name }}
+          </option>
         </select>
       </div>
       <div>
         <label for="audit-angle" class="text-[11px] font-bold uppercase tracking-[0.08em] text-heymo-muted">Angle</label>
-        <select id="audit-angle" v-model="trail.angleId.value" class="select select-bordered select-sm mt-1 w-full" :disabled="!trail.brandId.value" @change="trail.resetAndReload()">
+        <select
+          id="audit-angle"
+          v-model="trail.angleId.value"
+          class="select select-bordered select-sm mt-1 w-full"
+          :disabled="!trail.brandId.value"
+          @change="trail.resetAndReload()"
+        >
           <option :value="null">All angles</option>
-          <option v-for="angle in angleOptions" :key="angle.id" :value="angle.id">{{ angle.name }}</option>
+          <option v-for="angle in angleOptions" :key="angle.id" :value="angle.id">
+            {{ angle.name }}
+          </option>
         </select>
       </div>
       <div class="md:col-span-2">
@@ -40,7 +50,9 @@
       </div>
     </div>
 
-    <div v-if="trail.errorMessage.value" class="alert alert-soft alert-error mb-4 text-sm">{{ trail.errorMessage.value }}</div>
+    <div v-if="trail.errorMessage.value" class="alert alert-soft alert-error mb-4 text-sm">
+      {{ trail.errorMessage.value }}
+    </div>
 
     <Panel class="overflow-hidden" padding-class="p-0">
       <div class="overflow-x-auto">
@@ -69,17 +81,39 @@
             <tr v-else-if="trail.records.value.length === 0">
               <td colspan="11" class="px-5 py-8 text-center text-sm text-heymo-muted">No submissions match these filters.</td>
             </tr>
-            <tr v-for="record in trail.records.value" v-else :key="record.id" class="cursor-pointer transition hover:bg-slate-50" @click="openRecord(record)">
-              <td class="px-5 py-3 whitespace-nowrap text-heymo-muted">{{ formatDate(record.captured_at) }}</td>
-              <td class="px-3 py-3 font-bold text-heymo-navy">{{ record.visitor.preferred_name || "—" }}</td>
-              <td class="px-3 py-3 text-heymo-muted">{{ record.brand.name }}</td>
+            <tr
+              v-for="record in trail.records.value"
+              v-else
+              :key="record.id"
+              class="cursor-pointer transition hover:bg-slate-50"
+              @click="openRecord(record)"
+            >
+              <td class="px-5 py-3 whitespace-nowrap text-heymo-muted">
+                {{ formatDate(record.captured_at) }}
+              </td>
+              <td class="px-3 py-3 font-bold text-heymo-navy">
+                {{ record.visitor.preferred_name || "—" }}
+              </td>
+              <td class="px-3 py-3 text-heymo-muted">
+                {{ record.brand.name }}
+              </td>
               <td class="px-3 py-3 text-heymo-ink">{{ record.angle.name }}</td>
-              <td class="px-3 py-3 text-heymo-muted">{{ sourceLabel(record.attribution) }}</td>
-              <td class="px-3 py-3 text-heymo-muted">{{ deviceShort(record.device) }}</td>
-              <td class="px-3 py-3 text-right tabular-nums text-heymo-muted">{{ formatDuration(record.session_duration_seconds) }}</td>
+              <td class="px-3 py-3 text-heymo-muted">
+                {{ sourceLabel(record.attribution) }}
+              </td>
+              <td class="px-3 py-3 text-heymo-muted">
+                {{ deviceShort(record.device) }}
+              </td>
+              <td class="px-3 py-3 text-right tabular-nums text-heymo-muted">
+                {{ formatDuration(record.session_duration_seconds) }}
+              </td>
               <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">{{ record.campaigns_generated_count }}/{{ record.campaigns_count }}</td>
-              <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">{{ record.messages_sent_count }}</td>
-              <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">{{ record.messages_opened_count }}</td>
+              <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">
+                {{ record.messages_sent_count }}
+              </td>
+              <td class="px-3 py-3 text-right tabular-nums text-heymo-ink">
+                {{ record.messages_opened_count }}
+              </td>
               <td class="px-5 py-3 text-right">
                 <CaretRight :size="16" weight="bold" class="text-heymo-muted" aria-hidden="true" />
               </td>
@@ -106,8 +140,8 @@
 import { PhCaretRight as CaretRight, PhMagnifyingGlass as MagnifyingGlass } from "@phosphor-icons/vue";
 import { onMounted, ref } from "vue";
 import AuditDetailDrawer from "../../components/Backoffice/AuditDetailDrawer.vue";
-import Panel from "../../components/Backoffice/Panel.vue";
 import Pagination from "../../components/Backoffice/Pagination.vue";
+import Panel from "../../components/Backoffice/Panel.vue";
 import { useAuditTrail } from "../../composables/useAuditTrail";
 import { apiFetch } from "../../lib/auth";
 import type { AuditRecord } from "../../lib/audit";
