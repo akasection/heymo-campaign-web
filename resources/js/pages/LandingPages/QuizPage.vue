@@ -319,6 +319,7 @@ import {
 import { computed, reactive, ref } from "vue";
 import { ApiError, apiFetch } from "../../lib/auth";
 import type { AgeGroupOption, BrandPresentation, CaptureForm, QuizDefinition } from "../../lib/landing";
+import { captureMetadata } from "../../lib/tracking";
 
 type Props = {
   ageGroups: AgeGroupOption[];
@@ -429,6 +430,8 @@ async function submit(): Promise<void> {
 
   status.value = "submitting";
 
+  const metadata = captureMetadata();
+
   try {
     const response = await apiFetch<{ message: string }>("/api/capture", {
       method: "POST",
@@ -443,6 +446,10 @@ async function submit(): Promise<void> {
         concern: form.concern.trim(),
         email: form.email.trim(),
         consent: form.consent,
+        fingerprint: metadata.fingerprint,
+        session_duration_seconds: metadata.session_duration_seconds,
+        attribution: metadata.attribution,
+        device: metadata.device,
       }),
     });
 

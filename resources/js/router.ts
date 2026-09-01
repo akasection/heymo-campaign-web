@@ -41,6 +41,12 @@ const router = createRouter({
       meta: { navigationId: "campaigns" },
     },
     {
+      path: "/audit",
+      name: "admin.audit",
+      component: Dashboard,
+      meta: { navigationId: "audit" },
+    },
+    {
       path: "/samples",
       name: "admin.samples",
       component: Dashboard,
