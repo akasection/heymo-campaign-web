@@ -77,6 +77,10 @@
 
         <AngleManagement v-else-if="isAuthReady && activeNavigation === 'angles'" :can-manage="canManageBackoffice" />
 
+        <CampaignDashboard v-else-if="isAuthReady && activeNavigation === 'dashboard'" />
+
+        <AuditTrail v-else-if="isAuthReady && activeNavigation === 'audit'" />
+
         <div v-else-if="isAuthReady" class="mx-auto max-w-[1600px] p-4 sm:p-6 lg:p-8">
           <div class="mb-6 flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
             <div>
@@ -333,6 +337,7 @@ import {
   PhPulse as Pulse,
   PhSignOut as SignOut,
   PhSquaresFour as SquaresFour,
+  PhTable as Table,
   PhTarget as Target,
   PhWarningCircle as WarningCircle,
   PhX as X,
@@ -347,7 +352,9 @@ import StatTile from "../../components/Backoffice/StatTile.vue";
 import StatusBadge from "../../components/Backoffice/StatusBadge.vue";
 import { ApiError, apiFetch, clearAccessToken, saveAccessToken } from "../../lib/auth";
 import AngleManagement from "./AngleManagement.vue";
+import AuditTrail from "./AuditTrail.vue";
 import BrandManagement from "./BrandManagement.vue";
+import CampaignDashboard from "./CampaignDashboard.vue";
 import {
   campaignProgress,
   dashboardMetrics,
@@ -369,6 +376,7 @@ const navigationItems: {
   { id: "dashboard", label: "Dashboard", icon: SquaresFour },
   { id: "brands", label: "Brands", icon: Drop },
   { id: "angles", label: "Campaigns", icon: Target },
+  { id: "audit", label: "Audit trail", icon: Table },
 ];
 
 const metricIcons = [Flask, ChartLineUp, Drop];
@@ -391,6 +399,7 @@ const navigationRoutes: Record<string, string> = {
   participants: "admin.participants",
   locations: "admin.locations",
   reports: "admin.reports",
+  audit: "admin.audit",
 };
 
 const activeNavigation = computed(() => (typeof route.meta.navigationId === "string" ? route.meta.navigationId : "dashboard"));

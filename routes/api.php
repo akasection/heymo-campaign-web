@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\AngleController;
+use App\Http\Controllers\AuditController;
 use App\Http\Controllers\Auth\PasswordlessLoginController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CaptureController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LandingEventController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -56,4 +59,12 @@ Route::prefix('brands/{brand}/angles')->middleware(['web', 'auth.jwt'])->group(f
     Route::put('{angle}', [AngleController::class, 'update']);
     Route::delete('{angle}', [AngleController::class, 'destroy']);
     Route::post('{angle}/restore', [AngleController::class, 'restore']);
+});
+
+Route::post('landing', [LandingEventController::class, 'store'])->middleware(['web', 'throttle:landing']);
+
+Route::middleware(['web', 'auth.jwt'])->group(function () {
+    Route::get('dashboard', [DashboardController::class, 'index']);
+    Route::get('audit', [AuditController::class, 'index']);
+    Route::get('audit/{intentResponse}', [AuditController::class, 'show'])->whereNumber('intentResponse');
 });

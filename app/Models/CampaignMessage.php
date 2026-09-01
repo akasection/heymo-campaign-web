@@ -41,6 +41,8 @@ class CampaignMessage extends Model
         'status',
         'scheduled_at',
         'sent_at',
+        'open_token',
+        'opened_at',
     ];
 
     protected $casts = [
@@ -48,6 +50,7 @@ class CampaignMessage extends Model
         'evidence_ids' => 'array',
         'scheduled_at' => 'datetime',
         'sent_at' => 'datetime',
+        'opened_at' => 'datetime',
     ];
 
     public function campaign(): BelongsTo
@@ -58,5 +61,10 @@ class CampaignMessage extends Model
     public function deliveryEvents(): HasMany
     {
         return $this->hasMany(DeliveryEvent::class);
+    }
+
+    public function engagementEvents(): HasMany
+    {
+        return $this->hasMany(EngagementEvent::class);
     }
 }

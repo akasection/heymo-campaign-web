@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class IntentResponse extends Model
 {
@@ -20,10 +22,16 @@ class IntentResponse extends Model
         'trigger',
         'concern',
         'captured_at',
+        'fingerprint',
+        'session_duration_seconds',
+        'attribution',
+        'device',
     ];
 
     protected $casts = [
         'captured_at' => 'datetime',
+        'attribution' => 'array',
+        'device' => 'array',
     ];
 
     public function visitor(): BelongsTo
@@ -34,5 +42,15 @@ class IntentResponse extends Model
     public function angle(): BelongsTo
     {
         return $this->belongsTo(Angle::class);
+    }
+
+    public function campaigns(): HasMany
+    {
+        return $this->hasMany(Campaign::class);
+    }
+
+    public function messages(): HasManyThrough
+    {
+        return $this->hasManyThrough(CampaignMessage::class, Campaign::class, 'intent_response_id', 'campaign_id');
     }
 }

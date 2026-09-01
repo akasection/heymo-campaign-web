@@ -1,4 +1,5 @@
 import { createApp } from "vue";
+import { sendLandingBeacon } from "./lib/tracking";
 import QuizPage from "./pages/LandingPages/QuizPage.vue";
 import type { AgeGroupOption, BrandPresentation, QuizDefinition } from "./lib/landing";
 
@@ -32,4 +33,12 @@ if (appElement) {
       quiz,
     }).mount(appElement);
   }
+}
+
+const brandMeta = document.querySelector<HTMLMetaElement>('meta[name="brand-id"]')?.content;
+const landingMeta = document.querySelector<HTMLMetaElement>('meta[name="landing-identifier"]')?.content;
+const beaconBrandId = Number(brandMeta);
+
+if (Number.isSafeInteger(beaconBrandId) && beaconBrandId > 0 && landingMeta) {
+  void sendLandingBeacon(beaconBrandId, landingMeta);
 }
