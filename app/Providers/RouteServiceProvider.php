@@ -58,5 +58,13 @@ class RouteServiceProvider extends ServiceProvider
                 Limit::perMinute((int) config('capture.limits.per_email_per_minute', 3))->by('capture-email:'.$emailKey),
             ];
         });
+
+        RateLimiter::for('landing', function (Request $request) {
+            return Limit::perMinute(60)->by('landing-ip:'.$request->ip());
+        });
+
+        RateLimiter::for('open', function (Request $request) {
+            return Limit::perMinute(120)->by('open-ip:'.$request->ip());
+        });
     }
 }

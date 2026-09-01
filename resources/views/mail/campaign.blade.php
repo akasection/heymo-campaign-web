@@ -60,5 +60,9 @@
       </td>
     </tr>
   </table>
+
+  @if ($openTrackingUrl)
+    <img src="{{ $openTrackingUrl }}" width="1" height="1" alt="" style="display:none;" />
+  @endif
 </body>
 </html>

@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="landing-identifier" content="{{ $landingIdentifier }}">
+    <meta name="brand-id" content="{{ $brandId }}">
     <title>@yield('title', $brand['name'])</title>
     @vite(['resources/css/app.css', 'resources/js/campaign.ts'])
   </head>

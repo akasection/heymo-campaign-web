@@ -52,6 +52,10 @@ class CaptureController extends Controller
                 'trigger' => $data['trigger'],
                 'concern' => $data['concern'],
                 'captured_at' => now(),
+                'fingerprint' => $data['fingerprint'] ?? null,
+                'session_duration_seconds' => $data['session_duration_seconds'] ?? null,
+                'attribution' => $data['attribution'] ?? null,
+                'device' => $data['device'] ?? null,
             ]);
 
             $visitor->consentRecords()->create([

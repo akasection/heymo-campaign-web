@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\Angle;
 use App\Models\Brand;
+use App\Models\Campaign;
+use App\Models\Visitor;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -16,6 +18,8 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         Angle::class => \App\Policies\AnglePolicy::class,
         Brand::class => \App\Policies\BrandPolicy::class,
+        Campaign::class => \App\Policies\CampaignPolicy::class,
+        Visitor::class => \App\Policies\VisitorPolicy::class,
     ];
 
     /**

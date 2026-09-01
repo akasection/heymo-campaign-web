@@ -48,4 +48,5 @@ Route::middleware('auth')->group(function () {
     Route::view('admin/participants', 'Backoffice.dashboard')->name('admin.participants');
     Route::view('admin/locations', 'Backoffice.dashboard')->name('admin.locations');
     Route::view('admin/reports', 'Backoffice.dashboard')->name('admin.reports');
+    Route::view('admin/audit', 'Backoffice.dashboard')->name('admin.audit');
 });

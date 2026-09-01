@@ -9,6 +9,7 @@ use App\Models\CampaignMessage;
 use App\Models\GenerationAttempt;
 use App\Models\IntentResponse;
 use App\Models\Visitor;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class CampaignGenerator
@@ -190,6 +191,7 @@ class CampaignGenerator
                 'headline' => $message['headline'],
                 'body_paragraphs' => $message['body_paragraphs'],
                 'evidence_ids' => $message['evidence_ids'],
+                'open_token' => (string) Str::uuid(),
                 'status' => CampaignMessage::STATUS_GENERATED,
             ]);
         }

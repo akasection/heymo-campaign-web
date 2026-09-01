@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Campaign;
 use App\Models\CampaignMessage;
 use App\Models\Visitor;
+use Illuminate\Support\Facades\URL;
 
 class CampaignMailComposer
 {
@@ -48,6 +49,9 @@ class CampaignMailComposer
             'valediction' => $signOff['valediction'],
             'signature' => $signOff['signature'],
             'unsubscribeUrl' => $unsubscribeUrl,
+            'openTrackingUrl' => $message->open_token
+                ? URL::route('open.track', ['openToken' => $message->open_token])
+                : null,
         ])->render();
 
         return [
