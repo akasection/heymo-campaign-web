@@ -97,32 +97,6 @@
   timeout, rate limit, or unexpected provider response, and a job can be retried safely.
   ```
 
-### T-12 Seed a complete, deterministic reviewer demo
-
-- tags: [backend, database, seeding, demo]
-- priority: high
-- workload: Hard
-- steps:
-  - [ ] Seed an administrator, two contrasting brands, four topic angles, optional evidence enrichment, and landing mappings.
-  - [ ] Seed diverse consented, suppressed, and failed-generation visitor histories.
-  - [ ] Seed authored/validated sample campaigns so review does not need an API key.
-  - [ ] Verify a clean reset and reseed from an empty database.
-
-  ```md
-  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
-  authenticated admin access and authorisation; T-05 Build brand management settings;
-  T-06 Build authenticated angle management; T-09 Generate and validate the
-  three-email personalised welcome sequence; T-10 Queue, send, and observe campaign email
-  delivery.
-
-  The seeded brands must differ in both visual treatment and copy voice. The visitors should
-  include same-angle comparisons where age, sex, and answers visibly change the emails. Seed
-  realistic persisted sample outputs rather than calling a paid/remote LLM during seeding.
-
-  **Done when:** `php artisan migrate:fresh --seed` succeeds unattended and the reviewer can log
-  in immediately to inspect all required scenarios.
-  ```
-
 ### T-13 Document setup, one end-to-end journey, and design decisions
 
 - tags: [documentation, readme, delivery]
@@ -223,6 +197,32 @@
 
   **Done when:** the aggregate view compares all four angles and a single visitor page clearly
   answers what was generated, why it was generated, and whether it was sent.
+  ```
+
+### T-12 Seed a complete, deterministic reviewer demo
+
+- tags: [backend, database, seeding, demo]
+- priority: high
+- workload: Hard
+- steps:
+  - [ ] Seed an administrator, two contrasting brands, four topic angles, optional evidence enrichment, and landing mappings.
+  - [ ] Seed diverse consented, suppressed, and failed-generation visitor histories.
+  - [ ] Seed authored/validated sample campaigns so review does not need an API key.
+  - [ ] Verify a clean reset and reseed from an empty database.
+
+  ```md
+  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-03 Add
+  authenticated admin access and authorisation; T-05 Build brand management settings;
+  T-06 Build authenticated angle management; T-09 Generate and validate the
+  three-email personalised welcome sequence; T-10 Queue, send, and observe campaign email
+  delivery.
+
+  The seeded brands must differ in both visual treatment and copy voice. The visitors should
+  include same-angle comparisons where age, sex, and answers visibly change the emails. Seed
+  realistic persisted sample outputs rather than calling a paid/remote LLM during seeding.
+
+  **Done when:** `php artisan migrate:fresh --seed` succeeds unattended and the reviewer can log
+  in immediately to inspect all required scenarios.
   ```
 
 ## Review / QA
