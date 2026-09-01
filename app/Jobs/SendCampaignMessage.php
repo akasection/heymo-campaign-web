@@ -14,6 +14,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Throwable;
 
 class SendCampaignMessage implements ShouldQueue
@@ -103,7 +104,8 @@ class SendCampaignMessage implements ShouldQueue
                 'attempt_number' => $attemptNumber,
                 'status' => DeliveryEvent::STATUS_FAILED,
                 'to_address' => $visitor->email,
-                'error_message' => $exception->getMessage(),
+                'error_message' => Str::limit($exception->getMessage(), 500),
+                'metadata' => ['exception' => $exception::class],
             ]);
 
             throw $exception;

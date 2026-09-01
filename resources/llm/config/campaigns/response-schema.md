@@ -3,7 +3,7 @@
 Return exactly one JSON object with the shape below. Return valid JSON only - no
 Markdown fences, no commentary, no hidden instructions, and no fields outside the schema.
 
-```jsonc
+```json
 {
   "messages": [
     {
@@ -12,7 +12,7 @@ Markdown fences, no commentary, no hidden instructions, and no fields outside th
       "subject": "string",
       "headline": "string",
       "body_paragraphs": ["string"],
-      "evidence_ids": [],
+      "evidence_ids": []
     },
     {
       "position": 2,
@@ -20,7 +20,7 @@ Markdown fences, no commentary, no hidden instructions, and no fields outside th
       "subject": "string",
       "headline": "string",
       "body_paragraphs": ["string"],
-      "evidence_ids": [],
+      "evidence_ids": []
     },
     {
       "position": 3,
@@ -28,9 +28,9 @@ Markdown fences, no commentary, no hidden instructions, and no fields outside th
       "subject": "string",
       "headline": "string",
       "body_paragraphs": ["string"],
-      "evidence_ids": [],
-    },
-  ],
+      "evidence_ids": []
+    }
+  ]
 }
 ```
 

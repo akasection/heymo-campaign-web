@@ -10,14 +10,15 @@ return [
     | Delay in seconds between generation and each sequence position. Position
     | 1 (promise) is sent immediately; later beats follow the configured cadence.
     | Production would use day-scale values; demo defaults are intentionally
-    | short so the sequence is observable in Mailpit without waiting.
+    | short (under a minute apart) so the full sequence is observable in
+    | Mailpit quickly.
     |
     */
 
     'schedule' => [
         1 => (int) env('DELIVERY_DELAY_POSITION_1', 0),
-        2 => (int) env('DELIVERY_DELAY_POSITION_2', 300),
-        3 => (int) env('DELIVERY_DELAY_POSITION_3', 600),
+        2 => (int) env('DELIVERY_DELAY_POSITION_2', 30),
+        3 => (int) env('DELIVERY_DELAY_POSITION_3', 60),
     ],
 
     /*

@@ -55,11 +55,18 @@ class LlmClient
         // policy; do not retry a malformed completion here.
 
         if ($response->failed()) {
-            Log::error('LLM request failed', [
+            $context = [
                 'url' => $url,
                 'status' => $response->status(),
-                'body' => $this->summarize((string) $response->body()),
-            ]);
+            ];
+
+            // Provider error bodies may echo user-supplied prompts (PII), so only
+            // include them while debugging locally. Never log API keys or secrets.
+            if (config('app.debug')) {
+                $context['body'] = $this->summarize((string) $response->body());
+            }
+
+            Log::error('LLM request failed', $context);
 
             throw new RuntimeException("LLM provider returned HTTP {$response->status()}.");
         }

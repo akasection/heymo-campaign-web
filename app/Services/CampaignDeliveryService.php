@@ -22,19 +22,19 @@ class CampaignDeliveryService
         $schedule = config('delivery.schedule', []);
 
         foreach ($campaign->messages()->orderBy('sequence_position')->get() as $message) {
+            $delay = (int) ($schedule[$message->sequence_position] ?? 0);
+
             $queued = CampaignMessage::query()
                 ->whereKey($message->id)
                 ->where('status', CampaignMessage::STATUS_GENERATED)
                 ->update([
                     'status' => CampaignMessage::STATUS_QUEUED,
-                    'scheduled_at' => now(),
+                    'scheduled_at' => now()->addSeconds($delay),
                 ]);
 
             if ($queued === 0) {
                 continue;
             }
-
-            $delay = (int) ($schedule[$message->sequence_position] ?? 0);
 
             SendCampaignMessage::dispatch($message->id)->delay(now()->addSeconds($delay));
         }
