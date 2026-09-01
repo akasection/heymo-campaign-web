@@ -12,8 +12,15 @@
       <td align="center">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #dbe4f0;">
           <tr>
-            <td style="padding:24px 32px;background:{{ $primaryColor }};color:#ffffff;">
-              <div style="font-size:20px;font-weight:700;letter-spacing:.04em;">{{ $brandName }}</div>
+            <td style="height:6px;background:{{ $primaryColor }};font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+          <tr>
+            <td style="padding:20px 32px;background:#ffffff;">
+              @if ($logoUrl)
+                <img src="{{ $logoUrl }}" alt="{{ $brandName }} logo" style="display:block;max-height:56px;width:auto;border:0;" />
+              @else
+                <div style="font-size:20px;font-weight:700;color:{{ $primaryColor }};letter-spacing:.04em;">{{ $brandName }}</div>
+              @endif
             </td>
           </tr>
           <tr>
@@ -49,6 +56,12 @@
               <p style="margin:24px 0 0;color:#17233d;font-size:{{ $bodyFontSize }};line-height:1.6;">
                 {{ $valediction }},<br>{{ $signature }}
               </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 32px;background:{{ $primaryColor }};color:#ffffff;text-align:center;">
+              <div style="font-size:15px;font-weight:700;letter-spacing:.04em;">{{ $brandName }}</div>
+              <div style="margin-top:6px;font-size:11px;opacity:.85;">&copy; {{ date('Y') }} {{ $brandName }}</div>
             </td>
           </tr>
           <tr>

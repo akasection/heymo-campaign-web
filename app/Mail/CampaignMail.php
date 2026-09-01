@@ -11,14 +11,15 @@ class CampaignMail extends Mailable
     use Queueable, SerializesModels;
 
     public function __construct(
-        public string $subject,
-        public string $html,
-    ) {}
+        string $subject,
+        string $html,
+    ) {
+        $this->subject = $subject;
+        $this->html = $html;
+    }
 
     public function build(): self
     {
-        return $this
-            ->subject($this->subject)
-            ->html($this->html);
+        return $this;
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Campaign;
 use App\Models\CampaignMessage;
 use App\Models\Visitor;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 
 class CampaignMailComposer
@@ -34,6 +35,7 @@ class CampaignMailComposer
 
         $html = view('mail.campaign', [
             'brandName' => $brand->name,
+            'logoUrl' => $brand->logo_path ? Storage::disk('public')->url($brand->logo_path) : null,
             'primaryColor' => $brand->primary_color ?: '#2E5BFF',
             'secondaryColor' => $brand->secondary_color ?: '#00B8A9',
             'headingFont' => $this->fontFamily($brand->heading_font),
