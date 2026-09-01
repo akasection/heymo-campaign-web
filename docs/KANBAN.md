@@ -97,85 +97,6 @@
   timeout, rate limit, or unexpected provider response, and a job can be retried safely.
   ```
 
-### T-08 Implement intent capture, explicit consent, and suppression handling
-
-- tags: [backend, frontend, capture, consent, safety]
-- priority: high
-- workload: Extreme
-- steps:
-  - [x] Build the short quiz/pop-up and public submission endpoint.
-  - [x] Validate and persist age group, sex, sub-interest, trigger, concern, page/angle, timestamp, email, and consent.
-  - [ ] Provide unsubscribe/suppression handling that prevents future sends.
-
-  ```md
-  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-06 Build
-  authenticated angle management; T-07 Build four hand-authored, message-matched landing
-  pages.
-
-  Each captured field must affect campaign tone, emphasis, or presentation. Record affirmative
-  email consent separately from the profile with source, timestamp, policy/version, and the
-  exact submitted address. No campaign generation or email send may proceed without active
-  consent. Do not collect clinical information beyond the stated concern.
-
-  **Done when:** invalid submissions cannot create sends, the confirmation path gives a clear
-  pending/generated state, and a withdrawal or conversion excludes the visitor from queued
-  and future delivery.
-  ```
-
-### T-09 Generate and validate the three-email personalised welcome sequence
-
-- tags: [backend, llm, campaign, safety, core]
-- priority: high
-- workload: Extreme
-- steps:
-  - [ ] Build the prompt payload and structured-response parser.
-  - [ ] Generate promise, mechanism, and angle-specific-objection email beats.
-  - [ ] Apply policy validation, repair retry, deterministic composition, and audit persistence.
-  - [ ] Apply demographic presentation profiles without demographic clinical inferences.
-
-  ```md
-  **Dependencies:** T-01 Define the campaign contract and safety policy; T-02 Create the
-  campaign domain and immutable audit schema; T-04 Configure provider-neutral LLM and mail
-  integration; T-05 Build brand management settings; T-06 Build
-  authenticated angle management; T-08 Implement intent capture, explicit consent, and
-  suppression handling.
-
-  The sequence is fixed: (1) deliver the promise and restate the angle in the visitor's
-  language, (2) explain the approved mechanism plainly, (3) address the recorded
-  angle-specific objection. Personalisation must use the visitor's stated sub-interest,
-  trigger, and concern directly; age and sex select the presentation treatment only.
-
-  **Done when:** two same-angle profiles with different demographics or answers produce
-  materially different body copy, emphasis, and email look while retaining the exact same
-  deterministic evidence set where their clinical context is the same. Every rejected or successful
-  attempt records prompt version, provider/model, raw structured response, policy result, and
-  final composed output.
-  ```
-
-### T-10 Queue, send, and observe campaign email delivery
-
-- tags: [backend, mail, queue, reliability]
-- priority: high
-- workload: Hard
-- steps:
-  - [ ] Create a queued send flow with scheduled sequence positions and idempotency.
-  - [ ] Re-check active consent and suppression immediately before each send.
-  - [ ] Record attempted, sent, skipped, and failed delivery events with actionable errors.
-
-  ```md
-  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-04 Configure
-  provider-neutral LLM and mail integration; T-08 Implement intent capture, explicit consent,
-  and suppression handling; T-09 Generate and validate the three-email personalised welcome
-  sequence.
-
-  Do not couple provider latency to the capture request. Jobs must safely handle retries,
-  timeouts, rate limits, and duplicate dispatch. The mail driver needs to support local review
-  in development, and no message should be marked sent unless the driver accepted it.
-
-  **Done when:** the three messages are observable in Mailpit/Mailtrap or the configured driver,
-  failures remain auditable, and a suppressed visitor's queued messages are skipped.
-  ```
-
 ### T-12 Seed a complete, deterministic reviewer demo
 
 - tags: [backend, database, seeding, demo]
@@ -254,6 +175,30 @@
   ```
 
 ## In Progress
+
+### T-10 Queue, send, and observe campaign email delivery
+
+- tags: [backend, mail, queue, reliability]
+- priority: high
+- workload: Hard
+- steps:
+  - [x] Create a queued send flow with scheduled sequence positions and idempotency.
+  - [x] Re-check active consent and suppression immediately before each send.
+  - [x] Record attempted, sent, skipped, and failed delivery events with actionable errors.
+
+  ```md
+  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-04 Configure
+  provider-neutral LLM and mail integration; T-08 Implement intent capture, explicit consent,
+  and suppression handling; T-09 Generate and validate the three-email personalised welcome
+  sequence.
+
+  Do not couple provider latency to the capture request. Jobs must safely handle retries,
+  timeouts, rate limits, and duplicate dispatch. The mail driver needs to support local review
+  in development, and no message should be marked sent unless the driver accepted it.
+
+  **Done when:** the three messages are observable in Mailpit/Mailtrap or the configured driver,
+  failures remain auditable, and a suppressed visitor's queued messages are skipped.
+  ```
 
 ### T-11 Build the admin audit trail and angle performance dashboard
 
@@ -426,4 +371,59 @@
 
   **Done when:** unauthenticated users cannot read or mutate brands, angles, visitors, or
   campaigns, while the seeded administrator can access the dashboard.
+  ```
+
+### T-08 Implement intent capture, explicit consent, and suppression handling
+
+- tags: [backend, frontend, capture, consent, safety]
+- priority: high
+- workload: Extreme
+- steps:
+  - [x] Build the short quiz/pop-up and public submission endpoint.
+  - [x] Validate and persist age group, sex, sub-interest, trigger, concern, page/angle, timestamp, email, and consent.
+  - [x] Provide unsubscribe/suppression handling that prevents future sends.
+
+  ```md
+  **Dependencies:** T-02 Create the campaign domain and immutable audit schema; T-06 Build
+  authenticated angle management; T-07 Build four hand-authored, message-matched landing
+  pages.
+
+  Each captured field must affect campaign tone, emphasis, or presentation. Record affirmative
+  email consent separately from the profile with source, timestamp, policy/version, and the
+  exact submitted address. No campaign generation or email send may proceed without active
+  consent. Do not collect clinical information beyond the stated concern.
+
+  **Done when:** invalid submissions cannot create sends, the confirmation path gives a clear
+  pending/generated state, and a withdrawal or conversion excludes the visitor from queued
+  and future delivery.
+  ```
+
+### T-09 Generate and validate the three-email personalised welcome sequence
+
+- tags: [backend, llm, campaign, safety, core]
+- priority: high
+- workload: Extreme
+- steps:
+  - [x] Build the prompt payload and structured-response parser.
+  - [x] Generate promise, mechanism, and angle-specific-objection email beats.
+  - [x] Apply policy validation, repair retry, deterministic composition, and audit persistence.
+  - [x] Apply demographic presentation profiles without demographic clinical inferences.
+
+  ```md
+  **Dependencies:** T-01 Define the campaign contract and safety policy; T-02 Create the
+  campaign domain and immutable audit schema; T-04 Configure provider-neutral LLM and mail
+  integration; T-05 Build brand management settings; T-06 Build
+  authenticated angle management; T-08 Implement intent capture, explicit consent, and
+  suppression handling.
+
+  The sequence is fixed: (1) deliver the promise and restate the angle in the visitor's
+  language, (2) explain the approved mechanism plainly, (3) address the recorded
+  angle-specific objection. Personalisation must use the visitor's stated sub-interest,
+  trigger, and concern directly; age and sex select the presentation treatment only.
+
+  **Done when:** two same-angle profiles with different demographics or answers produce
+  materially different body copy, emphasis, and email look while retaining the exact same
+  deterministic evidence set where their clinical context is the same. Every rejected or successful
+  attempt records prompt version, provider/model, raw structured response, policy result, and
+  final composed output.
   ```

@@ -283,22 +283,38 @@ suppression are the following campaign tickets and are not invoked by the quiz y
 
 ## First Run
 
-Start both the Vite dev server **and** the Laravel server in one command:
+Start the web app — the Vite dev server **and** the Laravel server — in one command:
+
+```bash
+pnpm dev:web
+```
+
+`pnpm dev:web` runs Vite (hot reload) and `php artisan serve` together via `concurrently`,
+with color-coded `[frontend]` / `[backend]` output. Ctrl+C stops both.
+
+To also run the background queue worker (required so captured campaigns actually generate and
+send their emails), use:
 
 ```bash
 pnpm dev:all        # or: composer dev (same thing)
 ```
 
-This runs Vite (hot reload) and `php artisan serve` together via `concurrently`, with color-coded `[vite]` / `[php]` output. Ctrl+C stops both.
+`pnpm dev:all` adds `php artisan queue:work` as a third color-coded process.
 
-Prefer separate terminals? Use them individually:
+Prefer separate terminals? Use the individual runners:
 
 ```bash
-# Terminal 1 — frontend dev server (Vite, hot reload)
-pnpm dev
+# Frontend dev server (Vite, hot reload)
+pnpm dev:frontend
 
-# Terminal 2 — backend server
-pnpm serve          # == php artisan serve
+# Backend server
+pnpm dev:backend          # == php artisan serve
+
+# Queue worker daemon (required for QUEUE_CONNECTION=redis)
+pnpm dev:service          # == php artisan queue:work
+
+# Queue worker that exits after one job (handy for testing)
+pnpm dev:service:once     # == php artisan queue:work --once
 ```
 
 Then open <http://localhost:8000>.
@@ -345,4 +361,4 @@ php artisan queue:work
 - This project uses **PostgreSQL 18** (Docker, host port `5434`) and **Valkey** (Docker, host port `6380`) — both Redis and PHP Redis config map to Valkey; the Redis client is `predis` (pure PHP, no phpredis extension needed).
 - The PHP runtime is managed by mise + vfox-php; `pdo_pgsql` is **not** compiled in by default and must be enabled at PHP build time (see Prerequisites/Installation).
 - DB credentials in the compose file and `.env.example` default to user `heymo` / password `secret` / database `heymo`. Override via `POSTGRES_*` env vars and `.env` respectively.
-- Frontend assets are built with Vite (`pnpm dev` / `pnpm build`); do not commit compiled assets unless required.
+- Frontend assets are built with Vite (`pnpm dev:frontend` / `pnpm build`); do not commit compiled assets unless required.

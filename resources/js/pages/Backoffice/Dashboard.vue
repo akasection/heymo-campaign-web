@@ -326,17 +326,14 @@ import {
   PhCaretDown as CaretDown,
   PhChartLineUp as ChartLineUp,
   PhCheckCircle as CheckCircle,
-  PhClipboardText as ClipboardText,
   PhDrop as Drop,
   PhFlask as Flask,
   PhList as List,
-  PhMapPin as MapPin,
   PhPlus as Plus,
   PhPulse as Pulse,
   PhSignOut as SignOut,
   PhSquaresFour as SquaresFour,
   PhTarget as Target,
-  PhUsersThree as UsersThree,
   PhWarningCircle as WarningCircle,
   PhX as X,
 } from "@phosphor-icons/vue";
@@ -371,12 +368,7 @@ const navigationItems: {
 }[] = [
   { id: "dashboard", label: "Dashboard", icon: SquaresFour },
   { id: "brands", label: "Brands", icon: Drop },
-  { id: "angles", label: "Angles", icon: Target },
-  { id: "campaigns", label: "Campaigns", icon: ChartLineUp, count: "18" },
-  { id: "samples", label: "Samples", icon: Flask, count: "433" },
-  { id: "participants", label: "Participants", icon: UsersThree },
-  { id: "locations", label: "Locations", icon: MapPin },
-  { id: "reports", label: "Reports", icon: ClipboardText },
+  { id: "angles", label: "Campaigns", icon: Target },
 ];
 
 const metricIcons = [Flask, ChartLineUp, Drop];
