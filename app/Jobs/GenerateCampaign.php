@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\IntentResponse;
+use App\Services\CampaignDeliveryService;
 use App\Services\CampaignGenerator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -24,7 +25,7 @@ class GenerateCampaign implements ShouldQueue
 
     public function __construct(public int $intentResponseId) {}
 
-    public function handle(CampaignGenerator $generator): void
+    public function handle(CampaignGenerator $generator, CampaignDeliveryService $delivery): void
     {
         $intentResponse = IntentResponse::query()->find($this->intentResponseId);
 
@@ -33,7 +34,12 @@ class GenerateCampaign implements ShouldQueue
             return;
         }
 
-        $generator->generate($intentResponse);
+        $campaign = $generator->generate($intentResponse);
+
+        // Generation succeeded; queue the sequence beats on the configured
+        // cadence. Scheduling is idempotent (compare-and-set on message status),
+        // so a job retry after generation never duplicates a send.
+        $delivery->schedule($campaign);
     }
 
     public function failed(Throwable $exception): void

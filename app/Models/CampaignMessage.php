@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CampaignMessage extends Model
 {
@@ -20,6 +21,14 @@ class CampaignMessage extends Model
 
     public const STATUS_GENERATED = 'generated';
 
+    public const STATUS_QUEUED = 'queued';
+
+    public const STATUS_SENT = 'sent';
+
+    public const STATUS_SKIPPED = 'skipped';
+
+    public const STATUS_FAILED = 'failed';
+
     protected $fillable = [
         'campaign_id',
         'sequence_position',
@@ -30,15 +39,24 @@ class CampaignMessage extends Model
         'body_paragraphs',
         'evidence_ids',
         'status',
+        'scheduled_at',
+        'sent_at',
     ];
 
     protected $casts = [
         'body_paragraphs' => 'array',
         'evidence_ids' => 'array',
+        'scheduled_at' => 'datetime',
+        'sent_at' => 'datetime',
     ];
 
     public function campaign(): BelongsTo
     {
         return $this->belongsTo(Campaign::class);
+    }
+
+    public function deliveryEvents(): HasMany
+    {
+        return $this->hasMany(DeliveryEvent::class);
     }
 }
