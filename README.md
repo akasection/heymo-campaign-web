@@ -1,3 +1,5 @@
+![Heymo Campaign Webapp](docs/heymo_banner.png)
+
 # Heymo! Campaign Webapp
 
 Campaign management web application for Heymo!.
