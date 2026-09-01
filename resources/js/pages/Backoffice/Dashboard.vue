@@ -337,8 +337,8 @@ import {
   PhPulse as Pulse,
   PhSignOut as SignOut,
   PhSquaresFour as SquaresFour,
-  PhTarget as Target,
   PhTable as Table,
+  PhTarget as Target,
   PhWarningCircle as WarningCircle,
   PhX as X,
 } from "@phosphor-icons/vue";
@@ -352,8 +352,8 @@ import StatTile from "../../components/Backoffice/StatTile.vue";
 import StatusBadge from "../../components/Backoffice/StatusBadge.vue";
 import { ApiError, apiFetch, clearAccessToken, saveAccessToken } from "../../lib/auth";
 import AngleManagement from "./AngleManagement.vue";
-import BrandManagement from "./BrandManagement.vue";
 import AuditTrail from "./AuditTrail.vue";
+import BrandManagement from "./BrandManagement.vue";
 import CampaignDashboard from "./CampaignDashboard.vue";
 import {
   campaignProgress,
@@ -399,6 +399,7 @@ const navigationRoutes: Record<string, string> = {
   participants: "admin.participants",
   locations: "admin.locations",
   reports: "admin.reports",
+  audit: "admin.audit",
 };
 
 const activeNavigation = computed(() => (typeof route.meta.navigationId === "string" ? route.meta.navigationId : "dashboard"));
