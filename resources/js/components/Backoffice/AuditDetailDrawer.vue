@@ -265,6 +265,7 @@ import type {
   ParsedMessage,
 } from "../../lib/audit";
 
+// oxlint-disable-next-line vue/define-props-destructuring "id" was too generic to destructure. Potentially confusing
 const props = defineProps<{ id: number | null }>();
 
 defineEmits<{ close: [] }>();
