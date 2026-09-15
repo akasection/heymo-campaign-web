@@ -45,6 +45,7 @@ class AngleRequest extends FormRequest
             'offer' => [$presence, 'string', "max:{$textLimit}"],
             'tone' => [$presence, 'string', Rule::in(array_keys(config('angles.tones', [])))],
             'next_step' => [$presence, 'string', "max:{$textLimit}"],
+            'next_step_url' => ['nullable', 'string', 'max:2048', 'url:http,https'],
         ];
     }
 
@@ -66,6 +67,7 @@ class AngleRequest extends FormRequest
             'offer',
             'tone',
             'next_step',
+            'next_step_url',
         ] as $field) {
             if (isset($input[$field]) && is_string($input[$field])) {
                 $input[$field] = preg_replace('/\\s+/u', ' ', trim($input[$field])) ?? '';

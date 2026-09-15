@@ -385,8 +385,11 @@ it never manufactures urgency.
   must be precise and are never invented or paraphrased by the model.
 - **`next step`** = the smallest clear CTA, such as "Order the fatigue panel", framed as
   getting clarity on numbers rather than diagnosing a condition.
-- Both are deterministic, angle-scoped blocks composed after the objection is handled,
-  normally in email 3 or a later beat.
+- **`next_step_url`** = the destination the CTA button links to (order, register, or catalog
+  page). Optional; when empty, the CTA renders as plain text.
+- The CTA button renders on the **mechanism** beat (email 2), which carries the campaign's
+  main offer of value. The `offer` block renders on the final beat (email 3) as reassurance
+  after the objection is handled.
 
 ---
 

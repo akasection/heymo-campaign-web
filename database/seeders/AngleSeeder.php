@@ -60,6 +60,7 @@ class AngleSeeder extends Seeder
                     'offer' => 'The panel price and included measurements are shown before checkout with no hidden conditions.',
                     'tone' => 'reassuring',
                     'next_step' => 'Review the fatigue panel details and decide whether ordering feels right for you.',
+                    'next_step_url' => 'https://example.com/order',
                 ],
                 [
                     'name' => 'Make progress feel more workable',
@@ -76,6 +77,7 @@ class AngleSeeder extends Seeder
                     'offer' => 'The panel price, included measurements, and checkout terms are visible before you decide.',
                     'tone' => 'warm',
                     'next_step' => 'Read what the panel includes and choose whether it fits the kind of context you want.',
+                    'next_step_url' => 'https://example.com/order',
                 ],
                 [
                     'name' => 'Build a better before-the-wedding conversation',
@@ -92,6 +94,7 @@ class AngleSeeder extends Seeder
                     'offer' => 'Each panel is priced and described separately before checkout, with no hidden conditions.',
                     'tone' => 'warm',
                     'next_step' => 'Explore the pre-marital panel details together and decide whether to order.',
+                    'next_step_url' => 'https://example.com/order',
                 ],
                 [
                     'name' => 'Train from a clearer baseline',
@@ -108,6 +111,7 @@ class AngleSeeder extends Seeder
                     'offer' => 'The panel contents and price are shown clearly before checkout with no hidden conditions.',
                     'tone' => 'matter_of_fact',
                     'next_step' => 'Review the performance panel contents and decide whether it supports your next block.',
+                    'next_step_url' => 'https://example.com/order',
                 ],
             ],
             'xo-health-group' => [
@@ -126,6 +130,7 @@ class AngleSeeder extends Seeder
                     'offer' => 'Panel contents, price, and checkout terms are stated before purchase and contain no hidden conditions.',
                     'tone' => 'authoritative',
                     'next_step' => 'Review the panel scope and decide whether it is an appropriate information-gathering step.',
+                    'next_step_url' => 'https://example.com/order',
                 ],
                 [
                     'name' => 'Context for a sustainable wellness plan',
@@ -142,6 +147,7 @@ class AngleSeeder extends Seeder
                     'offer' => 'The panel scope, price, and checkout terms are available for review before purchase.',
                     'tone' => 'authoritative',
                     'next_step' => 'Review the panel scope and decide whether it belongs in your broader wellness plan.',
+                    'next_step_url' => 'https://example.com/order',
                 ],
                 [
                     'name' => 'A considered baseline for two',
@@ -158,6 +164,7 @@ class AngleSeeder extends Seeder
                     'offer' => 'Each panel\'s contents, price, and purchase terms are stated separately before checkout.',
                     'tone' => 'reassuring',
                     'next_step' => 'Review the two panel options and decide whether this is the right time to order.',
+                    'next_step_url' => 'https://example.com/order',
                 ],
                 [
                     'name' => 'Evidence for the next training conversation',
@@ -174,6 +181,7 @@ class AngleSeeder extends Seeder
                     'offer' => 'The selected panel\'s scope, price, and checkout terms are visible before purchase.',
                     'tone' => 'matter_of_fact',
                     'next_step' => 'Review the panel scope and decide whether it is useful for your next training discussion.',
+                    'next_step_url' => 'https://example.com/order',
                 ],
             ],
         ];

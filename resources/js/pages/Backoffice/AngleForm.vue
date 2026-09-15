@@ -199,6 +199,21 @@
           </p>
         </div>
         <div>
+          <label for="angle-next-step-url" class="mb-2 block text-xs font-bold text-heymo-ink">CTA link</label>
+          <input
+            id="angle-next-step-url"
+            v-model="draft.next_step_url"
+            type="url"
+            class="input input-md w-full"
+            maxlength="2048"
+            placeholder="https://example.com/order"
+          />
+          <p v-if="fieldError('next_step_url')" class="mt-1.5 text-xs font-semibold text-heymo-red">
+            {{ fieldError("next_step_url") }}
+          </p>
+          <p v-else class="mt-1.5 text-[11px] leading-4 text-heymo-muted">Optional. The CTA button on email 2 links here.</p>
+        </div>
+        <div>
           <label for="angle-tone" class="mb-2 block text-xs font-bold text-heymo-ink">Angle tone</label>
           <select id="angle-tone" v-model="draft.tone" class="select select-md w-full" :disabled="isLoadingOptions">
             <option v-for="tone in options?.tones ?? []" :key="tone.value" :value="tone.value">

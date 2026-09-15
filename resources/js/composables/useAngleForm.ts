@@ -19,6 +19,7 @@ const fallbackDraft: AngleDraft = {
   offer: "",
   tone: "matter_of_fact",
   next_step: "",
+  next_step_url: "",
 };
 
 function draftFrom(angle: Angle | null | undefined, defaults: AngleOptions["defaults"] = {}): AngleDraft {
@@ -37,6 +38,7 @@ function draftFrom(angle: Angle | null | undefined, defaults: AngleOptions["defa
       offer: angle.offer,
       tone: angle.tone,
       next_step: angle.next_step,
+      next_step_url: angle.next_step_url ?? "",
     };
   }
 

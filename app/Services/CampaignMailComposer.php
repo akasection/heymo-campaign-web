@@ -94,6 +94,7 @@ class CampaignMailComposer
     ): array {
         $profile = $campaign->presentation_profile ?? [];
         $isFinalBeat = $message['position'] === 3;
+        $isCtaBeat = $message['position'] === 2;
 
         $signOff = $this->signOff->resolve($brand->tone_preset, $brand->tense_preset, $brand->name);
 
@@ -110,7 +111,8 @@ class CampaignMailComposer
             'paragraphs' => $message['body_paragraphs'],
             'evidenceTexts' => $this->resolveEvidence($message['evidence_ids']),
             'offer' => $isFinalBeat ? $angle->offer : null,
-            'nextStep' => $isFinalBeat ? $angle->next_step : null,
+            'nextStep' => $isCtaBeat ? $angle->next_step : null,
+            'nextStepUrl' => $isCtaBeat ? $angle->next_step_url : null,
             'compliance' => (string) config('delivery.compliance_text'),
             'valediction' => $signOff['valediction'],
             'signature' => $signOff['signature'],
