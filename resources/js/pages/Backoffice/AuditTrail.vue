@@ -136,13 +136,14 @@
       />
     </div>
 
-    <AuditDetailDrawer :record="selectedRecord" @close="selectedRecord = null" />
+    <AuditDetailDrawer :id="selectedId" @close="closeDrawer" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { PhCaretRight as CaretRight, PhMagnifyingGlass as MagnifyingGlass } from "@phosphor-icons/vue";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import AuditDetailDrawer from "../../components/Backoffice/AuditDetailDrawer.vue";
 import Pagination from "../../components/Backoffice/Pagination.vue";
 import Panel from "../../components/Backoffice/Panel.vue";
@@ -153,10 +154,16 @@ import type { Brand } from "../../lib/brands";
 
 type AngleOption = { id: number; name: string; slug: string };
 
+const route = useRoute();
+const router = useRouter();
 const trail = useAuditTrail();
 const brandOptions = ref<Brand[]>([]);
 const angleOptions = ref<AngleOption[]>([]);
-const selectedRecord = ref<AuditRecord | null>(null);
+const selectedId = computed(() => {
+  const raw = route.params.id;
+
+  return typeof raw === "string" ? Number(raw) : null;
+});
 
 async function loadBrands(): Promise<void> {
   try {
@@ -189,7 +196,11 @@ function onBrandChange(): void {
 }
 
 function openRecord(record: AuditRecord): void {
-  selectedRecord.value = record;
+  void router.push({ name: "admin.audit.detail", params: { id: record.id } });
+}
+
+function closeDrawer(): void {
+  void router.push({ name: "admin.audit" });
 }
 
 function formatDate(value: string | null): string {

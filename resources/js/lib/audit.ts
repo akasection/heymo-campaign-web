@@ -57,6 +57,15 @@ export type EngagementEventDetail = {
   occurred_at: string | null;
 };
 
+export type ParsedMessage = {
+  position?: number;
+  role?: string;
+  subject: string;
+  headline: string;
+  body_paragraphs: string[];
+  evidence_ids?: string[];
+};
+
 export type GenerationAttemptDetail = {
   attempt_number: number;
   provider: string | null;
@@ -64,6 +73,7 @@ export type GenerationAttemptDetail = {
   prompt_version: string | null;
   status: string;
   violations: string[] | null;
+  parsed_messages: ParsedMessage[] | null;
   error_message: string | null;
   created_at: string | null;
 };
@@ -73,6 +83,9 @@ export type CampaignMessageDetail = {
   sequence_position: number;
   role: string;
   subject: string;
+  headline: string;
+  body_paragraphs: string[];
+  evidence_ids: string[];
   status: string;
   scheduled_at: string | null;
   sent_at: string | null;

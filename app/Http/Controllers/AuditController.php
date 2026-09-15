@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Resources\AuditRecordResource;
 use App\Models\Brand;
 use App\Models\Campaign;
+use App\Models\GenerationAttempt;
 use App\Models\IntentResponse;
 use App\Models\LandingEvent;
+use App\Services\CampaignResponseParser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -14,6 +16,8 @@ use Illuminate\Support\Collection;
 
 class AuditController extends Controller
 {
+    public function __construct(private CampaignResponseParser $parser) {}
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $brandIds = $this->organizationBrandIds($request);
@@ -97,6 +101,28 @@ class AuditController extends Controller
     }
 
     /**
+     * Reconstruct the messages a model attempt produced from its stored raw
+     * response. Returns null when the output cannot be parsed (for example a
+     * malformed model response), so the UI can fall back gracefully.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    private function attemptMessages(GenerationAttempt $attempt): ?array
+    {
+        $raw = $attempt->raw_response['content'] ?? '';
+
+        if (! is_string($raw) || trim($raw) === '') {
+            return null;
+        }
+
+        try {
+            return $this->parser->parse($raw)['messages'];
+        } catch (\RuntimeException) {
+            return null;
+        }
+    }
+
+    /**
      * @param  Collection<int, LandingEvent>  $landingEvents
      * @return array<string, mixed>
      */
@@ -164,6 +190,7 @@ class AuditController extends Controller
                     'prompt_version' => $attempt->prompt_version,
                     'status' => $attempt->status,
                     'violations' => $attempt->violations,
+                    'parsed_messages' => $this->attemptMessages($attempt),
                     'error_message' => $attempt->error_message,
                     'created_at' => $attempt->created_at?->toIso8601String(),
                 ])->values()->all() ?? [],
@@ -172,6 +199,9 @@ class AuditController extends Controller
                     'sequence_position' => $message->sequence_position,
                     'role' => $message->role,
                     'subject' => $message->subject,
+                    'headline' => $message->headline,
+                    'body_paragraphs' => $message->body_paragraphs,
+                    'evidence_ids' => $message->evidence_ids,
                     'status' => $message->status,
                     'scheduled_at' => $message->scheduled_at?->toIso8601String(),
                     'sent_at' => $message->sent_at?->toIso8601String(),

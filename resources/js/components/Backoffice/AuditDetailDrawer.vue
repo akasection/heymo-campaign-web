@@ -1,6 +1,6 @@
 <template>
   <Transition name="drawer">
-    <div v-if="record" class="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Visitor journey">
+    <div v-if="id !== null" class="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Visitor journey">
       <button class="absolute inset-0 bg-heymo-navy/45" aria-label="Close details" @click="$emit('close')"></button>
 
       <aside class="relative flex h-full w-full max-w-2xl flex-col overflow-y-auto bg-white shadow-xl">
@@ -8,7 +8,7 @@
           <div class="min-w-0">
             <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-heymo-red">Audit trail</p>
             <h2 class="truncate text-lg font-extrabold text-heymo-navy">
-              {{ record.visitor.preferred_name || record.visitor.email }}
+              {{ drawerTitle }}
             </h2>
           </div>
           <button class="btn btn-square btn-ghost btn-sm" aria-label="Close" @click="$emit('close')">
@@ -123,12 +123,17 @@
             </div>
             <p class="mt-2 text-xs text-heymo-muted">Prompt version: {{ campaign.prompt_version || "—" }}</p>
 
-            <div class="mt-3 space-y-1 text-xs text-heymo-muted">
-              <p v-for="attempt in campaign.generation_attempts" :key="attempt.attempt_number">
-                Attempt {{ attempt.attempt_number }} · {{ attempt.provider }}/{{ attempt.model }} · {{ attempt.status }}
-                <span v-if="attempt.violations?.length"> · violations: {{ attempt.violations.join(", ") }}</span>
-                <span v-if="attempt.error_message"> · {{ attempt.error_message }}</span>
-              </p>
+            <div class="mt-3 space-y-4">
+              <div v-for="attempt in campaign.generation_attempts" :key="attempt.attempt_number">
+                <p class="text-xs text-heymo-muted">
+                  Attempt {{ attempt.attempt_number }} · {{ attempt.provider }}/{{ attempt.model }} · {{ attempt.status }}
+                  <span v-if="attempt.error_message"> · {{ attempt.error_message }}</span>
+                </p>
+                <div v-if="attempt.parsed_messages?.length" class="mt-2">
+                  <EmailMessagePreview :messages="attempt.parsed_messages" />
+                </div>
+                <GuardrailStatusBox class="mt-2" :violations="attempt.violations" />
+              </div>
             </div>
 
             <div class="mt-3 space-y-3">
@@ -137,13 +142,14 @@
                   <span class="text-xs font-bold text-heymo-navy">#{{ message.sequence_position }} · {{ message.role }}</span>
                   <span class="badge badge-soft" :class="messageStatusClass(message.status)">{{ message.status }}</span>
                 </div>
-                <p class="mt-1 text-sm font-semibold text-heymo-ink">
-                  {{ message.subject }}
-                </p>
                 <p class="mt-2 text-[11px] text-heymo-muted">
                   Scheduled {{ formatDate(message.scheduled_at) }} · Sent {{ formatDate(message.sent_at) }} · Opened
                   {{ formatDate(message.opened_at) }}
                 </p>
+                <div class="mt-2">
+                  <EmailMessagePreview :messages="[message]" />
+                </div>
+                <GuardrailStatusBox class="mt-2" :violations="null" />
                 <div class="mt-2 flex flex-wrap gap-1">
                   <span v-for="event in message.delivery_events" :key="`delivery-${event.created_at}`" class="badge badge-outline badge-xs">{{
                     event.status
@@ -166,11 +172,13 @@
 
 <script setup lang="ts">
 import { PhX as X } from "@phosphor-icons/vue";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { ApiError, apiFetch } from "../../lib/auth";
-import type { AuditDetail, AuditDetailResponse, AuditRecord } from "../../lib/audit";
+import EmailMessagePreview from "./EmailMessagePreview.vue";
+import GuardrailStatusBox from "./GuardrailStatusBox.vue";
+import type { AuditDetail, AuditDetailResponse } from "../../lib/audit";
 
-const props = defineProps<{ record: AuditRecord | null }>();
+const props = defineProps<{ id: number | null }>();
 
 defineEmits<{ close: [] }>();
 
@@ -178,13 +186,15 @@ const detail = ref<AuditDetail | null>(null);
 const isLoading = ref(false);
 const errorMessage = ref("");
 
+const drawerTitle = computed(() => detail.value?.visitor?.preferred_name || detail.value?.visitor?.email || "Audit trail");
+
 watch(
-  () => props.record?.id,
+  () => props.id,
   id => {
     detail.value = null;
     errorMessage.value = "";
 
-    if (!id) {
+    if (id === null) {
       return;
     }
 
