@@ -120,7 +120,7 @@
             <section class="rounded-lg border border-heymo-line p-4">
               <div class="flex items-center justify-between gap-3">
                 <h3 class="text-xs font-bold uppercase tracking-[0.08em] text-heymo-muted">Questions</h3>
-                <button type="button" class="btn btn-outline btn-xs" @click="showQuestionsDialog = true">
+                <button ref="questionsTrigger" type="button" class="btn btn-outline btn-xs" @click="showQuestionsDialog = true">
                   View questionnaire
                   <CaretRight :size="14" weight="bold" aria-hidden="true" />
                 </button>
@@ -213,7 +213,15 @@
       <Transition name="dialog">
         <div v-if="showQuestionsDialog" class="fixed inset-0 z-60 flex items-center justify-center p-4">
           <button class="absolute inset-0 bg-heymo-navy/45" aria-label="Close questions" @click="showQuestionsDialog = false"></button>
-          <div class="relative w-full max-w-lg rounded-lg bg-white p-5 shadow-xl" role="dialog" aria-modal="true" aria-label="Questions and answers">
+          <div
+            ref="questionsDialog"
+            tabindex="-1"
+            class="relative w-full max-w-lg rounded-lg bg-white p-5 shadow-xl"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Questions and answers"
+            @keydown="onQuestionsDialogKeydown"
+          >
             <div class="flex items-center justify-between gap-3">
               <h3 class="text-sm font-bold uppercase tracking-[0.08em] text-heymo-muted">Questions &amp; answers</h3>
               <button class="btn btn-square btn-ghost btn-sm" aria-label="Close" @click="showQuestionsDialog = false">
@@ -250,10 +258,7 @@
 
 <script setup lang="ts">
 import { PhCaretRight as CaretRight, PhCheck as Check, PhEye as Eye, PhX as X } from "@phosphor-icons/vue";
-import { computed, ref, watch } from "vue";
-import { ApiError, apiFetch } from "../../lib/auth";
-import EmailPreviewPane from "./EmailPreviewPane.vue";
-import GuardrailStatusBox from "./GuardrailStatusBox.vue";
+import { computed, nextTick, ref, watch } from "vue";
 import type {
   AuditDetail,
   AuditDetailResponse,
@@ -264,6 +269,9 @@ import type {
   GenerationAttemptDetail,
   ParsedMessage,
 } from "../../lib/audit";
+import { ApiError, apiFetch } from "../../lib/auth";
+import EmailPreviewPane from "./EmailPreviewPane.vue";
+import GuardrailStatusBox from "./GuardrailStatusBox.vue";
 
 // oxlint-disable-next-line vue/define-props-destructuring "id" was too generic to destructure. Potentially confusing
 const props = defineProps<{ id: number | null }>();
@@ -277,6 +285,9 @@ const preview = ref<EmailPreviewPayload | null>(null);
 const previewLoading = ref(false);
 const previewError = ref("");
 const showQuestionsDialog = ref(false);
+const questionsDialogRef = ref<HTMLElement | null>(null);
+const questionsTriggerRef = ref<HTMLButtonElement | null>(null);
+let previewRequestToken = 0;
 
 const drawerTitle = computed(() => detail.value?.visitor?.preferred_name || detail.value?.visitor?.email || "Audit trail");
 
@@ -297,6 +308,16 @@ watch(
   },
   { immediate: true },
 );
+
+watch(showQuestionsDialog, async open => {
+  await nextTick();
+
+  if (open) {
+    questionsDialogRef.value?.focus();
+  } else {
+    questionsTriggerRef.value?.focus();
+  }
+});
 
 async function loadDetail(id: number): Promise<void> {
   isLoading.value = true;
@@ -332,11 +353,17 @@ async function loadAttemptPreview(campaign: CampaignDetail, attempt: GenerationA
 }
 
 async function loadPreview(label: string, url: string, violations: string[] | null): Promise<void> {
+  const token = ++previewRequestToken;
   previewLoading.value = true;
   previewError.value = "";
 
   try {
     const response = await apiFetch<EmailPreviewResponse>(url);
+
+    if (token !== previewRequestToken) {
+      return;
+    }
+
     preview.value = {
       label,
       subject: response.data.subject,
@@ -344,9 +371,15 @@ async function loadPreview(label: string, url: string, violations: string[] | nu
       violations,
     };
   } catch (error) {
+    if (token !== previewRequestToken) {
+      return;
+    }
+
     previewError.value = error instanceof ApiError ? error.message : "Could not load the email preview.";
   } finally {
-    previewLoading.value = false;
+    if (token === previewRequestToken) {
+      previewLoading.value = false;
+    }
   }
 }
 
@@ -373,6 +406,43 @@ function selectDefaultPreview(): void {
         return;
       }
     }
+  }
+}
+
+function onQuestionsDialogKeydown(event: KeyboardEvent): void {
+  if (event.key === "Escape") {
+    showQuestionsDialog.value = false;
+
+    return;
+  }
+
+  if (event.key !== "Tab") {
+    return;
+  }
+
+  const dialog = questionsDialogRef.value;
+
+  if (!dialog) {
+    return;
+  }
+
+  const focusables = dialog.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+
+  if (focusables.length === 0) {
+    event.preventDefault();
+
+    return;
+  }
+
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
   }
 }
 

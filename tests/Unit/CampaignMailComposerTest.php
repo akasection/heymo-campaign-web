@@ -107,4 +107,28 @@ class CampaignMailComposerTest extends TestCase
         $this->assertStringNotContainsString('CTA text.', $final['html']);
         $this->assertStringNotContainsString('https://example.test/order', $final['html']);
     }
+
+    public function test_empty_next_step_url_renders_plain_text_cta(): void
+    {
+        $composer = new CampaignMailComposer(new SignOffResolver);
+
+        $result = $composer->compose(
+            new CampaignMessage([
+                'sequence_position' => 2,
+                'subject' => 'How it works',
+                'headline' => 'A closer look',
+                'body_paragraphs' => ['First paragraph.'],
+                'evidence_ids' => [],
+            ]),
+            new Campaign(['presentation_profile' => []]),
+            new Brand(['name' => 'Lexical Labs', 'tone_preset' => 'informal', 'tense_preset' => 'relaxed', 'primary_color' => '#2E5BFF']),
+            new Angle(['offer' => 'Offer text.', 'next_step' => 'CTA text.', 'next_step_url' => null]),
+            new Visitor(['email' => 'remy@example.test']),
+            'https://example.test/unsubscribe/1?sig=abc',
+        );
+
+        $this->assertStringContainsString('CTA text.', $result['html']);
+        $this->assertStringNotContainsString('href="https://example.test/order"', $result['html']);
+        $this->assertStringContainsString('<strong', $result['html']);
+    }
 }
