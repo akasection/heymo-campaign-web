@@ -6,7 +6,9 @@
     <div v-if="violated" class="space-y-1">
       <p class="font-bold uppercase tracking-[0.08em]">Guardrail violations</p>
       <ul class="list-inside list-disc space-y-0.5">
-        <li v-for="(violation, index) in violations" :key="index">{{ violation }}</li>
+        <li v-for="(violation, index) in violations" :key="index">
+          {{ violation }}
+        </li>
       </ul>
     </div>
     <p v-else class="flex items-center gap-1.5 font-semibold">

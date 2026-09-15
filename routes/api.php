@@ -67,4 +67,8 @@ Route::middleware(['web', 'auth.jwt'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index']);
     Route::get('audit', [AuditController::class, 'index']);
     Route::get('audit/{intentResponse}', [AuditController::class, 'show'])->whereNumber('intentResponse');
+    Route::get('audit/{intentResponse}/messages/{campaignMessage}/preview', [AuditController::class, 'messagePreview'])
+        ->whereNumber(['intentResponse', 'campaignMessage']);
+    Route::get('audit/{intentResponse}/attempts/{generationAttempt}/preview/{position}', [AuditController::class, 'attemptPreview'])
+        ->whereNumber(['intentResponse', 'generationAttempt', 'position']);
 });

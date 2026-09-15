@@ -67,6 +67,7 @@ export type ParsedMessage = {
 };
 
 export type GenerationAttemptDetail = {
+  id: number;
   attempt_number: number;
   provider: string | null;
   model: string | null;
@@ -150,4 +151,18 @@ export type AuditDetail = {
 
 export type AuditDetailResponse = {
   data: AuditDetail;
+};
+
+export type EmailPreviewResponse = {
+  data: {
+    subject: string;
+    html: string;
+  };
+};
+
+export type EmailPreviewPayload = {
+  label: string;
+  subject: string;
+  html: string;
+  violations: string[] | null;
 };

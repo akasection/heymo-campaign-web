@@ -28,8 +28,72 @@ class CampaignMailComposer
         Visitor $visitor,
         string $unsubscribeUrl,
     ): array {
+        return $this->render(
+            [
+                'position' => (int) $message->sequence_position,
+                'subject' => (string) $message->subject,
+                'headline' => (string) $message->headline,
+                'body_paragraphs' => $message->body_paragraphs ?? [],
+                'evidence_ids' => $message->evidence_ids ?? [],
+            ],
+            $campaign,
+            $brand,
+            $angle,
+            $visitor,
+            $unsubscribeUrl,
+            $message->open_token
+                ? URL::route('open.track', ['openToken' => $message->open_token])
+                : null,
+        );
+    }
+
+    /**
+     * Compose a preview-safe email from message parts without the open-tracking
+     * pixel, so auditing a generated email never records an open event.
+     *
+     * @param  array{position?: int, subject?: string, headline?: string, body_paragraphs?: array<int, string>, evidence_ids?: array<int, string>}  $message
+     * @return array{subject: string, html: string}
+     */
+    public function composePreview(
+        array $message,
+        Campaign $campaign,
+        Brand $brand,
+        Angle $angle,
+        Visitor $visitor,
+        string $unsubscribeUrl,
+    ): array {
+        return $this->render(
+            [
+                'position' => (int) ($message['position'] ?? 1),
+                'subject' => (string) ($message['subject'] ?? ''),
+                'headline' => (string) ($message['headline'] ?? ''),
+                'body_paragraphs' => is_array($message['body_paragraphs'] ?? null) ? $message['body_paragraphs'] : [],
+                'evidence_ids' => is_array($message['evidence_ids'] ?? null) ? $message['evidence_ids'] : [],
+            ],
+            $campaign,
+            $brand,
+            $angle,
+            $visitor,
+            $unsubscribeUrl,
+            null,
+        );
+    }
+
+    /**
+     * @param  array{position: int, subject: string, headline: string, body_paragraphs: array<int, string>, evidence_ids: array<int, string>}  $message
+     * @return array{subject: string, html: string}
+     */
+    private function render(
+        array $message,
+        Campaign $campaign,
+        Brand $brand,
+        Angle $angle,
+        Visitor $visitor,
+        string $unsubscribeUrl,
+        ?string $openTrackingUrl,
+    ): array {
         $profile = $campaign->presentation_profile ?? [];
-        $isFinalBeat = $message->sequence_position === 3;
+        $isFinalBeat = $message['position'] === 3;
 
         $signOff = $this->signOff->resolve($brand->tone_preset, $brand->tense_preset, $brand->name);
 
@@ -42,22 +106,20 @@ class CampaignMailComposer
             'bodyFont' => $this->fontFamily($brand->body_font),
             'bodyFontSize' => $this->typeSize($profile['type_size'] ?? 'standard'),
             'bodyPadding' => $this->densityPadding($profile['density'] ?? 'standard'),
-            'headline' => $message->headline,
-            'paragraphs' => $message->body_paragraphs ?? [],
-            'evidenceTexts' => $this->resolveEvidence($message->evidence_ids ?? []),
+            'headline' => $message['headline'],
+            'paragraphs' => $message['body_paragraphs'],
+            'evidenceTexts' => $this->resolveEvidence($message['evidence_ids']),
             'offer' => $isFinalBeat ? $angle->offer : null,
             'nextStep' => $isFinalBeat ? $angle->next_step : null,
             'compliance' => (string) config('delivery.compliance_text'),
             'valediction' => $signOff['valediction'],
             'signature' => $signOff['signature'],
             'unsubscribeUrl' => $unsubscribeUrl,
-            'openTrackingUrl' => $message->open_token
-                ? URL::route('open.track', ['openToken' => $message->open_token])
-                : null,
+            'openTrackingUrl' => $openTrackingUrl,
         ])->render();
 
         return [
-            'subject' => $message->subject,
+            'subject' => $message['subject'],
             'html' => $html,
         ];
     }
