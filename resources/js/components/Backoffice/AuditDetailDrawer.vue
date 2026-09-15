@@ -117,6 +117,27 @@
               </div>
             </section>
 
+            <section class="rounded-lg border border-heymo-line p-4">
+              <div class="flex items-center justify-between gap-3">
+                <h3 class="text-xs font-bold uppercase tracking-[0.08em] text-heymo-muted">Questions</h3>
+                <button type="button" class="btn btn-outline btn-xs" @click="showQuestionsDialog = true">
+                  View questionnaire
+                  <CaretRight :size="14" weight="bold" aria-hidden="true" />
+                </button>
+              </div>
+              <ul v-if="detail.questions.length" class="mt-3 space-y-2">
+                <li v-for="answer in detail.questions" :key="answer.question" class="text-sm">
+                  <p class="text-[11px] text-heymo-muted">
+                    {{ answer.question }}
+                  </p>
+                  <p class="font-semibold text-heymo-ink">
+                    {{ answer.answer }}
+                  </p>
+                </li>
+              </ul>
+              <p v-else class="mt-3 text-xs text-heymo-muted">No answers recorded.</p>
+            </section>
+
             <section v-for="campaign in detail.campaigns" :key="campaign.id" class="rounded-lg border border-heymo-line p-4">
               <div class="flex items-center justify-between gap-3">
                 <h3 class="text-xs font-bold uppercase tracking-[0.08em] text-heymo-muted">Campaign #{{ campaign.id }}</h3>
@@ -188,12 +209,47 @@
           </div>
         </div>
       </aside>
+
+      <Transition name="dialog">
+        <div v-if="showQuestionsDialog" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <button class="absolute inset-0 bg-heymo-navy/45" aria-label="Close questions" @click="showQuestionsDialog = false"></button>
+          <div class="relative w-full max-w-lg rounded-lg bg-white p-5 shadow-xl" role="dialog" aria-modal="true" aria-label="Questions and answers">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-sm font-bold uppercase tracking-[0.08em] text-heymo-muted">Questions &amp; answers</h3>
+              <button class="btn btn-square btn-ghost btn-sm" aria-label="Close" @click="showQuestionsDialog = false">
+                <X :size="18" weight="bold" aria-hidden="true" />
+              </button>
+            </div>
+            <div class="mt-4 max-h-[70vh] space-y-3 overflow-y-auto">
+              <div v-for="answer in detail?.questions ?? []" :key="answer.question" class="rounded-md border border-heymo-line p-3">
+                <p class="text-[11px] font-bold uppercase tracking-[0.08em] text-heymo-muted">
+                  {{ answer.question }}
+                </p>
+                <ul v-if="answer.options" class="mt-2 space-y-1.5 text-sm">
+                  <li
+                    v-for="option in answer.options"
+                    :key="option.label"
+                    class="flex items-center gap-2"
+                    :class="option.selected ? 'font-bold text-heymo-navy' : 'text-heymo-muted'"
+                  >
+                    <Check :size="14" weight="bold" aria-hidden="true" class="shrink-0" :class="option.selected ? 'text-heymo-red' : 'opacity-0'" />
+                    {{ option.label }}
+                  </li>
+                </ul>
+                <p v-else class="mt-2 text-sm leading-6 text-heymo-ink">
+                  {{ answer.answer }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
     </div>
   </Transition>
 </template>
 
 <script setup lang="ts">
-import { PhEye as Eye, PhX as X } from "@phosphor-icons/vue";
+import { PhCaretRight as CaretRight, PhCheck as Check, PhEye as Eye, PhX as X } from "@phosphor-icons/vue";
 import { computed, ref, watch } from "vue";
 import { ApiError, apiFetch } from "../../lib/auth";
 import EmailPreviewPane from "./EmailPreviewPane.vue";
@@ -219,6 +275,7 @@ const errorMessage = ref("");
 const preview = ref<EmailPreviewPayload | null>(null);
 const previewLoading = ref(false);
 const previewError = ref("");
+const showQuestionsDialog = ref(false);
 
 const drawerTitle = computed(() => detail.value?.visitor?.preferred_name || detail.value?.visitor?.email || "Audit trail");
 
@@ -229,6 +286,7 @@ watch(
     errorMessage.value = "";
     preview.value = null;
     previewError.value = "";
+    showQuestionsDialog.value = false;
 
     if (id === null) {
       return;
@@ -403,5 +461,15 @@ function messageStatusClass(status: string): string {
 .drawer-enter-from aside,
 .drawer-leave-to aside {
   transform: translateX(100%);
+}
+
+.dialog-enter-active,
+.dialog-leave-active {
+  transition: opacity 180ms ease;
+}
+
+.dialog-enter-from,
+.dialog-leave-to {
+  opacity: 0;
 }
 </style>

@@ -105,6 +105,17 @@ export type CampaignDetail = {
   messages: CampaignMessageDetail[];
 };
 
+export type QuizOption = {
+  label: string;
+  selected: boolean;
+};
+
+export type QuizAnswer = {
+  question: string;
+  answer: string;
+  options: QuizOption[] | null;
+};
+
 export type AuditDetail = {
   id: number;
   captured_at: string | null;
@@ -118,6 +129,7 @@ export type AuditDetail = {
   sub_interest: string;
   trigger: string;
   concern: string;
+  questions: QuizAnswer[];
   visitor: AuditVisitor & { created_at: string | null };
   angle: {
     id: number;

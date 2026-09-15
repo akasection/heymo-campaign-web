@@ -154,6 +154,85 @@ class AuditController extends Controller
     }
 
     /**
+     * Resolve the landing quiz answers into a question/answer list for the
+     * audit trail. Choice values are mapped back to their human-readable
+     * labels (with the selected option flagged); the free-text concern is
+     * included as its own question.
+     *
+     * @return array<int, array{question: string, answer: string, options: array<int, array{label: string, selected: bool}>|null}>
+     */
+    private function quizAnswers(IntentResponse $intent): array
+    {
+        $quiz = config("landing-pages.{$intent->landing_identifier}.quiz", []);
+
+        if (! is_array($quiz)) {
+            return [];
+        }
+
+        $answers = [];
+
+        foreach (['sub_interest', 'trigger'] as $field) {
+            $question = $quiz[$field]['label'] ?? null;
+            $rawOptions = $quiz[$field]['options'] ?? [];
+            $value = $intent->{$field};
+
+            if (! is_string($question) || $question === '') {
+                continue;
+            }
+
+            $options = $this->optionList($rawOptions, $value);
+            $answer = $value;
+
+            foreach ($options as $option) {
+                if ($option['selected']) {
+                    $answer = $option['label'];
+
+                    break;
+                }
+            }
+
+            $answers[] = [
+                'question' => $question,
+                'answer' => is_string($answer) ? $answer : '',
+                'options' => $options,
+            ];
+        }
+
+        $concernQuestion = $quiz['concern_label'] ?? null;
+
+        if (is_string($concernQuestion) && $concernQuestion !== '' && is_string($intent->concern) && $intent->concern !== '') {
+            $answers[] = [
+                'question' => $concernQuestion,
+                'answer' => $intent->concern,
+                'options' => null,
+            ];
+        }
+
+        return $answers;
+    }
+
+    /**
+     * @param  array<int, mixed>  $options
+     * @return array<int, array{label: string, selected: bool}>
+     */
+    private function optionList(array $options, ?string $value): array
+    {
+        return array_values(array_filter(array_map(
+            function (mixed $option) use ($value): ?array {
+                if (! is_array($option) || ! is_string($option['label'] ?? null)) {
+                    return null;
+                }
+
+                return [
+                    'label' => $option['label'],
+                    'selected' => ($option['value'] ?? null) === $value,
+                ];
+            },
+            $options,
+        )));
+    }
+
+    /**
      * @return array<int, int>
      */
     private function organizationBrandIds(Request $request): array
@@ -212,6 +291,7 @@ class AuditController extends Controller
             'sub_interest' => $intent->sub_interest,
             'trigger' => $intent->trigger,
             'concern' => $intent->concern,
+            'questions' => $this->quizAnswers($intent),
             'visitor' => [
                 'id' => $intent->visitor?->id,
                 'preferred_name' => $intent->visitor?->preferred_name,
