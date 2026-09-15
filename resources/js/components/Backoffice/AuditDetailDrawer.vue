@@ -211,7 +211,7 @@
       </aside>
 
       <Transition name="dialog">
-        <div v-if="showQuestionsDialog" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div v-if="showQuestionsDialog" class="fixed inset-0 z-60 flex items-center justify-center p-4">
           <button class="absolute inset-0 bg-heymo-navy/45" aria-label="Close questions" @click="showQuestionsDialog = false"></button>
           <div class="relative w-full max-w-lg rounded-lg bg-white p-5 shadow-xl" role="dialog" aria-modal="true" aria-label="Questions and answers">
             <div class="flex items-center justify-between gap-3">
