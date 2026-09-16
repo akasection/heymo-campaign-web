@@ -18,6 +18,7 @@ type AngleDraft = {
   offer: string;
   tone: string;
   next_step: string;
+  next_step_url: string;
 };
 
 type AnglePayload = AngleDraft;

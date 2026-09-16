@@ -44,9 +44,15 @@
               @endif
 
               @if ($nextStep)
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;background:#f2faf8;border:1px solid {{ $secondaryColor }};">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
                   <tr>
-                    <td style="padding:16px 20px;color:#17233d;font-size:{{ $bodyFontSize }};line-height:1.6;"><strong>Next step:</strong> {{ $nextStep }}</td>
+                    <td align="center">
+                      @if ($nextStepUrl)
+                        <a href="{{ $nextStepUrl }}" style="display:inline-block;padding:14px 28px;background:{{ $primaryColor }};color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;border-radius:8px;">{{ $nextStep }}</a>
+                      @else
+                        <strong style="display:inline-block;color:{{ $primaryColor }};font-size:{{ $bodyFontSize }};">{{ $nextStep }}</strong>
+                      @endif
+                    </td>
                   </tr>
                 </table>
               @endif

@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Resources\AuditRecordResource;
 use App\Models\Brand;
 use App\Models\Campaign;
+use App\Models\GenerationAttempt;
 use App\Models\IntentResponse;
 use App\Models\LandingEvent;
+use App\Services\CampaignMailComposer;
+use App\Services\CampaignResponseParser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -14,6 +17,11 @@ use Illuminate\Support\Collection;
 
 class AuditController extends Controller
 {
+    public function __construct(
+        private CampaignResponseParser $parser,
+        private CampaignMailComposer $composer,
+    ) {}
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $brandIds = $this->organizationBrandIds($request);
@@ -78,6 +86,155 @@ class AuditController extends Controller
         ]);
     }
 
+    public function messagePreview(Request $request, int $intentResponse, int $campaignMessage): JsonResponse
+    {
+        $campaign = $this->previewCampaign($request, $intentResponse);
+        $message = $campaign->messages()->findOrFail($campaignMessage);
+
+        return response()->json([
+            'data' => $this->composer->composePreview(
+                [
+                    'position' => $message->sequence_position,
+                    'subject' => $message->subject,
+                    'headline' => $message->headline,
+                    'body_paragraphs' => $message->body_paragraphs ?? [],
+                    'evidence_ids' => $message->evidence_ids ?? [],
+                    'offer' => $message->offer,
+                    'next_step' => $message->next_step,
+                    'next_step_url' => $message->next_step_url,
+                ],
+                $campaign,
+                $campaign->brand,
+                $campaign->angle,
+                $campaign->visitor,
+                '#',
+            ),
+        ]);
+    }
+
+    public function attemptPreview(Request $request, int $intentResponse, int $generationAttempt, int $position): JsonResponse
+    {
+        $campaign = $this->previewCampaign($request, $intentResponse);
+        $attempt = $campaign->generationAttempts()->findOrFail($generationAttempt);
+        $messages = $this->attemptMessages($attempt);
+
+        if ($messages === null) {
+            return response()->json(['message' => 'This attempt has no parseable output.'], 422);
+        }
+
+        $message = collect($messages)->firstWhere('position', $position);
+
+        if (! is_array($message)) {
+            return response()->json(['message' => 'Message position not found in this attempt.'], 404);
+        }
+
+        return response()->json([
+            'data' => $this->composer->composePreview(
+                $message,
+                $campaign,
+                $campaign->brand,
+                $campaign->angle,
+                $campaign->visitor,
+                '#',
+            ),
+        ]);
+    }
+
+    /**
+     * Load a campaign that belongs to the authenticated organization for a
+     * given intent response, with the relationships needed to compose email
+     * previews.
+     */
+    private function previewCampaign(Request $request, int $intentResponse): Campaign
+    {
+        $organizationId = (int) $request->user()->organization_id;
+
+        return Campaign::query()
+            ->where('intent_response_id', $intentResponse)
+            ->whereHas('angle.brand', fn ($q) => $q->where('organization_id', $organizationId))
+            ->with(['brand', 'angle', 'visitor', 'messages', 'generationAttempts'])
+            ->firstOrFail();
+    }
+
+    /**
+     * Resolve the landing quiz answers into a question/answer list for the
+     * audit trail. Choice values are mapped back to their human-readable
+     * labels (with the selected option flagged); the free-text concern is
+     * included as its own question.
+     *
+     * @return array<int, array{question: string, answer: string, options: array<int, array{label: string, selected: bool}>|null}>
+     */
+    private function quizAnswers(IntentResponse $intent): array
+    {
+        $quiz = config("landing-pages.{$intent->landing_identifier}.quiz", []);
+
+        if (! is_array($quiz)) {
+            return [];
+        }
+
+        $answers = [];
+
+        foreach (['sub_interest', 'trigger'] as $field) {
+            $question = $quiz[$field]['label'] ?? null;
+            $rawOptions = $quiz[$field]['options'] ?? [];
+            $value = $intent->{$field};
+
+            if (! is_string($question) || $question === '') {
+                continue;
+            }
+
+            $options = $this->optionList($rawOptions, $value);
+            $answer = $value;
+
+            foreach ($options as $option) {
+                if ($option['selected']) {
+                    $answer = $option['label'];
+
+                    break;
+                }
+            }
+
+            $answers[] = [
+                'question' => $question,
+                'answer' => is_string($answer) ? $answer : '',
+                'options' => $options,
+            ];
+        }
+
+        $concernQuestion = $quiz['concern_label'] ?? null;
+
+        if (is_string($concernQuestion) && $concernQuestion !== '' && is_string($intent->concern) && $intent->concern !== '') {
+            $answers[] = [
+                'question' => $concernQuestion,
+                'answer' => $intent->concern,
+                'options' => null,
+            ];
+        }
+
+        return $answers;
+    }
+
+    /**
+     * @param  array<int, mixed>  $options
+     * @return array<int, array{label: string, selected: bool}>
+     */
+    private function optionList(array $options, ?string $value): array
+    {
+        return array_values(array_filter(array_map(
+            function (mixed $option) use ($value): ?array {
+                if (! is_array($option) || ! is_string($option['label'] ?? null)) {
+                    return null;
+                }
+
+                return [
+                    'label' => $option['label'],
+                    'selected' => ($option['value'] ?? null) === $value,
+                ];
+            },
+            $options,
+        )));
+    }
+
     /**
      * @return array<int, int>
      */
@@ -94,6 +251,28 @@ class AuditController extends Controller
             ->pluck('id')
             ->map(fn ($id) => (int) $id)
             ->all();
+    }
+
+    /**
+     * Reconstruct the messages a model attempt produced from its stored raw
+     * response. Returns null when the output cannot be parsed (for example a
+     * malformed model response), so the UI can fall back gracefully.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    private function attemptMessages(GenerationAttempt $attempt): ?array
+    {
+        $raw = $attempt->raw_response['content'] ?? '';
+
+        if (! is_string($raw) || trim($raw) === '') {
+            return null;
+        }
+
+        try {
+            return $this->parser->parse($raw)['messages'];
+        } catch (\RuntimeException) {
+            return null;
+        }
     }
 
     /**
@@ -115,6 +294,7 @@ class AuditController extends Controller
             'sub_interest' => $intent->sub_interest,
             'trigger' => $intent->trigger,
             'concern' => $intent->concern,
+            'questions' => $this->quizAnswers($intent),
             'visitor' => [
                 'id' => $intent->visitor?->id,
                 'preferred_name' => $intent->visitor?->preferred_name,
@@ -158,12 +338,14 @@ class AuditController extends Controller
                 'prompt_version' => $campaign->prompt_version,
                 'created_at' => $campaign->created_at?->toIso8601String(),
                 'generation_attempts' => $campaign->generationAttempts?->map(fn ($attempt) => [
+                    'id' => $attempt->id,
                     'attempt_number' => $attempt->attempt_number,
                     'provider' => $attempt->provider,
                     'model' => $attempt->model,
                     'prompt_version' => $attempt->prompt_version,
                     'status' => $attempt->status,
                     'violations' => $attempt->violations,
+                    'parsed_messages' => $this->attemptMessages($attempt),
                     'error_message' => $attempt->error_message,
                     'created_at' => $attempt->created_at?->toIso8601String(),
                 ])->values()->all() ?? [],
@@ -172,6 +354,9 @@ class AuditController extends Controller
                     'sequence_position' => $message->sequence_position,
                     'role' => $message->role,
                     'subject' => $message->subject,
+                    'headline' => $message->headline,
+                    'body_paragraphs' => $message->body_paragraphs,
+                    'evidence_ids' => $message->evidence_ids,
                     'status' => $message->status,
                     'scheduled_at' => $message->scheduled_at?->toIso8601String(),
                     'sent_at' => $message->sent_at?->toIso8601String(),

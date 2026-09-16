@@ -57,13 +57,24 @@ export type EngagementEventDetail = {
   occurred_at: string | null;
 };
 
+export type ParsedMessage = {
+  position?: number;
+  role?: string;
+  subject: string;
+  headline: string;
+  body_paragraphs: string[];
+  evidence_ids?: string[];
+};
+
 export type GenerationAttemptDetail = {
+  id: number;
   attempt_number: number;
   provider: string | null;
   model: string | null;
   prompt_version: string | null;
   status: string;
   violations: string[] | null;
+  parsed_messages: ParsedMessage[] | null;
   error_message: string | null;
   created_at: string | null;
 };
@@ -73,6 +84,9 @@ export type CampaignMessageDetail = {
   sequence_position: number;
   role: string;
   subject: string;
+  headline: string;
+  body_paragraphs: string[];
+  evidence_ids: string[];
   status: string;
   scheduled_at: string | null;
   sent_at: string | null;
@@ -91,6 +105,17 @@ export type CampaignDetail = {
   messages: CampaignMessageDetail[];
 };
 
+export type QuizOption = {
+  label: string;
+  selected: boolean;
+};
+
+export type QuizAnswer = {
+  question: string;
+  answer: string;
+  options: QuizOption[] | null;
+};
+
 export type AuditDetail = {
   id: number;
   captured_at: string | null;
@@ -104,6 +129,7 @@ export type AuditDetail = {
   sub_interest: string;
   trigger: string;
   concern: string;
+  questions: QuizAnswer[];
   visitor: AuditVisitor & { created_at: string | null };
   angle: {
     id: number;
@@ -137,4 +163,18 @@ export type AuditDetail = {
 
 export type AuditDetailResponse = {
   data: AuditDetail;
+};
+
+export type EmailPreviewResponse = {
+  data: {
+    subject: string;
+    html: string;
+  };
+};
+
+export type EmailPreviewPayload = {
+  label: string;
+  subject: string;
+  html: string;
+  violations: string[] | null;
 };

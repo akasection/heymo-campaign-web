@@ -77,7 +77,7 @@ class CampaignGenerator
             return $campaign;
         }
 
-        $this->persistMessages($campaign, $messages);
+        $this->persistMessages($campaign, $messages, $angle);
         $campaign->update([
             'status' => Campaign::STATUS_GENERATED,
             'prompt_version' => $prompt['version'],
@@ -180,7 +180,7 @@ class CampaignGenerator
     /**
      * @param  array<int, array<string, mixed>>  $messages
      */
-    private function persistMessages(Campaign $campaign, array $messages): void
+    private function persistMessages(Campaign $campaign, array $messages, Angle $angle): void
     {
         foreach ($messages as $message) {
             $campaign->messages()->create([
@@ -191,6 +191,9 @@ class CampaignGenerator
                 'headline' => $message['headline'],
                 'body_paragraphs' => $message['body_paragraphs'],
                 'evidence_ids' => $message['evidence_ids'],
+                'offer' => $message['position'] === 3 ? $angle->offer : null,
+                'next_step' => $message['position'] === 2 ? $angle->next_step : null,
+                'next_step_url' => $message['position'] === 2 ? $angle->next_step_url : null,
                 'open_token' => (string) Str::uuid(),
                 'status' => CampaignMessage::STATUS_GENERATED,
             ]);

@@ -19,8 +19,8 @@ class CampaignMailComposerTest extends TestCase
 
         $result = $composer->compose(
             new CampaignMessage([
-                'sequence_position' => 3,
-                'subject' => 'A follow-up about your panel',
+                'sequence_position' => 2,
+                'subject' => 'How the process works, step by step',
                 'headline' => 'Your next step, explained',
                 'body_paragraphs' => ['First paragraph.', 'Second paragraph.'],
                 'evidence_ids' => [],
@@ -35,28 +35,32 @@ class CampaignMailComposerTest extends TestCase
                 'heading_font' => 'space_grotesk',
                 'body_font' => 'public_sans',
             ]),
-            new Angle(['offer' => 'The panel price is shown before checkout.', 'next_step' => 'Review the panel details and decide.']),
+            new Angle([
+                'offer' => 'The panel price is shown before checkout.',
+                'next_step' => 'Review the panel details and decide.',
+                'next_step_url' => 'https://example.test/order',
+            ]),
             new Visitor(['email' => 'remy@example.test']),
             'https://example.test/unsubscribe/1?sig=abc',
         );
 
-        $this->assertSame('A follow-up about your panel', $result['subject']);
+        $this->assertSame('How the process works, step by step', $result['subject']);
         $this->assertStringContainsString('Your next step, explained', $result['html']);
         $this->assertStringContainsString('First paragraph.', $result['html']);
-        $this->assertStringContainsString('The panel price is shown before checkout.', $result['html']);
-        $this->assertStringContainsString('Next step:', $result['html']);
         $this->assertStringContainsString('Review the panel details and decide.', $result['html']);
+        $this->assertStringContainsString('https://example.test/order', $result['html']);
+        $this->assertStringNotContainsString('The panel price is shown before checkout.', $result['html']);
         $this->assertStringContainsString('Take care', $result['html']);
         $this->assertStringContainsString('The Lexical Labs team', $result['html']);
         $this->assertStringContainsString((string) config('delivery.compliance_text'), $result['html']);
         $this->assertStringContainsString('https://example.test/unsubscribe/1?sig=abc', $result['html']);
     }
 
-    public function test_offer_and_next_step_only_appear_on_the_final_beat(): void
+    public function test_offer_and_cta_land_on_their_designated_beats(): void
     {
         $composer = new CampaignMailComposer(new SignOffResolver);
 
-        $result = $composer->compose(
+        $promise = $composer->compose(
             new CampaignMessage([
                 'sequence_position' => 1,
                 'subject' => 'Welcome',
@@ -66,13 +70,65 @@ class CampaignMailComposerTest extends TestCase
             ]),
             new Campaign(['presentation_profile' => []]),
             new Brand(['name' => 'Lexical Labs', 'tone_preset' => 'informal', 'tense_preset' => 'relaxed']),
-            new Angle(['offer' => 'Offer text.', 'next_step' => 'CTA text.']),
+            new Angle([
+                'offer' => 'Offer text.',
+                'next_step' => 'CTA text.',
+                'next_step_url' => 'https://example.test/order',
+            ]),
             new Visitor(['email' => 'remy@example.test']),
             'https://example.test/unsubscribe/1?sig=abc',
         );
 
-        $this->assertStringNotContainsString('Offer text.', $result['html']);
-        $this->assertStringNotContainsString('Next step:', $result['html']);
-        $this->assertStringContainsString('https://example.test/unsubscribe/1?sig=abc', $result['html']);
+        $this->assertStringNotContainsString('Offer text.', $promise['html']);
+        $this->assertStringNotContainsString('CTA text.', $promise['html']);
+        $this->assertStringNotContainsString('https://example.test/order', $promise['html']);
+        $this->assertStringContainsString('https://example.test/unsubscribe/1?sig=abc', $promise['html']);
+
+        $final = $composer->compose(
+            new CampaignMessage([
+                'sequence_position' => 3,
+                'subject' => 'One more thing',
+                'headline' => 'Keeping this simple',
+                'body_paragraphs' => ['Final paragraph.'],
+                'evidence_ids' => [],
+            ]),
+            new Campaign(['presentation_profile' => []]),
+            new Brand(['name' => 'Lexical Labs', 'tone_preset' => 'informal', 'tense_preset' => 'relaxed']),
+            new Angle([
+                'offer' => 'Offer text.',
+                'next_step' => 'CTA text.',
+                'next_step_url' => 'https://example.test/order',
+            ]),
+            new Visitor(['email' => 'remy@example.test']),
+            'https://example.test/unsubscribe/1?sig=abc',
+        );
+
+        $this->assertStringContainsString('Offer text.', $final['html']);
+        $this->assertStringNotContainsString('CTA text.', $final['html']);
+        $this->assertStringNotContainsString('https://example.test/order', $final['html']);
+    }
+
+    public function test_empty_next_step_url_renders_plain_text_cta(): void
+    {
+        $composer = new CampaignMailComposer(new SignOffResolver);
+
+        $result = $composer->compose(
+            new CampaignMessage([
+                'sequence_position' => 2,
+                'subject' => 'How it works',
+                'headline' => 'A closer look',
+                'body_paragraphs' => ['First paragraph.'],
+                'evidence_ids' => [],
+            ]),
+            new Campaign(['presentation_profile' => []]),
+            new Brand(['name' => 'Lexical Labs', 'tone_preset' => 'informal', 'tense_preset' => 'relaxed', 'primary_color' => '#2E5BFF']),
+            new Angle(['offer' => 'Offer text.', 'next_step' => 'CTA text.', 'next_step_url' => null]),
+            new Visitor(['email' => 'remy@example.test']),
+            'https://example.test/unsubscribe/1?sig=abc',
+        );
+
+        $this->assertStringContainsString('CTA text.', $result['html']);
+        $this->assertStringNotContainsString('href="https://example.test/order"', $result['html']);
+        $this->assertStringContainsString('<strong', $result['html']);
     }
 }

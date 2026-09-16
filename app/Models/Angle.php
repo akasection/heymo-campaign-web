@@ -27,6 +27,7 @@ class Angle extends Model
         'offer',
         'tone',
         'next_step',
+        'next_step_url',
     ];
 
     protected $casts = [

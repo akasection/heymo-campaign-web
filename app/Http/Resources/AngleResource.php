@@ -53,6 +53,7 @@ class AngleResource extends JsonResource
             'tone_label' => $tone['label'] ?? $this->tone,
             'tone_description' => $tone['description'] ?? null,
             'next_step' => $this->next_step,
+            'next_step_url' => $this->next_step_url ?? '',
             'proof_state' => filled($this->proof) ? 'configured' : 'missing',
             'archived_at' => $this->deleted_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),

@@ -19,7 +19,7 @@ class GenerateCampaign implements ShouldQueue
 
     public int $tries = 3;
 
-    public int $timeout = 120;
+    public int $timeout = 420;
 
     public int $backoff = 10;
 

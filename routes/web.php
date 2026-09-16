@@ -55,4 +55,5 @@ Route::middleware('auth')->group(function () {
     Route::view('admin/locations', 'Backoffice.dashboard')->name('admin.locations');
     Route::view('admin/reports', 'Backoffice.dashboard')->name('admin.reports');
     Route::view('admin/audit', 'Backoffice.dashboard')->name('admin.audit');
+    Route::view('admin/audit/{id}', 'Backoffice.dashboard')->whereNumber('id')->name('admin.audit.detail');
 });
