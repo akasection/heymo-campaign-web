@@ -1,4 +1,4 @@
-# **(Rashemi) Senior Full Stack Developer \-- Take-Home Assignment**
+# Take-Home Assignment**
 
 ## **Overview**
 
